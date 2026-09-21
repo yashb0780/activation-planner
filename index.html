@@ -116,8 +116,8 @@
     display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em;
     color: var(--faint); font-weight: 650; margin-bottom: .2rem;
   }
-  ul.ev, ul.dep { margin: .2rem 0; padding-left: 1.1rem; }
-  ul.ev li, ul.dep li { margin: .3rem 0; font-size: .9rem; }
+  ul.ev, ul.dep, ol.dep { margin: .2rem 0; padding-left: 1.1rem; }
+  ul.ev li, ul.dep li, ol.dep li { margin: .3rem 0; font-size: .9rem; }
   ul.ev li { color: var(--muted); }
   ul.ev li q { color: var(--ink); font-style: italic; }
   .unk { color: var(--unknown); font-weight: 650; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
@@ -155,7 +155,7 @@
 
 <header>
   <h1>Halden Retail Group</h1>
-  <p class="sub">Activation board and draft 30-day plan &middot; generated from a filled handoff and the ITSM product config</p>
+  <p class="sub">Activation board and draft 30-day plan &middot; generated from a filled sales handoff and the ITSM product config</p>
 </header>
 
 <p class="notice">
@@ -167,6 +167,7 @@
   <ul>
     <li><a href="#runway">Runway</a></li>
     <li><a href="#open-questions">Open questions</a></li>
+    <li><a href="#discovery-tasks">Discovery tasks</a></li>
     <li><a href="#conflicts">Conflicts</a></li>
     <li><a href="#board">Activation board</a></li>
     <li><a href="#slip">Slip check</a></li>
@@ -178,18 +179,27 @@
 
 <section id="runway">
   <h2>The job, and the runway</h2>
+  <p class="sub">Handoff dated 16 September 2026, filled by D. Osei (rep) and K. Varga (SE),
+  received by M. Lindqvist (implementation lead).</p>
   <blockquote>
     "We are merging the store-support desk and the head-office IT desk into one queue
     before the new distribution centre opens in March. Right now a store manager emails
     whoever they last spoke to, and nobody can tell me how many open requests we have."
   </blockquote>
+  <p><strong>Why now:</strong> Dana asked for the open-request count at the July board meeting,
+  and nobody could produce one for store support. <span class="step-note">(Commercial call,
+  4 September 2026.)</span></p>
   <div class="callout">
     <p><strong>The calendar, before anything else.</strong> Contract start (1 October 2026)
     to target go-live (12 January 2027) is 15 weeks. The handoff states a hard freeze from
     1 December to 6 January &mdash; five of those weeks.</p>
     <p>Working runway is <strong>nine weeks</strong>, plus six days after the freeze lifts.
     Every lead time below should be read against nine weeks, not fifteen.</p>
+    <p><strong>Fixed or preferred:</strong> <span class="unk">UNKNOWN</span>. Dana describes the date
+    as fixed. Priya described it as "what we are aiming for".</p>
   </div>
+  <p class="step-note"><strong>Unsourced answers that decisions rest on:</strong> the target date, what
+  is driving it, and "one shared process" have no source in the handoff. Confirm each at kickoff.</p>
 </section>
 
 <section id="open-questions">
@@ -202,45 +212,76 @@
         <tr><th>Question</th><th>Blocks</th><th>Date at risk</th><th>Ask</th></tr>
       </thead>
       <tbody>
-        <tr><td>Is a security review required before deployment, and who owns sign-off?</td><td>Discovery &mdash; the config names a passed review as its first dependency</td><td>Everything downstream: asset management, change management</td><td>Dana Whitfield &mdash; handoff names no security contact</td></tr>
-        <tr><td>Who is the infrastructure / security contact?</td><td>Discovery &mdash; config notes this owner is almost never the ITSM project owner</td><td>Same</td><td>Dana Whitfield (<em>unassigned</em> in handoff)</td></tr>
-        <tr><td>Are there restrictions on agents, scanners, or outbound connections?</td><td>Discovery &mdash; scanner host and agent deployment</td><td>Same</td><td>Follows from the security contact</td></tr>
-        <tr><td>Who holds credentials for the store and DC networks, HR system, endpoint tooling?</td><td>Discovery, and any automation reaching another system</td><td>Discovery start date; automation coverage</td><td>Priya Raman, then whoever she names</td></tr>
-        <tr><td>Does the directory licence tier include automated user provisioning?</td><td>Cross-cutting prerequisites, then catalog visibility rules</td><td>Catalog go-live</td><td>Priya Raman</td></tr>
-        <tr><td>Data residency or regional hosting requirements?</td><td>Deployment itself</td><td>All dates, if the answer is non-standard</td><td>Dana Whitfield</td></tr>
-        <tr><td>Average time to first response &mdash; no baseline captured</td><td>Workflow automation evidence, measured against a pre-automation baseline</td><td>Not a date. A measurement window: capture before configuring, or the evidence has nothing to compare against.</td><td>Priya Raman, week one</td></tr>
-        <tr><td>Store ticket volume &mdash; no baseline captured</td><td>Same, plus catalog adoption share</td><td>Same</td><td>Tomas Berg, who has not been in a call</td></tr>
-        <tr><td>Changes per month and emergency share &mdash; no baseline, no process</td><td>Change management evidence, a ratio that must be falling</td><td>Phase two</td><td>Priya Raman</td></tr>
-        <tr><td>How many of the ~200 wiki pages are current?</td><td>Knowledge base seed set</td><td>KB timeline</td><td>Priya Raman</td></tr>
+        <tr><td>Is a security review required before deployment, and who owns sign-off?</td><td>Discovery &mdash; the config names a passed review as its first dependency</td><td>Everything downstream: asset management, change management</td><td><em>Unassigned</em> &mdash; Dana Whitfield</td></tr>
+        <tr><td>Who is the security contact?</td><td>Discovery &mdash; config notes the infrastructure owner is almost never the ITSM project owner</td><td>Same</td><td><em>Unassigned</em> &mdash; Dana Whitfield</td></tr>
+        <tr><td>Are there restrictions on installing software or outbound connections?</td><td>Discovery &mdash; scanner host and agent deployment</td><td>Same</td><td><em>Unassigned</em> &mdash; follows from the security contact</td></tr>
+        <tr><td>Who holds the credentials for each system?</td><td>Discovery, and the joiners-and-leavers automation</td><td>Discovery start date; automation beyond internal routing</td><td>Priya Raman, then whoever she names</td></tr>
+        <tr><td>Who is the identity / IT contact?</td><td>Cross-cutting prerequisites &mdash; single sign-on is required</td><td>Catalog go-live</td><td><em>Unassigned</em> &mdash; Dana Whitfield</td></tr>
+        <tr><td>Is automated user provisioning required, and does their licence tier include it?</td><td>Cross-cutting prerequisites, then catalog and knowledge base visibility rules</td><td>Catalog go-live</td><td>Priya Raman</td></tr>
+        <tr><td>Data residency or regional hosting requirements?</td><td>Deployment itself</td><td>All dates, if the answer is non-standard</td><td><em>Unassigned</em> &mdash; Dana Whitfield</td></tr>
         <tr><td>Who will be the day-to-day admin?</td><td>Cross-cutting prerequisites &mdash; config asks for budgeted time, not a volunteer</td><td>Week one, everything</td><td>Priya Raman</td></tr>
+        <tr><td>Is 12 January 2027 fixed or preferred?</td><td>The whole sequence</td><td>The target date itself</td><td>Dana Whitfield and Priya Raman, together</td></tr>
+        <tr><td>Has anyone outside the buying team agreed to this?</td><td>Taxonomy, and so the catalog and automation</td><td>Catalog build, weeks 2 to 3</td><td>Tomas Berg, introduced by Priya Raman</td></tr>
+        <tr><td>Must anything in workflow automation be live by day 30?</td><td>Workflow automation</td><td>Day 30</td><td>Priya Raman</td></tr>
+        <tr><td>What is out of scope for workflow automation and for change management?</td><td>Those two modules</td><td>Scope of each, from week 1</td><td>Priya Raman</td></tr>
+        <tr><td>Average time to first response &mdash; no baseline</td><td>Workflow automation evidence, measured against a pre-automation baseline</td><td>Not a date. A measurement window: capture before configuring, or the evidence has nothing to compare against.</td><td>Priya Raman, week one</td></tr>
+        <tr><td>Store ticket volume &mdash; no baseline</td><td>Same, plus catalog adoption share</td><td>Same</td><td>Tomas Berg</td></tr>
+        <tr><td>Changes per month and emergency share &mdash; no baseline, no process</td><td>Change management evidence, a ratio that must be falling</td><td>Phase two</td><td>Priya Raman</td></tr>
+        <tr><td>How many of the ~200 wiki pages are current, and when was it last reviewed?</td><td>Knowledge base seed set</td><td>Knowledge base timeline</td><td>Priya Raman</td></tr>
+        <tr><td>Alternatives they considered</td><td>No module</td><td>None. Not yet a finding.</td><td>D. Osei</td></tr>
+        <tr><td>Languages or frameworks we have to work with</td><td>No module identified</td><td>None. Not yet a finding.</td><td>K. Varga</td></tr>
       </tbody>
     </table>
   </div>
   <div class="callout">
     <p>Four of the five discovery dependencies in the config are <span class="unk">UNKNOWN</span>
     in this handoff, and three of them route to a person who has been on one commercial call.
-    That is the headline finding on this account.</p>
+    That is still the headline finding on this account.</p>
+  </div>
+</section>
+
+<section id="discovery-tasks">
+  <h2>Discovery tasks: requests with no volume</h2>
+  <p class="sub">Requests are built in volume order. A request with no volume is not guessed into a
+  rank. It becomes a week-one task to find out the volume, with an owner.</p>
+  <div class="scroll">
+    <table class="tight">
+      <thead><tr><th>Module</th><th>Request, in their words</th><th>Owner</th></tr></thead>
+      <tbody>
+        <tr><td>Service catalog</td><td>"Till and printer faults in the stores"</td><td>Tomas Berg</td></tr>
+        <tr><td>Knowledge base</td><td>"Get the store sheets off the back-room wall and onto a screen"</td><td>Tomas Berg</td></tr>
+        <tr><td>Discovery</td><td>"Find out what is actually on the store networks"</td><td><em>Unassigned</em> &mdash; Dana Whitfield</td></tr>
+        <tr><td>Change management</td><td>"Sign-off before anyone touches a store network during trading hours"</td><td>Priya Raman</td></tr>
+        <tr><td>Change management</td><td>"The December freeze written down somewhere other than my head"</td><td>Priya Raman</td></tr>
+      </tbody>
+    </table>
   </div>
 </section>
 
 <section id="conflicts">
   <h2>Conflicts</h2>
   <ol class="conflicts">
-    <li><strong>"Discovery will give you an accurate asset list in the first month" &mdash; recorded,
-      said to the technical owner, and not deliverable.</strong> The config puts discovery at 8 to 16
-      weeks and calls it the longest pole in most deployments. Here the clock has not started, because
-      every credential and the security review are <span class="unk">UNKNOWN</span>. Raise it in week
-      one. It is recorded on a call, so it will resurface.</li>
+    <li><strong>Asset management: a day-30 "yes" against an 8-to-16-week gate.</strong> The handoff says
+      asset management must have something live by day 30 &mdash; "Expects the asset list promised in the
+      demo". That promise is the recorded commitment "Discovery will give you an accurate asset list in the
+      first month". The config puts discovery at 8 to 16 weeks, and lists a populated asset list as
+      <em>not</em> evidence. The clock has not started, because the security review and every credential are
+      <span class="unk">UNKNOWN</span>. <strong>The lead time does not support this expectation.</strong>
+      Raise it in week one. It is recorded twice, so it will resurface.</li>
     <li><strong>Fixed or preferred is unresolved between the two people who matter.</strong> Dana calls
       12 January fixed and has told the board. Priya calls the same date what they are aiming for. They
       have not said this to each other in front of us. Until that is settled there is no agreed target
       date, only two.</li>
+    <li><strong>"One process" is stated, and the handoff then describes two.</strong> Store support is
+      phone-first and same-shift; head office is ticket-first and next-day. One workspace or two is
+      undecided. Taxonomy changes after catalog items are built mean rebuilding them, so this settles in
+      week 2, before build.</li>
+    <li><strong>The technical owner has about 4 hours a week</strong>, by her own estimate, with no
+      backfill, and no day-to-day admin is named. The config asks for an admin with time actually
+      budgeted, not an interested volunteer. Raise it with Dana in week one.</li>
     <li><strong>The success definition and the retained macro contradict each other.</strong> Success is
       Dana no longer receiving the weekly spreadsheet. Priya expects the spreadsheet macro to keep
       running. One has to give, and it is cheaper to decide at kickoff than at the day-90 review.</li>
-    <li><strong>"One process" is stated, and the handoff then describes two.</strong> Store support is
-      phone-first and same-shift; head office is ticket-first and next-day. Taxonomy changes after
-      catalog items are built mean rebuilding them, so this settles before build.</li>
     <li><strong>The legacy store desk tool expires 31 March 2027 &mdash; a harder date than the
       go-live</strong>, recorded only in the handoff notes. It is the real backstop, and it sits after
       the date everyone is discussing.</li>
@@ -252,8 +293,8 @@
 
 <section id="board">
   <h2>Activation board</h2>
-  <p class="sub">Ordered by the config's sequencing rules, not by score. Scoring breaks ties within a
-  step only.</p>
+  <p class="sub">Ordered by the config's sequencing rules, not by score. Within a module, requests are
+  built in volume order.</p>
 
   <div class="step">
     <h3>Step 1 &mdash; Week one: prerequisites, and opening the long gates</h3>
@@ -268,12 +309,13 @@
       </div>
       <div class="field"><span class="label">Depends on, and where each stands</span>
         <ul class="dep">
-          <li>SSO &mdash; directory confirmed, available</li>
-          <li>Provisioning &mdash; licence tier <span class="unk">UNKNOWN</span></li>
+          <li>Single sign-on &mdash; <strong>required</strong>, and their identity provider has it available</li>
+          <li>Identity / IT contact &mdash; <span class="unk">UNKNOWN</span></li>
+          <li>Provisioning &mdash; whether it is required, and whether the licence tier includes it, both <span class="unk">UNKNOWN</span></li>
           <li>Agent groups and business hours &mdash; not started, blocked on the one-process-or-two question</li>
           <li>Inbound email cutover &mdash; the shared mailbox is the current front door and needs a plan</li>
-          <li>Named admin with budgeted time &mdash; <span class="unk">UNKNOWN</span>; Priya is doing this on top of a full-time job with no backfill</li>
-          <li>Sandbox &mdash; the December freeze makes this likely, unconfirmed</li>
+          <li>Named admin with budgeted time &mdash; <span class="unk">UNKNOWN</span>; Priya has about 4 hours a week and no backfill</li>
+          <li>Test instance &mdash; <strong>required</strong> (separate test and production), and the December freeze is why the config asks for one</li>
         </ul>
       </div>
     </div>
@@ -285,12 +327,14 @@
         <span class="pill blocked">Blocked</span>
       </div>
       <div class="field"><span class="label">State</span>
-        No reviewer named, no process known to exist, no confirmation a review is required at all.</div>
+        Whether a review is required is <span class="unk">UNKNOWN</span>. Status: not started. No sign-off
+        owner and no security contact named. DPA signed at contract; nothing else raised.</div>
       <div class="field"><span class="label">Evidence</span>
         <ul class="ev"><li><q>A passed security review. Assume one exists even when nobody has mentioned it.</q></li></ul>
       </div>
       <div class="field"><span class="label">Unblocked by</span>
-        Dana Whitfield, by default, because the handoff names nobody.</div>
+        Dana Whitfield, by default, because the handoff names nobody. Work starts in week one regardless:
+        find out whether a review exists and who owns it, then open it.</div>
     </div>
 
     <div class="mod">
@@ -318,12 +362,19 @@
         complete catalog, <q>which is the most common reason a go-live date slips</q>. The handoff does
         not say which. Planned here as a starter set &mdash; the top week-one decision, and the largest
         single lever on the January date.</div>
+      <div class="field"><span class="label">Build order, by volume &middot; live by day 30: yes</span>
+        <ol class="dep">
+          <li>"Password resets and account unlocks" &mdash; ~380 a month, head office, measured</li>
+          <li>"New starter setup: laptop, accounts, the lot" &mdash; ~40 a month, estimate</li>
+        </ol>
+        "Till and printer faults in the stores" has no volume: <strong>discovery task</strong>, Tomas Berg.
+        Facilities and HR request types are out of scope.</div>
       <div class="field"><span class="label">Depends on, and where each stands</span>
         <ul class="dep">
           <li>Settled taxonomy &mdash; <strong>not settled</strong>, and the one-process-or-two conflict sits directly on it</li>
           <li>Named approvers plus a cover rule &mdash; not started</li>
           <li>Requester visibility rules &mdash; need provisioning, which is <span class="unk">UNKNOWN</span></li>
-          <li>Fulfilment group per item with confirmed capacity &mdash; 23 agents across two desks, one of which has never been on a call</li>
+          <li>Fulfilment group per item with confirmed capacity &mdash; 23 agents across two desks, one of whose leads has never been on a call</li>
         </ul>
       </div>
       <div class="field"><span class="label">Evidence it is real</span>
@@ -334,9 +385,9 @@
           <li><q>Every live item has a named owner recorded on the item itself</q></li>
         </ul>
       </div>
-      <p class="step-note">Note the shape of that evidence: an adoption measurement sustained over two
-      consecutive weeks. The earliest it can be true is two weeks after real requests start arriving
-      through live items &mdash; and it is a behaviour change in 240 stores, not a configuration step.</p>
+      <p class="step-note">The short lead time supports live items by day 30, which is what the customer
+      asked for. It does not support the evidence: an adoption measurement sustained over two consecutive
+      weeks, and a behaviour change in 240 stores.</p>
     </div>
   </div>
 
@@ -351,11 +402,17 @@
       <div class="field"><span class="label">Lead time</span>
         Short per workflow, often days. Long to reach coverage that changes the team's numbers, 8 weeks
         plus. Config: plan it as a sequence of small deliveries, never as one project.</div>
+      <div class="field"><span class="label">Build order, by volume &middot; live by day 30: <span class="unk">UNKNOWN</span></span>
+        <ol class="dep">
+          <li>"Store tickets go to the store desk and ours come to us, without anyone sorting them" &mdash; ~1,400 a month, head office only, estimate. Internal, so no outside credentials needed.</li>
+          <li>"Joiners and leavers from HR open their own tickets" &mdash; 70 a month, measured. Waits on HR system credentials.</li>
+        </ol>
+      </div>
       <div class="field"><span class="label">Depends on, and where each stands</span>
         <ul class="dep">
           <li>Catalog and taxonomy settled &mdash; not yet; automation written against moving fields gets rewritten</li>
           <li>Agent groups, business hours, SLA targets &mdash; not defined</li>
-          <li>Credentials and scopes for the HR system and endpoint tooling &mdash; <span class="unk">UNKNOWN</span></li>
+          <li>Credentials and scopes for the HR system and endpoint management tool &mdash; <span class="unk">UNKNOWN</span></li>
           <li>A named owner for the rules &mdash; not named</li>
         </ul>
       </div>
@@ -390,9 +447,12 @@
       </div>
       <div class="field"><span class="label">Lead time</span>
         The longest pole in most deployments. The range does not start until the gate opens.</div>
+      <div class="field"><span class="label">Request</span>
+        "Find out what is actually on the store networks" has no volume: <strong>discovery task</strong>,
+        unassigned, routed to Dana Whitfield.</div>
       <div class="field"><span class="label">Depends on, and where each stands</span>
         <ul class="dep">
-          <li>A passed security review &mdash; <span class="unk">UNKNOWN</span></li>
+          <li>A passed security review &mdash; <span class="unk">UNKNOWN</span>, status not started</li>
           <li>Service accounts and credentials per platform &mdash; <span class="unk">UNKNOWN</span></li>
           <li>Network access, firewall rules, subnet list, scanner host &mdash; <span class="unk">UNKNOWN</span></li>
           <li>Approval to deploy agents, plus access to their deployment tooling &mdash; <span class="unk">UNKNOWN</span></li>
@@ -417,10 +477,13 @@
         <span class="pill lead">Long</span>
         <span class="pill blocked">Blocked &mdash; behind the gate</span>
       </div>
+      <div class="field"><span class="label">Request &middot; live by day 30: yes (see conflict 1)</span>
+        "Laptop swaps and returns, and who has what" &mdash; ~90 a month, estimate. Built once the gate
+        clears. First step inside 30 days is groundwork: agree the asset model.</div>
       <div class="field"><span class="label">Depends on, and where each stands</span>
         <ul class="dep">
           <li>Discovery output, or a clean import &mdash; neither exists</li>
-          <li>Agreed asset model &mdash; not started</li>
+          <li>Agreed asset model &mdash; not started, though stock in the distribution centres is already out of scope</li>
           <li>Assignment rules needing directory or HR data &mdash; HR credentials <span class="unk">UNKNOWN</span></li>
           <li>Named process owners for purchase, assignment, reclaim, disposal &mdash; not named</li>
         </ul>
@@ -445,13 +508,17 @@
         <span class="pill blocked">Blocked</span>
       </div>
       <div class="field"><span class="label">Lead time</span>
-        Longer where no change process exists today, and none exists here &mdash; no framework, and no
-        baseline for changes per month because there is nothing to count. Config: you are implementing a
+        Longer where no change process exists today, and none exists here. Config: you are implementing a
         process, not a module.</div>
+      <div class="field"><span class="label">Requests &middot; live by day 30: no</span>
+        Both have no volume, so both are <strong>discovery tasks</strong> for Priya Raman: "Sign-off before
+        anyone touches a store network during trading hours" and "The December freeze written down somewhere
+        other than my head". First step inside 30 days is groundwork: name the change-board members, and
+        write down the freeze and maintenance windows.</div>
       <div class="field"><span class="label">Depends on, and where each stands</span>
         <ul class="dep">
           <li>Asset and CMDB data of usable quality &mdash; blocked behind a blocked gate</li>
-          <li>Change types with real examples &mdash; none</li>
+          <li>Change types with real examples &mdash; none agreed; store network work during trading hours is the first real case on record</li>
           <li>Approval chains, board membership, a standing meeting on calendars &mdash; none</li>
           <li>Maintenance windows and freeze periods &mdash; the December freeze is documented, nothing else</li>
           <li>Integration with where work happens &mdash; <span class="unk">UNKNOWN</span></li>
@@ -481,13 +548,19 @@
       <div class="field"><span class="label">Lead time</span>
         The tool is ready on day one. The content, the owners, and the habit of writing articles are the
         actual work. It is content-limited, so it never finishes if it waits for a slot.</div>
+      <div class="field"><span class="label">Build order, by volume &middot; live by day 30: no</span>
+        <ol class="dep">
+          <li>"Answers to the questions we get every week, so the desk stops retyping them" &mdash; ~250 a month, estimate</li>
+        </ol>
+        "Get the store sheets off the back-room wall and onto a screen" has no volume:
+        <strong>discovery task</strong>, Tomas Berg.</div>
       <div class="field"><span class="label">Depends on, and where each stands</span>
         <ul class="dep">
           <li>Same taxonomy as the catalog &mdash; not settled</li>
           <li>A seed set &mdash; ~200 wiki pages exist, currency <span class="unk">UNKNOWN</span>, and stores keep printed sheets that are not in the wiki at all</li>
           <li>Named article owners per team and a review cadence &mdash; none</li>
           <li>A publishing decision &mdash; not made</li>
-          <li>End-user portal access &mdash; needs the same visibility rules as the catalog, which need provisioning</li>
+          <li>End-user portal access &mdash; needs the same visibility rules as the catalog, which need provisioning. "Anything customer-facing" is out of scope; whether that covers the staff portal is not said.</li>
         </ul>
       </div>
       <div class="field"><span class="label">Evidence it is real</span>
@@ -500,15 +573,15 @@
       </div>
       <p class="step-note">The config singles out the second one: <q>the one that matters: the read path
       is easy, the write path is where knowledge bases die.</q> The recorded commitment &mdash; "we can
-      import your wiki" &mdash; is a read-path promise. It is deliverable, and it is not the same thing
-      as this module working.</p>
+      import your wiki" &mdash; is a read-path promise. The top-ranked request is closer to the write path.</p>
     </div>
   </div>
 
   <div class="callout">
     <h4 style="margin-top:0">Ordering rules, stated plainly</h4>
     <p><strong>Change management before trustworthy asset data produces a process nobody believes.</strong>
-    Asset data here is behind a gate that has not opened, so change management is out of go-live scope.</p>
+    Asset data here is behind a gate that has not opened, so change management is out of go-live scope,
+    and its first step is groundwork only.</p>
     <p><strong>Automation before a settled taxonomy produces rework.</strong> The taxonomy is unsettled
     and has a live disagreement under it. Nothing gets built against it until that closes.</p>
   </div>
@@ -520,78 +593,78 @@
     <table class="tight">
       <thead><tr><th>Known failure mode</th><th>Here</th></tr></thead>
       <tbody>
-        <tr><td>The security review surfaces in week six instead of week one</td><td><span class="live">Already happening.</span> <span class="unk">UNKNOWN</span> at handoff, no named owner. Fix this first.</td></tr>
-        <tr><td>The named technical owner also has a day job, and the project is the part that gives</td><td><span class="live">Already happening.</span> Stated outright: no backfill, running the desk day to day, five months in seat.</td></tr>
-        <tr><td>The customer holds out for a complete catalog at launch instead of a starter set</td><td><span class="latent">Not yet visible.</span> Nobody has asked. Ask in week one, before they form a view.</td></tr>
-        <tr><td>The knowledge base is treated as a content migration rather than a habit to build</td><td><span class="live">Already happening.</span> The only KB conversation on record is "we can import your wiki."</td></tr>
-        <tr><td>Discovery credentials are owned by a team that was never in the kickoff</td><td><span class="live">Already happening.</span> No infrastructure contact exists in the handoff at all.</td></tr>
-        <tr><td>Change management was sold to the exec sponsor and never explained to the engineers expected to file changes</td><td><span class="latent">Not yet visible, and set up to happen.</span> Bought on one commercial call. No engineer has been in a conversation about it.</td></tr>
+        <tr><td>The security review surfaces in week six instead of week one</td><td><span class="live">Already happening.</span> <span class="unk">UNKNOWN</span> at handoff, status not started, no named owner. Fix this first.</td></tr>
+        <tr><td>The named technical owner also has a day job, and the project is the part that gives</td><td><span class="live">Already happening.</span> About 4 hours a week by her own estimate, no backfill, five months in seat.</td></tr>
+        <tr><td>The customer holds out for a complete catalog at launch instead of a starter set</td><td><span class="latent">Not yet visible.</span> Three requests named and Facilities and HR deferred, which reads like a starter set. Nobody has asked. Ask in week one.</td></tr>
+        <tr><td>The knowledge base is treated as a content migration rather than a habit to build</td><td><span class="live">Already happening, with a way out.</span> The only KB commitment on record is "we can import your wiki", but the top-ranked KB request points at the write path.</td></tr>
+        <tr><td>Discovery credentials are owned by a team that was never in the kickoff</td><td><span class="live">Already happening.</span> No security, infrastructure, or identity contact exists in the handoff.</td></tr>
+        <tr><td>Change management was sold to the exec sponsor and never explained to the engineers expected to file changes</td><td><span class="latent">Not yet visible, and set up to happen.</span> Priya raised two change requests, but no engineer has been in a conversation about it.</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="step-note">Five of six are live or set up to happen. That is not unusual and it is not a
-  reason to panic &mdash; it is the week-one agenda.</p>
+  <p class="step-note">Four of six are live, one is set up to happen. That is not unusual and it is
+  not a reason to panic &mdash; it is the week-one agenda.</p>
 </section>
 
 <section id="day30">
   <h2>Where this stands at day 30</h2>
-  <p class="sub">Day 1 is 1 October 2026. Day 30 is 30 October 2026. Not a pass/fail list &mdash; three
-  categories. Nothing below is late for being unfinished.</p>
+  <p class="sub">Day 1 is 1 October 2026. Day 30 is 30 October 2026. Every purchased module has a first
+  step inside the window. Not a pass/fail list &mdash; three categories.</p>
 
   <h3>Started and moving, with proof</h3>
   <div class="grid two">
     <div class="card moving"><h4>Cross-cutting prerequisites</h4>
-      <p>SSO live and in use by both desks. A named day-to-day admin with hours budgeted in writing, not
-      a volunteer. Business hours and agent groups defined for both desks.</p></div>
+      <p>Single sign-on live and in use by both desks. A test instance in place. A named day-to-day admin
+      with hours budgeted in writing, not a volunteer. Business hours and agent groups defined.</p></div>
     <div class="card moving"><h4>Service catalog</h4>
       <p>8 to 12 items live in production, each with a named owner recorded on the item, receiving real
-      requests from both desks. The two-week adoption window has opened.</p></div>
+      requests from both desks. Password resets first. The two-week adoption window has opened.</p></div>
     <div class="card moving"><h4>Workflow automation</h4>
-      <p>First rules enabled and visible in execution logs firing on real tickets, not test records.
+      <p>The routing rule enabled and visible in execution logs firing on real tickets, not test records.
       Coverage is the long part and has not started.</p></div>
     <div class="card moving"><h4>Knowledge base</h4>
       <p>Article owners named per team, a review cadence agreed, a publishing decision made, and the
       first agent-written article published during ticket work.</p></div>
-    <div class="card moving"><h4>Baseline</h4>
-      <p>Time to first response and store volume captured pre-configuration, labelled as measured or
-      estimated.</p></div>
+    <div class="card moving"><h4>Baseline and discovery tasks</h4>
+      <p>Time to first response and store volume captured before configuration. Each of the five requests
+      with no volume either has one, or has a named person and a date.</p></div>
   </div>
 
   <h3>Started as waiting, with the gate as the signal</h3>
-  <div class="grid two">
+  <div class="grid">
     <div class="card waiting"><h4>Discovery</h4>
       <p>The gate, not the scans. Signals in order: a named security owner; confirmation of whether a
-      review is required; the questionnaire returned if one exists; a named infrastructure contact;
-      credentials received for <em>n</em> of the platforms in scope; subnet list supplied; scanner host
-      agreed. Each is observable, and each would be false if nothing had happened.</p></div>
-    <div class="card waiting"><h4>Asset management</h4>
-      <p>Nothing, correctly &mdash; it is behind the gate. Its day-30 signal is the agreed asset model:
-      what is tracked, at what depth, what is deliberately out of scope. That can be decided while
-      waiting.</p></div>
+      review is required; the questionnaire returned if one exists; a named security contact; credentials
+      received for <em>n</em> of the platforms in scope; subnet list supplied; scanner host agreed. Each is
+      observable, and each would be false if nothing had happened.</p></div>
   </div>
 
-  <h3>Not started, and correctly so</h3>
-  <div class="grid">
+  <h3>Groundwork only, and correctly so</h3>
+  <div class="grid two">
+    <div class="card correct"><h4>Asset management</h4>
+      <p>The asset model agreed in writing and process owners named. It is behind the discovery gate, so
+      groundwork is as far as it can honestly go. The asset list expected by day 30 is not here, and the
+      day-30 review says so.</p></div>
     <div class="card correct"><h4>Change management</h4>
-      <p>Config ordering rule: change management before trustworthy asset data produces a process nobody
-      believes. Asset data is behind a gate that has not opened. Starting now would produce a process,
-      not a working one.</p></div>
+      <p>Change-board members named, the December freeze and maintenance windows written down, real
+      examples of each change type collected. Config ordering rule: change management before trustworthy
+      asset data produces a process nobody believes.</p></div>
   </div>
 </section>
 
 <section id="after">
   <h2>On track to land after day 30</h2>
   <p class="sub">Windows are the config's lead times, anchored to the event that starts the clock, with
-  the 1 December to 6 January freeze subtracted. They are windows, not dates.</p>
+  the 1 December to 6 January freeze counted. They are windows, not dates.</p>
   <div class="scroll">
     <table>
       <thead><tr><th>Module</th><th>Window</th><th>What has to stay true</th></tr></thead>
       <tbody>
         <tr><td><strong>Service catalog</strong></td><td>Adoption evidence earliest mid-November, if items went live in week 4 and both desks route traffic to them</td><td>Starter set, not a complete catalog. Both desk leads bought into one taxonomy.</td></tr>
-        <tr><td><strong>Knowledge base</strong></td><td>6 to 10 weeks from week 2 &mdash; mid-November to mid-January, with the freeze pushing the back half into January</td><td>The write path holds. Agents keep writing articles during ticket work after the novelty passes.</td></tr>
-        <tr><td><strong>Workflow automation</strong></td><td>Per-rule, days. Coverage that moves the numbers, 8 weeks plus from a settled taxonomy &mdash; late November at the earliest, into January for anything crossing a system boundary</td><td>Taxonomy stays settled. Cross-system credentials arrive.</td></tr>
-        <tr><td><strong>Discovery</strong></td><td>8 to 16 weeks <strong>from the gate opening, which has not happened</strong>. If the gate opens in October, December to February; the freeze pushes the early end to January.</td><td>The gate opens in October. Every week it stays shut moves this window one week.</td></tr>
-        <tr><td><strong>Asset management</strong></td><td>After discovery. Not before February on the most favourable reading.</td><td>Discovery output reconciles against an expected count &mdash; and the only count available comes from a finance register, labelled an estimate.</td></tr>
+        <tr><td><strong>Knowledge base</strong></td><td>6 to 10 weeks from week 2 &mdash; mid-November to mid-December, with the freeze pushing the back half into January</td><td>The write path holds. Agents keep writing articles during ticket work after the novelty passes.</td></tr>
+        <tr><td><strong>Workflow automation</strong></td><td>Per-rule, days. Coverage that moves the numbers, 8 weeks plus from a settled taxonomy &mdash; early December at the earliest, inside the freeze, so January in practice</td><td>Taxonomy stays settled. HR system credentials arrive.</td></tr>
+        <tr><td><strong>Discovery</strong></td><td>8 to 16 weeks <strong>from the gate opening, which has not happened</strong>. If it opens by 30 October and the freeze halts the work, early February to late March.</td><td>The gate opens in October. Every week it stays shut moves this window one week.</td></tr>
+        <tr><td><strong>Asset management</strong></td><td>After discovery. Not before February on the most favourable reading, and plausibly after the 31 March legacy tool expiry.</td><td>Discovery output reconciles against an expected count &mdash; and the only count available comes from a finance register, labelled an estimate.</td></tr>
         <tr><td><strong>Change management</strong></td><td>Not reachable before the 12 January go-live. 8 to 12 weeks, longer where no process exists, and none exists here. Realistically phase two, ahead of the 31 March legacy tool expiry.</td><td>Exec backing becomes real. Config: change management fails on adoption, never on configuration.</td></tr>
       </tbody>
     </table>
@@ -615,9 +688,14 @@
       <thead><tr><th>Claim as drafted</th><th>Caught by</th><th>What it became</th></tr></thead>
       <tbody>
         <tr>
-          <td>"Service catalog live at day 30"</td>
+          <td>"Asset list delivered by day 30, as required"</td>
+          <td><em>Not evidence: a populated asset list, a dashboard with a device count, one successful scan.</em></td>
+          <td>"Asset model agreed in writing and process owners named; the discovery gate signals are the day-30 checkpoint." A list would not be evidence even if it existed, and the lead time says it cannot exist yet.</td>
+        </tr>
+        <tr>
+          <td>"Service catalog live at day 30, meeting the day-30 requirement"</td>
           <td><em>Not evidence: items built, portal branded, a test request submitted by the admin.</em></td>
-          <td>"8 to 12 items live and receiving real requests; the two-week adoption window has opened." Live items are configuration. The evidence is sustained adoption.</td>
+          <td>"8 to 12 items live and receiving real requests; the two-week adoption window has opened." Live items meet what the customer asked for. The evidence is sustained adoption.</td>
         </tr>
         <tr>
           <td>"Knowledge base seeded &mdash; ~200 wiki pages imported"</td>
@@ -625,9 +703,9 @@
           <td>"Article owners named, review cadence agreed, first agent-written article published." The import is a read-path deliverable and would still be true if nobody touched it.</td>
         </tr>
         <tr>
-          <td>"Workflow automation complete for the starter catalog"</td>
+          <td>"Routing automation done for head-office tickets"</td>
           <td><em>Not evidence: rules built, a test ticket firing correctly, a walkthrough of the builder.</em></td>
-          <td>"First rules visible in execution logs firing on real tickets." Coverage, and movement in time to first response, are the evidence, and both are weeks out.</td>
+          <td>"The routing rule visible in execution logs firing on real tickets." Coverage, and movement in time to first response, are the evidence, and both are weeks out.</td>
         </tr>
         <tr>
           <td>"Discovery on track"</td>
@@ -635,9 +713,9 @@
           <td>Replaced with named gate signals: security owner, credentials received for <em>n</em> platforms, subnet list, scanner host. "On track" asserted progress without making it observable.</td>
         </tr>
         <tr>
-          <td>"Change management kicked off"</td>
+          <td>"Change management started &mdash; freeze documented and change board scheduled"</td>
           <td><em>Not evidence: the workflow is built, a board meeting was scheduled, the first change was filed by the admin.</em></td>
-          <td>Moved to "not started, and correctly so," with the config's ordering rule as the reason. A kickoff meeting would have been a scheduled meeting, which is exactly what the config excludes.</td>
+          <td>Moved to "groundwork only, and correctly so." Writing down the freeze and naming board members is groundwork for its dependencies, and a scheduled board meeting is exactly what the config excludes.</td>
         </tr>
       </tbody>
     </table>

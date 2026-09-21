@@ -73,9 +73,10 @@ support.
    Per module: lead time (short or long, with any conditions that change it),
    what it depends on, what evidence proves it is doing work, and a
    `Not evidence` line listing what gets mistaken for that evidence. Plus the
-   cross-cutting prerequisites, a default sequencing order, and the ways plans
-   on your product usually slip.
-2. Hand `templates/handoff.md` to whoever runs your handoff meeting.
+   cross-cutting prerequisites, the baseline metrics your product measures, a
+   default sequencing order, and the ways plans on your product usually slip.
+2. Hand `templates/handoff.md` to the rep and the SE, who fill it together on
+   one call. The rep owns sections 1 to 5, the SE sections 6 to 10.
 3. Run the planner on the result.
 
 The config is the only file that knows anything about a specific product. The
@@ -108,13 +109,14 @@ file wins on name collisions.
 
 ## Read the example first
 
-`examples/` holds a fictional customer whose handoff leaves eleven open
-questions, a recorded sales commitment the lead times cannot support, two people
-describing the same target date differently, and a five-week change freeze
-inside the runway. That is roughly what a real one looks like.
+`examples/` holds a fictional customer whose handoff leaves eighteen open
+questions and five requests with no volume, a recorded sales commitment the lead
+times cannot support, two people describing the same target date differently,
+and a five-week change freeze inside the runway. That is roughly what a real one
+looks like.
 
 The generated plan reaches one module's evidence inside 30 days and does not
 read as a failure. The last section of it, **Downgrades applied in review**,
-shows the "Not evidence" check catching five completion claims in the
+shows the "Not evidence" check catching six completion claims in the
 planner's own draft and restating each one — which is the part worth copying if
 you adapt this for another product.
