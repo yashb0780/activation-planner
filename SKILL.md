@@ -13,10 +13,24 @@ and do not edit the config to make a plan fit.
 
 1. **The filled handoff** — the file the user points at, in the shape of
    `templates/handoff.md`.
-2. **The product config** — the file in `config/` matching what the **Account
-   basics → Products and tiers purchased** field names. If only one config
-   exists, use it. If several could match, ask rather than guess. A
+2. **The product config** — the file in `config/` matching what the
+   `products` field in **Account basics** names. If only one config exists,
+   use it. If several could match, ask rather than guess. A
    `config/private-*.md` file is read in addition and wins on name collisions.
+
+### How the handoff is laid out
+
+The rep fills sections 1 to 5 and the SE fills sections 6 to 10. Every answer
+sits in a row with a fixed **ID** (such as `target_date` or `sso_required`) and
+a **Source**. Refer to fields by their ID when you pull them forward.
+
+- **Answer choices.** Some fields list their allowed answers, such as
+  `yes / no / UNKNOWN`. An answer that is not one of the listed choices is
+  treated as `UNKNOWN`, and the board notes what was actually written.
+- **Sources.** Carry each answer's source forward. An answer sourced as
+  `rep's read` or `SE's read` is someone's judgement, not a confirmed fact.
+  Describe it that way. A blank source is not a reason to discard an answer,
+  but say that it is unsourced when it matters to a decision.
 
 The config is authoritative on the product. The handoff is authoritative on the
 customer. Where they disagree about what is possible, the config wins and the
@@ -70,15 +84,31 @@ ordering rules, and the list of where these plans usually slip.
 
 From the **handoff**, pull forward and keep visible for every later step:
 
-- the production use case in their words, and whether it is phase one
-- the named people, and which roles are `UNKNOWN`
-- the target date, what drives it, whether it is fixed or preferred, and every
-  freeze period
-- every security and compliance answer, including each `UNKNOWN`
-- the commitments table, including the soft ones
-- the definition of good, and who judges it
-- the baseline table, keeping the estimate-or-measured column attached to every
-  number. An estimate never becomes a measurement later in your output.
+- **Why they bought (section 1):** `use_case` in their words, `why_now`,
+  `scope_phase` (whole scope or phase one), `incumbent` and `why_leaving`
+- **People (section 2):** each named role, which roles are `UNKNOWN`,
+  `owner_capacity`, and `sponsor_engaged`
+- **Target date (section 3):** `target_date`, `date_driver`, `date_fixed`,
+  `slip_impact`, and every period in `freeze_periods`. Where two people gave
+  different answers, keep both with their sources.
+- **Commitments (section 4):** the commitments table, including the soft ones
+  and the SE's "Deliverable as stated?" column, plus `timing_promises` and
+  `risky_promises`
+- **What good means (section 5):** `success_outcome`, `success_signal`,
+  `success_judge`, `success_number`, `failure_definition`
+- **What they want first (section 6):** one block per module, with
+  `day30_required`, `out_of_scope`, and the ranked requests with their volumes.
+  See Step 4 for how these are used.
+- **Security and access (section 7):** every answer, including each `UNKNOWN`
+- **Stack and integrations (section 8):** `integrations`, `credential_holders`,
+  and anything in `keep_existing`
+- **Teams and structure (section 9):** `teams_launch`, `team_count`,
+  `process_shape`, `separate_envs`, `outside_agreement`
+- **Baseline (section 10):** `core_volume`, `core_cycle_time`, `team_headcount`,
+  plus the rows the config's **Baseline metrics** section adds. The config says
+  what the core rows mean for its product. Keep the estimate-or-measured column
+  attached to every number. An estimate never becomes a measurement later in
+  your output.
 
 **Split modules the config splits.** Where the config treats a module as a gate
 plus a payload — discovery gating asset management — they are two rows with
@@ -133,6 +163,21 @@ step, never to move a module between steps. Within a step, order by:
 If following the config's order contradicts what the customer wants first, keep
 the config's order and record the tension as a conflict. The customer's
 enthusiasm is an input to the conversation, not to the sequence.
+
+**Every purchased module gets a first step inside 30 days.** Groundwork counts
+as a first step: naming the change-board members, requesting credentials,
+agreeing the asset model. The config's ordering still holds. A module whose
+config says it waits for another module starts with groundwork for its own
+dependencies, never with the module itself.
+
+**Within a module, requests from section 6 are built in volume order,**
+highest monthly volume first. A request with no volume, blank or `UNKNOWN`,
+becomes a **discovery task**: find out the volume, with a named owner, in
+week one. Do not guess its rank. (A discovery task is unrelated to any product
+module that happens to be called discovery.) Anything in `out_of_scope` stays
+off the plan. A module with `day30_required: yes` still follows the config's
+order. If the config's lead time says it cannot be live by day 30, that is a
+conflict for the board.
 
 ## Step 5 — Write the board
 
@@ -198,8 +243,8 @@ does not have.
 
 Close with:
 
-- **Where this stands at day 30** — started, moving with proof, not started and
-  correctly so. Not a pass/fail list.
+- **Where this stands at day 30** — started, moving with proof, groundwork
+  only and correctly so. Not a pass/fail list.
 - **On track to land after day 30** — module, window, and what has to stay true.
 - **What would change this plan** — the two or three `UNKNOWN`s or conflicts
   whose resolution would most reshape the sequence.
@@ -232,6 +277,9 @@ fastest way for a reader to see the difference between the two kinds of claim.
 
 - Every purchased module appears on the board; nothing appears that the config
   does not define.
+- Every purchased module has a first step inside 30 days, even if it is only
+  groundwork.
+- Every section 6 request with no volume is a discovery task with an owner.
 - Gate and payload modules are separate rows with separate evidence everywhere.
 - Every evidence statement is quoted from the config, unedited.
 - Every `Blocked` names who unblocks it. Every `Gated by UNKNOWN` names the

@@ -126,6 +126,20 @@ Evidence it is real
 * Changes reference affected assets or services, which is only possible if the asset data holds up
 
 Not evidence: the workflow is built, a board meeting was scheduled, the first change was filed by the admin.
+Baseline metrics
+Section 10 of the handoff asks for three core numbers on every product. For this product they mean:
+
+* core_volume: tickets or requests per month
+* core_cycle_time: average time to resolve
+
+Add these rows to section 10 as well:
+
+* first_response_time: average time to first response
+* unstructured_share: share of requests arriving unstructured (email, chat, tap on the shoulder)
+* asset_count: known asset count
+* change_volume: changes per month, and share that are emergency
+* kb_articles: existing knowledge articles
+
 Sequencing
 Default order, driven by dependencies rather than by customer enthusiasm:
 

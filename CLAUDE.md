@@ -62,5 +62,6 @@ example when it helps.
 
 - Version 1 (skill + static example page) is on GitHub at
   github.com/yashb0780/activation-planner.
-- A rebuild into an interactive app is planned but not started. Don't start it
-  unless asked.
+- The rebuild into an interactive app has started, beginning with the new sales
+  handoff template (rep and SE sections, a field ID and a source on every
+  answer). The app itself is not built yet.
