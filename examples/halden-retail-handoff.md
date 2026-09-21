@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | Filled by (rep) | D. Osei |
-| Filled by (SE) | UNKNOWN |
+| Filled by (SE) | K. Varga |
 | Date filled | 2026-09-16 |
 | Received by (implementation lead) | M. Lindqvist |
 
@@ -31,7 +31,7 @@ The ID column is for the app. Don't edit it.
 | Close date | close_date | 2026-09-11 | |
 | Contract start date | contract_start | 2026-10-01 | |
 | Rep | rep | D. Osei | |
-| SE | se | UNKNOWN. Referred to only as "Solution engineer" in section 4. | |
+| SE | se | K. Varga | CRM |
 | Assigned CSM | csm | M. Lindqvist | |
 
 ---
@@ -43,7 +43,7 @@ The ID column is for the app. Don't edit it.
 | Field | ID | Answer | Source |
 |---|---|---|---|
 | The job, in their words (quote) | use_case | "We are merging the store-support desk and the head-office IT desk into one queue before the new distribution centre opens in March. Right now a store manager emails whoever they last spoke to, and nobody can tell me how many open requests we have." | Discovery call, 2026-08-27, recorded |
-| Problem that made them buy now | why_now | UNKNOWN | |
+| Problem that made them buy now | why_now | Dana asked for the open-request count at the July board meeting, and nobody could produce one for store support. | Commercial call, 2026-09-04 |
 | Whole scope, or phase one of something bigger | scope_phase | Phase one. Facilities and HR have asked to come onto the same platform during 2027. Not scoped, not priced. | |
 | Alternatives they considered | alternatives | UNKNOWN | |
 | Tool being replaced, or greenfield | incumbent | Head office runs a shared mailbox plus a spreadsheet tracker. Stores use a separate legacy service desk tool whose contract expires 2027-03-31. | |
@@ -63,7 +63,7 @@ The ID column is for the app. Don't edit it.
 
 | Field | ID | Answer | Source |
 |---|---|---|---|
-| Hours per week the technical owner has for this | owner_capacity | UNKNOWN. Priya runs the head-office desk day to day and has no backfill. | |
+| Hours per week the technical owner has for this | owner_capacity | About 4 hours a week, Priya's own estimate. She runs the head-office desk day to day and has no backfill. | Technical call, 2026-09-02 |
 | Has the exec sponsor ever been on a call with us? | sponsor_engaged | yes. Once, 2026-09-04, commercial terms only. Not on any technical call. | |
 
 ---
@@ -120,52 +120,58 @@ The ID column is for the app. Don't edit it.
 | Field | ID | Answer | Source |
 |---|---|---|---|
 | Module | module | Request portal and service catalog | |
-| Must something here be live by day 30? | day30_required | UNKNOWN | |
-| Explicitly out of scope for now | out_of_scope | UNKNOWN | |
+| Must something here be live by day 30? | day30_required | yes. One queue before the distribution centre opens. | Discovery call, 2026-08-27 |
+| Explicitly out of scope for now | out_of_scope | Facilities and HR request types (2027) | Discovery call, 2026-08-27 |
 
 | Rank | Request, in their words | ID | Volume per month | Estimate or measured | Source |
 |---|---|---|---|---|---|
-| 1 | UNKNOWN | request_1 | | | |
+| 1 | "Password resets and account unlocks" | request_1 | ~380, head office | Measured | Spreadsheet tracker export, 2026-09-10 |
+| 2 | "New starter setup: laptop, accounts, the lot" | request_2 | ~40 | Estimate | Priya, discovery call, 2026-08-27 |
+| 3 | "Till and printer faults in the stores" | request_3 | UNKNOWN |  | Priya, technical call, 2026-09-02 |
 
 | Field | ID | Answer | Source |
 |---|---|---|---|
 | Module | module | Knowledge base | |
-| Must something here be live by day 30? | day30_required | UNKNOWN | |
-| Explicitly out of scope for now | out_of_scope | UNKNOWN | |
+| Must something here be live by day 30? | day30_required | no | Technical call, 2026-09-02 |
+| Explicitly out of scope for now | out_of_scope | Anything customer-facing | Technical call, 2026-09-02 |
 
 | Rank | Request, in their words | ID | Volume per month | Estimate or measured | Source |
 |---|---|---|---|---|---|
-| 1 | UNKNOWN | request_1 | | | |
+| 1 | "Answers to the questions we get every week, so the desk stops retyping them" | request_1 | ~250 | Estimate | Priya, technical call, 2026-09-02 |
+| 2 | "Get the store sheets off the back-room wall and onto a screen" | request_2 | UNKNOWN |  | Priya, technical call, 2026-09-02 |
 
 | Field | ID | Answer | Source |
 |---|---|---|---|
 | Module | module | Workflow automation | |
-| Must something here be live by day 30? | day30_required | UNKNOWN | |
-| Explicitly out of scope for now | out_of_scope | UNKNOWN | |
+| Must something here be live by day 30? | day30_required | UNKNOWN |  |
+| Explicitly out of scope for now | out_of_scope | UNKNOWN |  |
 
 | Rank | Request, in their words | ID | Volume per month | Estimate or measured | Source |
 |---|---|---|---|---|---|
-| 1 | UNKNOWN | request_1 | | | |
+| 1 | "Store tickets go to the store desk and ours come to us, without anyone sorting them" | request_1 | ~1,400, head office | Estimate | Priya, from the spreadsheet tracker, 2026-09-16 |
+| 2 | "Joiners and leavers from HR open their own tickets" | request_2 | 70 | Measured | HR system report shared by Priya, 2026-09-10 |
 
 | Field | ID | Answer | Source |
 |---|---|---|---|
 | Module | module | Asset management with discovery | |
-| Must something here be live by day 30? | day30_required | UNKNOWN | |
-| Explicitly out of scope for now | out_of_scope | UNKNOWN | |
+| Must something here be live by day 30? | day30_required | yes. Expects the asset list promised in the demo. | Technical call, 2026-09-02 |
+| Explicitly out of scope for now | out_of_scope | Stock in the distribution centres | Technical call, 2026-09-02 |
 
 | Rank | Request, in their words | ID | Volume per month | Estimate or measured | Source |
 |---|---|---|---|---|---|
-| 1 | UNKNOWN | request_1 | | | |
+| 1 | "Laptop swaps and returns, and who has what" | request_1 | ~90 | Estimate | Priya, technical call, 2026-09-02 |
+| 2 | "Find out what is actually on the store networks" | request_2 | UNKNOWN |  | Priya, technical call, 2026-09-02 |
 
 | Field | ID | Answer | Source |
 |---|---|---|---|
 | Module | module | Change management | |
-| Must something here be live by day 30? | day30_required | UNKNOWN | |
-| Explicitly out of scope for now | out_of_scope | UNKNOWN | |
+| Must something here be live by day 30? | day30_required | no | Technical call, 2026-09-02 |
+| Explicitly out of scope for now | out_of_scope | UNKNOWN |  |
 
 | Rank | Request, in their words | ID | Volume per month | Estimate or measured | Source |
 |---|---|---|---|---|---|
-| 1 | UNKNOWN | request_1 | | | |
+| 1 | "Sign-off before anyone touches a store network during trading hours" | request_1 | UNKNOWN |  | Priya, technical call, 2026-09-02 |
+| 2 | "The December freeze written down somewhere other than my head" | request_2 | UNKNOWN |  | Priya, technical call, 2026-09-02 |
 
 ---
 
@@ -176,13 +182,13 @@ The ID column is for the app. Don't edit it.
 | Field | ID | Answer | Source |
 |---|---|---|---|
 | Security review required before deployment | security_review | UNKNOWN | |
-| Review status | security_review_status | UNKNOWN | |
+| Review status | security_review_status | not started | Technical call, 2026-09-02 |
 | Who owns security sign-off on their side | security_signoff | UNKNOWN | |
 | Open items at signature (questionnaire, pen test report, DPA, insurance) | security_open_items | DPA signed at contract. Nothing else was raised. | |
 | Certifications they need from us | certifications | Priya asked what we hold on the technical call. Nothing has been formally requested. | |
 | Data residency or regional hosting requirements | data_residency | UNKNOWN | |
 | Restrictions on installing software or outbound connections | install_restrictions | UNKNOWN | |
-| Single sign-on required | sso_required | UNKNOWN | |
+| Single sign-on required | sso_required | yes. Priya wants every agent signing in through their identity provider from day one. | Technical call, 2026-09-02 |
 | Identity provider | identity_provider | A cloud directory with SSO available. | |
 | Automated user provisioning (SCIM) required | provisioning_required | UNKNOWN. Whether their licence tier includes automated user provisioning is also UNKNOWN. | |
 
@@ -209,11 +215,11 @@ The ID column is for the app. Don't edit it.
 |---|---|---|---|
 | Teams in scope at launch | teams_launch | Head-office IT desk (9 agents), store support desk (14 agents) | |
 | Teams in scope later, and roughly when | teams_later | Facilities and HR, during 2027. Not scoped. | |
-| Number of teams / workspaces | team_count | UNKNOWN | |
+| Number of teams / workspaces | team_count | 2 teams at launch (head-office IT, store support). One workspace or two is not decided. | Technical call, 2026-09-02 |
 | End-user population served | end_users | Roughly 3,200 staff across head office, 240 stores, and 2 distribution centres | |
 | Geographies and time zones | geographies | Single country, one time zone. Stores trade seven days a week. | |
 | One shared process, or several that genuinely differ | process_shape | shared. Stated as one. Worth noting the two desks describe their work differently on every call — store support is phone-first and same-shift, head office is ticket-first and next-day. | |
-| Separate test and production required | separate_envs | UNKNOWN | |
+| Separate test and production required | separate_envs | yes. Priya wants to test anything before it reaches stores, especially near the December freeze. | Technical call, 2026-09-02 |
 | Has anyone outside the buying team agreed to this | outside_agreement | UNKNOWN. Tomas Berg leads store support and has not been on a call. His desk carries the larger volume. | |
 
 ---
