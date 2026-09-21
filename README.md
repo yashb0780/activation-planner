@@ -49,8 +49,8 @@ platforms, the security reviewer named — never a completion claim and never
 
 ## How to run it
 
-There is no code. It runs as a skill — point Claude Code at a filled handoff
-and it reads `SKILL.md` for the procedure.
+The planner has no code. It runs as a skill — point Claude Code at a filled
+handoff and it reads `SKILL.md` for the procedure.
 
 ```bash
 claude "Run the activation planner on examples/halden-retail-handoff.md"
@@ -66,6 +66,25 @@ It writes `<customer>-board.md` and `<customer>-30-day-plan.md` beside the
 handoff, then reports the two paths, the largest `UNKNOWN`, the longest-lead
 item, and any commitment in the handoff that the config's lead times do not
 support.
+
+### Running the activation tracker locally
+
+The repo also holds an interactive activation tracker: a small web app that
+turns the example board and 30-day plan into cards you can move, annotate, and
+mark done. It needs Node.js.
+
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+Then open the address it prints (usually http://localhost:5173). The full
+static report is at `/report.html`. Progress is saved in your browser only, and
+**Export** downloads it as JSON. `npm run build` checks the code and builds the
+site into `dist/`, which is what Vercel deploys.
 
 ### Setting it up for your product
 
@@ -91,6 +110,10 @@ SKILL.md                   how to read a handoff and generate the two outputs
 templates/handoff.md       blank handoff — the fields the planner reads
 config/itsm.md             product modules, evidence, sequencing (the only product-specific file)
 examples/                  one filled handoff and both generated outputs
+src/                       the activation tracker app (React + TypeScript)
+src/data/halden.ts         the tracker's items, built from the example board and plan
+public/report.html         the full example report as one static page
+TODO.md                    parked issues
 ```
 
 `.gitignore` excludes `config/private-*`, so a config you would rather not

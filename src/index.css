@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+/* Colour tokens. Dark is the default; [data-theme="light"] overrides. */
+:root,
+[data-theme="dark"] {
+  --bg: #0f1011;
+  --panel: #151618;
+  --raised: #1b1c1f;
+  --hover: #202125;
+  --border: #26272b;
+  --text: #e6e6e8;
+  --muted: #8a8b91;
+  --faint: #5d5e64;
+  --accent: #7c8cf5;
+  --warn: #d9a54a;
+  --danger: #e0685f;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #fbfbfc;
+  --panel: #ffffff;
+  --raised: #f4f4f6;
+  --hover: #eeeef1;
+  --border: #e3e3e8;
+  --text: #1b1b1f;
+  --muted: #6b6c73;
+  --faint: #9a9ba2;
+  --accent: #4f5fd6;
+  --warn: #b07a18;
+  --danger: #c2453c;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-hover: var(--hover);
+  --color-line: var(--border);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}

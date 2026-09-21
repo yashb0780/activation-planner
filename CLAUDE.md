@@ -10,9 +10,9 @@ A tool that reads a filled sales handoff doc and produces:
 3. **A CS handoff doc** at the end of activation, built from the notes taken
    during activation.
 
-Today the tool runs as a Claude Code skill (`SKILL.md`) with no code. It covers
-outputs 1 and 2 as markdown. `index.html` is a static render of the example
-board. The CS handoff output is not built yet.
+The planner runs as a Claude Code skill (`SKILL.md`). It covers outputs 1 and 2
+as markdown. The interactive tracker at the repo root shows the example board
+and plan as cards. The CS handoff output is not built yet.
 
 ## Principles
 
@@ -56,12 +56,18 @@ example when it helps.
     templates/handoff.md   blank handoff; the input interface
     config/itsm.md         example product config (the only product-specific file)
     examples/              fictional customer: filled handoff and generated outputs
-    index.html             static rendered example board
+    src/                   interactive activation tracker (Vite + React + TypeScript + Tailwind)
+    src/data/halden.ts     tracker items, built from the example board and plan
+    public/report.html     static rendered example report
+    TODO.md                parked issues
 
 ## Current state
 
 - Version 1 (skill + static example page) is on GitHub at
   github.com/yashb0780/activation-planner.
-- The rebuild into an interactive app has started, beginning with the new sales
+- The rebuild into an interactive app has started. Done so far: the new sales
   handoff template (rep and SE sections, a field ID and a source on every
-  answer). The app itself is not built yet.
+  answer), and a first interactive activation tracker (Vite + React +
+  TypeScript + Tailwind at the repo root, data in `src/data/halden.ts`). The
+  static report is at `public/report.html`. The tracker does not yet read a
+  handoff directly, and the CS handoff output is not built.
