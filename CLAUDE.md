@@ -60,6 +60,7 @@ example when it helps.
 
 ## Current state
 
-- Commit `ac713b1` is pushed to github.com/yashb0780/activation-planner.
+- Version 1 (skill + static example page) is on GitHub at
+  github.com/yashb0780/activation-planner.
 - A rebuild into an interactive app is planned but not started. Don't start it
   unless asked.
