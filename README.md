@@ -69,9 +69,12 @@ support.
 
 ### Running the activation tracker locally
 
-The repo also holds an interactive activation tracker: a small web app that
-turns the example board and 30-day plan into cards you can move, annotate, and
-mark done. It needs Node.js.
+The repo also holds an interactive activation tracker: a small web app built
+from the example board and 30-day plan. **Plan** shows a proposed first value,
+four milestone gates, and the work as bucket columns you can group by lead
+time, owner, or module, with decisions and questions pinned first. **People**
+is an internal stakeholder map. **Customer view** hides everything internal
+for screen-sharing. It needs Node.js.
 
 ```bash
 npm install

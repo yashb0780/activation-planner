@@ -4,13 +4,12 @@ export type Status = "todo" | "progress" | "blocked" | "done";
 export type Side = "us" | "customer";
 export type Visibility = "internal" | "shared";
 
-/** task: work on the plan. question: an UNKNOWN in the handoff.
- *  volume: a section 6 request with no volume ("find out the volume").
- *  conflict: a conflict from the board, to raise with the customer. */
-export type Kind = "task" | "question" | "volume" | "conflict";
+/** task: work on the plan. decision: a choice someone has to make and record.
+ *  question: an UNKNOWN in the handoff, including "find out the volume". */
+export type Kind = "task" | "decision" | "question";
 
-/** A module or area from the product config, such as a module name. Kept as a
- *  plain string so the app stays product-agnostic. */
+/** A module or area from the product config. Kept as a plain string so the app
+ *  stays product-agnostic. */
 export type Module = string;
 
 export interface Why {
@@ -32,6 +31,12 @@ export interface Item {
   status: Status;
   owner: string;
   side: Side;
+  /** "other": owned by the customer's other teams (identity, security, infrastructure). */
+  team?: "other";
+  /** A conflict from the board. Hidden in customer view. */
+  conflict?: boolean;
+  /** A question whose answer is a monthly volume. */
+  volume?: boolean;
   blockedBy?: string;
   why: Why;
   /** Evidence that it is real, quoted from the config or the plan's checkpoint. */
@@ -49,9 +54,43 @@ export interface Note {
   internal: boolean;
 }
 
+export interface Decision {
+  decided: string;
+  by: string;
+  date: string;
+}
+
 export interface Account {
   customer: string;
   windowStart: string;
   windowEnd: string;
   goLive: string;
+}
+
+export interface FirstValue {
+  text: string;
+  basis: string;
+}
+
+export interface Gate {
+  id: string;
+  label: string;
+  exit: string;
+  linked: string[];
+}
+
+export type Quadrant = "closely" | "satisfied" | "informed" | "monitor";
+export type Sentiment = "supporter" | "neutral" | "skeptic" | "unknown";
+
+export interface Person {
+  id: string;
+  name: string;
+  role: string;
+  /** What's in it for them. Only when the handoff states it. */
+  wiifm: string;
+  engagement: string;
+  sentiment: Sentiment;
+  quadrant: Quadrant;
+  /** A role the handoff lists as UNKNOWN. Drawn as an empty dashed card. */
+  placeholder?: boolean;
 }

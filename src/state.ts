@@ -1,34 +1,43 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Item, Note, Status } from "./types";
+import type { Decision, Item, Note, Quadrant, Sentiment, Status } from "./types";
 
-const KEY = "activation-tracker:halden:v1";
+const KEY = "activation-tracker:halden:v2";
 
 export interface Saved {
   status: Record<string, Status>;
   notes: Record<string, Note[]>;
   answers: Record<string, string>;
+  decisions: Record<string, Decision>;
+  firstValue: string | null;
+  quadrants: Record<string, Quadrant>;
+  sentiments: Record<string, Sentiment>;
 }
 
-const empty: Saved = { status: {}, notes: {}, answers: {} };
+const empty: Saved = {
+  status: {},
+  notes: {},
+  answers: {},
+  decisions: {},
+  firstValue: null,
+  quadrants: {},
+  sentiments: {},
+};
 
 function load(): Saved {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return empty;
-    const parsed = JSON.parse(raw) as Partial<Saved>;
-    return {
-      status: parsed.status ?? {},
-      notes: parsed.notes ?? {},
-      answers: parsed.answers ?? {},
-    };
+    return { ...empty, ...(JSON.parse(raw) as Partial<Saved>) };
   } catch {
     return empty;
   }
 }
 
-export function readPref(key: string, fallback: string): string {
+export function readPref<T extends string>(key: string, fallback: T, allowed?: readonly T[]): T {
   try {
-    return localStorage.getItem(key) ?? fallback;
+    const v = localStorage.getItem(key) as T | null;
+    if (v === null) return fallback;
+    return allowed && !allowed.includes(v) ? fallback : v;
   } catch {
     return fallback;
   }
@@ -41,6 +50,8 @@ export function writePref(key: string, value: string) {
     // Storage unavailable (private window, blocked site data). The app still works for this visit.
   }
 }
+
+const now = () => new Date().toISOString();
 
 export function useTracker(base: Item[]) {
   const [saved, setSaved] = useState<Saved>(load);
@@ -60,18 +71,47 @@ export function useTracker(base: Item[]) {
   }, []);
 
   const addNote = useCallback((id: string, text: string, internal: boolean) => {
-    const note: Note = { text, internal, at: new Date().toISOString() };
-    setSaved((s) => ({ ...s, notes: { ...s.notes, [id]: [...(s.notes[id] ?? []), note] } }));
+    setSaved((s) => ({ ...s, notes: { ...s.notes, [id]: [...(s.notes[id] ?? []), { text, internal, at: now() }] } }));
   }, []);
 
   const answer = useCallback((id: string, text: string) => {
-    const note: Note = { text: `Answered: ${text}`, internal: false, at: new Date().toISOString() };
     setSaved((s) => ({
+      ...s,
       status: { ...s.status, [id]: "done" },
       answers: { ...s.answers, [id]: text },
-      notes: { ...s.notes, [id]: [...(s.notes[id] ?? []), note] },
     }));
   }, []);
+
+  const decide = useCallback((id: string, d: Decision) => {
+    setSaved((s) => ({
+      ...s,
+      status: { ...s.status, [id]: "done" },
+      decisions: { ...s.decisions, [id]: d },
+    }));
+  }, []);
+
+  /** Reopen a resolved decision or question. */
+  const reopen = useCallback((id: string) => {
+    setSaved((s) => {
+      const { [id]: _a, ...answers } = s.answers;
+      const { [id]: _d, ...decisions } = s.decisions;
+      const { [id]: _s, ...status } = s.status;
+      void _a;
+      void _d;
+      void _s;
+      return { ...s, answers, decisions, status };
+    });
+  }, []);
+
+  const setFirstValue = useCallback((text: string) => setSaved((s) => ({ ...s, firstValue: text })), []);
+  const setQuadrant = useCallback(
+    (id: string, q: Quadrant) => setSaved((s) => ({ ...s, quadrants: { ...s.quadrants, [id]: q } })),
+    [],
+  );
+  const setSentiment = useCallback(
+    (id: string, v: Sentiment) => setSaved((s) => ({ ...s, sentiments: { ...s.sentiments, [id]: v } })),
+    [],
+  );
 
   const reset = useCallback(() => setSaved(empty), []);
 
@@ -79,25 +119,42 @@ export function useTracker(base: Item[]) {
     (customer: string) => {
       const data = {
         customer,
-        exportedAt: new Date().toISOString(),
+        exportedAt: now(),
+        firstValue: saved.firstValue,
         items: items.map((i) => ({
           id: i.id,
+          kind: i.kind,
           title: i.title,
           status: i.status,
           answer: saved.answers[i.id] ?? null,
+          decision: saved.decisions[i.id] ?? null,
           notes: saved.notes[i.id] ?? [],
         })),
+        people: { quadrants: saved.quadrants, sentiments: saved.sentiments },
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `activation-tracker-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `activation-tracker-${now().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
     },
     [items, saved],
   );
 
-  return { items, saved, setStatus, addNote, answer, reset, exportJson };
+  return {
+    items,
+    saved,
+    setStatus,
+    addNote,
+    answer,
+    decide,
+    reopen,
+    setFirstValue,
+    setQuadrant,
+    setSentiment,
+    reset,
+    exportJson,
+  };
 }

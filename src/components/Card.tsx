@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { Item } from "../types";
 import { EyeOffIcon, LockIcon, StatusIcon } from "./icons";
 
@@ -15,18 +15,10 @@ export function initials(name: string): string {
   return name.includes(" and ") ? `${letters}+` : letters;
 }
 
-export function ModulePill({ module }: { module: string }) {
-  return (
-    <span className="min-w-0 truncate rounded border border-line px-1.5 py-px text-[11px] leading-4 text-muted">
-      {module}
-    </span>
-  );
-}
-
 export function SideTag({ side }: { side: Item["side"] }) {
   return (
     <span
-      className={`shrink-0 rounded px-1.5 py-px text-[11px] leading-4 ${
+      className={`shrink-0 rounded px-1.5 py-px text-[12px] leading-5 ${
         side === "us" ? "bg-raised text-ink" : "bg-raised text-muted"
       }`}
     >
@@ -39,12 +31,14 @@ export function Avatar({ name }: { name: string }) {
   return (
     <span
       title={name}
-      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-line bg-raised text-[10px] font-medium text-muted"
+      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-line bg-raised text-[11px] font-medium text-muted"
     >
       {initials(name)}
     </span>
   );
 }
+
+export const weekLabel = (w: Item["week"]) => (w === "after" ? "After day 30" : `Week ${w}`);
 
 interface CardProps {
   item: Item;
@@ -52,39 +46,16 @@ interface CardProps {
   onOpen: () => void;
   onFocus: () => void;
   showInternalMark: boolean;
-  /** Stacked puts the title on its own line, for narrow board columns. */
-  stacked?: boolean;
+  showWeek: boolean;
+  /** Scroll into view when focused. Only for keyboard moves, so hovering never scrolls the page. */
+  scrollOnFocus: boolean;
 }
 
-export function Card({ item, focused, onOpen, onFocus, showInternalMark, stacked = false }: CardProps) {
+export function Card({ item, focused, onOpen, onFocus, showInternalMark, showWeek, scrollOnFocus }: CardProps) {
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    if (focused) ref.current?.scrollIntoView({ block: "nearest" });
-  }, [focused]);
-
-  const title = (
-    <span
-      className={`min-w-0 flex-1 ${stacked ? "line-clamp-2" : "truncate"} ${
-        item.status === "done" ? "text-muted line-through decoration-faint" : ""
-      }`}
-    >
-      {item.title}
-    </span>
-  );
-  const marks = (
-    <>
-      {item.status === "blocked" && (
-        <span className="shrink-0">
-          <LockIcon />
-        </span>
-      )}
-      {showInternalMark && item.visibility === "internal" && (
-        <span className="shrink-0 text-faint" title="Internal: hidden in customer view">
-          <EyeOffIcon />
-        </span>
-      )}
-    </>
-  );
+    if (focused && scrollOnFocus) ref.current?.scrollIntoView({ block: "nearest" });
+  }, [focused, scrollOnFocus]);
 
   return (
     <button
@@ -92,41 +63,90 @@ export function Card({ item, focused, onOpen, onFocus, showInternalMark, stacked
       type="button"
       onClick={onOpen}
       onMouseEnter={onFocus}
-      className={`flex w-full rounded-md border px-2.5 py-2 text-left transition-colors ${
-        stacked ? "flex-col gap-1.5" : "items-center gap-2"
-      } ${focused ? "border-accent/60 bg-hover" : "border-line bg-panel hover:bg-hover"}`}
+      className={`flex w-full flex-col gap-2 rounded-lg border px-3.5 py-3 text-left transition-colors ${
+        focused ? "border-accent/60 bg-hover" : "border-line bg-panel hover:bg-hover"
+      }`}
     >
-      {stacked ? (
-        <>
-          <span className="flex w-full items-start gap-2">
-            <span className="mt-0.5 shrink-0">
-              <StatusIcon status={item.status} />
-            </span>
-            {title}
-          </span>
-          <span className="flex w-full items-center gap-1.5 pl-[22px]">
-            <ModulePill module={item.module} />
-            {marks}
-            <span className="ml-auto flex items-center gap-1.5">
-              <SideTag side={item.side} />
-              <Avatar name={item.owner} />
-            </span>
-          </span>
-        </>
-      ) : (
-        <>
+      <span className="flex w-full items-start gap-2.5">
+        <span className="mt-1 shrink-0">
+          <StatusIcon status={item.status} size={15} />
+        </span>
+        <span
+          className={`line-clamp-3 min-w-0 flex-1 text-[16px] leading-snug ${
+            item.status === "done" ? "text-muted line-through decoration-faint" : ""
+          }`}
+        >
+          {item.title}
+        </span>
+      </span>
+      <span className="flex w-full items-center gap-2 pl-[25px] text-[13px] text-muted">
+        {item.status === "blocked" && (
           <span className="shrink-0">
-            <StatusIcon status={item.status} />
+            <LockIcon />
           </span>
-          {title}
-          {marks}
-          <span className="hidden sm:inline-flex">
-            <ModulePill module={item.module} />
+        )}
+        {showInternalMark && item.visibility === "internal" && (
+          <span className="shrink-0 text-faint" title="Internal: hidden in customer view">
+            <EyeOffIcon />
           </span>
+        )}
+        {showWeek && <span>{weekLabel(item.week)}</span>}
+        <span className="ml-auto flex items-center gap-2">
           <SideTag side={item.side} />
           <Avatar name={item.owner} />
-        </>
-      )}
+        </span>
+      </span>
     </button>
+  );
+}
+
+interface BucketProps {
+  title: string;
+  purpose: string;
+  color: string;
+  count: number;
+  hiddenCount: number;
+  expanded: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+  empty?: string;
+}
+
+/** A whiteboard-style column: coloured header, one-line purpose, count, up to 5 cards. */
+export function Bucket({ title, purpose, color, count, hiddenCount, expanded, onToggle, children, empty }: BucketProps) {
+  return (
+    <section
+      className="flex min-w-0 flex-col rounded-xl border border-line bg-bg"
+      style={{ ["--c" as string]: `var(${color})` }}
+    >
+      <header
+        className="rounded-t-xl border-b border-line px-4 pb-3 pt-3"
+        style={{
+          background: "color-mix(in srgb, var(--c) 12%, var(--panel))",
+          borderTop: "3px solid var(--c)",
+        }}
+      >
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-[20px] font-semibold leading-tight" style={{ color: "var(--c)" }}>
+            {title}
+          </h2>
+          <span className="text-[15px] tabular-nums text-muted">{count}</span>
+        </div>
+        <p className="mt-1 text-[14px] leading-snug text-muted">{purpose}</p>
+      </header>
+      <div className="flex flex-col gap-2 p-3">
+        {count === 0 && <p className="px-1 py-2 text-[14px] text-faint">{empty ?? "Nothing here."}</p>}
+        {children}
+        {(hiddenCount > 0 || expanded) && (
+          <button
+            type="button"
+            onClick={onToggle}
+            className="rounded-md px-2 py-1.5 text-left text-[14px] text-muted hover:bg-hover hover:text-ink"
+          >
+            {expanded ? "Show less" : `Show ${hiddenCount} more`}
+          </button>
+        )}
+      </div>
+    </section>
   );
 }

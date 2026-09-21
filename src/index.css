@@ -14,6 +14,18 @@
   --accent: #7c8cf5;
   --warn: #d9a54a;
   --danger: #e0685f;
+  --ok: #5cb88a;
+  /* Bucket header colours */
+  --b-decision: #a58cf0;
+  --b-question: #d9a54a;
+  --b-start: #6e9cf0;
+  --b-quick: #5cb88a;
+  --b-earned: #c08ae0;
+  --b-after: #8a8b91;
+  --b-us: #6e9cf0;
+  --b-customer: #5cb88a;
+  --b-other: #e08a5c;
+  --b-resolved: #8a8b91;
   color-scheme: dark;
 }
 
@@ -29,6 +41,17 @@
   --accent: #4f5fd6;
   --warn: #b07a18;
   --danger: #c2453c;
+  --ok: #2f8a5c;
+  --b-decision: #7456d6;
+  --b-question: #a8701a;
+  --b-start: #3b6fd4;
+  --b-quick: #2f8a5c;
+  --b-earned: #9a4fc4;
+  --b-after: #6b6c73;
+  --b-us: #3b6fd4;
+  --b-customer: #2f8a5c;
+  --b-other: #c0622c;
+  --b-resolved: #6b6c73;
   color-scheme: light;
 }
 
@@ -44,6 +67,7 @@
   --color-accent: var(--accent);
   --color-warn: var(--warn);
   --color-danger: var(--danger);
+  --color-ok: var(--ok);
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
@@ -52,8 +76,8 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 

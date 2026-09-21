@@ -1,9 +1,11 @@
 // Illustrative example. Halden Retail Group is fictional.
-// Built only from examples/halden-retail-board.md and
-// examples/halden-retail-30-day-plan.md. No facts beyond those two files.
+// Built only from examples/halden-retail-board.md, examples/halden-retail-30-day-plan.md
+// and examples/halden-retail-handoff.md. No facts beyond those files. Groupings,
+// gates, quadrant placements and the proposed first value are judgment calls,
+// labelled inferred in the UI.
 // "Us" items default to M. Lindqvist, the implementation lead who received the handoff.
 
-import type { Account, Item } from "../types";
+import type { Account, FirstValue, Gate, Item, Person } from "../types";
 
 export const account: Account = {
   customer: "Halden Retail Group",
@@ -73,7 +75,7 @@ export const items: Item[] = [
   {
     id: "catalog-scope",
     title: "Decide: starter set or complete catalog",
-    kind: "task",
+    kind: "decision",
     module: "Service catalog",
     lane: "start",
     week: 1,
@@ -99,6 +101,7 @@ export const items: Item[] = [
     status: "blocked",
     owner: DANA,
     side: "customer",
+    team: "other",
     blockedBy: "No security owner or security contact named. Routed to the exec sponsor by default.",
     why: {
       field: "security_review, security_review_status, security_signoff",
@@ -119,6 +122,7 @@ export const items: Item[] = [
     status: "blocked",
     owner: DANA,
     side: "customer",
+    team: "other",
     blockedBy: "Credential holders UNKNOWN. No security or infrastructure contact named.",
     why: {
       field: "credential_holders, install_restrictions",
@@ -242,6 +246,7 @@ export const items: Item[] = [
     status: "todo",
     owner: DANA,
     side: "customer",
+    team: "other",
     why: { field: "security_review, security_signoff", answer: "UNKNOWN. Blocks discovery, and everything downstream of it.", source: "" },
     doneWhen: ["Answered, with a named sign-off owner"],
     notEvidence: [],
@@ -257,6 +262,7 @@ export const items: Item[] = [
     status: "todo",
     owner: DANA,
     side: "customer",
+    team: "other",
     why: { field: "security_contact", answer: "UNKNOWN. Never came up on any call. The infrastructure owner is almost never the ITSM project owner.", source: "" },
     doneWhen: ["A named security contact"],
     notEvidence: [],
@@ -272,6 +278,7 @@ export const items: Item[] = [
     status: "todo",
     owner: DANA,
     side: "customer",
+    team: "other",
     why: { field: "install_restrictions", answer: "UNKNOWN. Blocks the scanner host and agent deployment.", source: "" },
     doneWhen: ["Answered"],
     notEvidence: [],
@@ -302,6 +309,7 @@ export const items: Item[] = [
     status: "todo",
     owner: DANA,
     side: "customer",
+    team: "other",
     why: { field: "identity_contact", answer: "UNKNOWN. Single sign-on is required, and blocks catalog go-live.", source: "" },
     doneWhen: ["A named identity / IT contact"],
     notEvidence: [],
@@ -355,14 +363,14 @@ export const items: Item[] = [
   {
     id: "q-date-fixed",
     title: "Is 12 January 2027 fixed or preferred?",
-    kind: "question",
+    kind: "decision",
     module: "Timeline",
     lane: "start",
     week: 1,
     status: "todo",
     owner: `${DANA} and ${PRIYA}`,
     side: "customer",
-    why: { field: "date_fixed", answer: "UNKNOWN. Dana describes it as fixed. Priya described it as \"what we are aiming for\". They have not said this to each other in front of us.", source: "" },
+    why: { field: "date_fixed", answer: "UNKNOWN. Dana calls 2027-01-12 fixed and has told the board. Priya described it as \"what we are aiming for\". They have not said this to each other in front of us. Until settled there is no agreed target date, only two.", source: "" },
     doneWhen: ["Answered by both, together"],
     notEvidence: [],
     visibility: "internal",
@@ -507,7 +515,8 @@ export const items: Item[] = [
   {
     id: "v-till-faults",
     title: "Find the volume: till and printer faults in the stores",
-    kind: "volume",
+    kind: "question",
+    volume: true,
     module: "Service catalog",
     lane: "start",
     week: 1,
@@ -522,7 +531,8 @@ export const items: Item[] = [
   {
     id: "v-store-sheets",
     title: "Find the volume: store sheets onto a screen",
-    kind: "volume",
+    kind: "question",
+    volume: true,
     module: "Knowledge base",
     lane: "start",
     week: 1,
@@ -537,13 +547,15 @@ export const items: Item[] = [
   {
     id: "v-store-networks",
     title: "Find the volume: what is on the store networks",
-    kind: "volume",
+    kind: "question",
+    volume: true,
     module: "Discovery",
     lane: "start",
     week: 1,
     status: "todo",
     owner: DANA,
     side: "customer",
+    team: "other",
     why: { field: "Section 6, asset management with discovery request_2", answer: "\"Find out what is actually on the store networks\". Volume UNKNOWN. Unassigned, routed to the exec sponsor because no security or infrastructure contact is named.", source: "Priya, technical call, 2026-09-02" },
     doneWhen: ["A monthly volume, labelled measured or estimate"],
     notEvidence: [],
@@ -552,7 +564,8 @@ export const items: Item[] = [
   {
     id: "v-network-signoff",
     title: "Find the volume: sign-off for store network work in trading hours",
-    kind: "volume",
+    kind: "question",
+    volume: true,
     module: "Change management",
     lane: "start",
     week: 1,
@@ -567,7 +580,8 @@ export const items: Item[] = [
   {
     id: "v-freeze-written",
     title: "Find the volume: the December freeze, written down",
-    kind: "volume",
+    kind: "question",
+    volume: true,
     module: "Change management",
     lane: "start",
     week: 1,
@@ -583,8 +597,9 @@ export const items: Item[] = [
   // ─── Conflicts from the board ──────────────────────────────────────────
   {
     id: "c-asset-day30",
-    title: "Asset list expected by day 30; the lead time says 8 to 16 weeks",
-    kind: "conflict",
+    title: "Raise: asset list expected by day 30, lead time says 8 to 16 weeks",
+    kind: "task",
+    conflict: true,
     module: "Asset management",
     lane: "start",
     week: 1,
@@ -601,24 +616,10 @@ export const items: Item[] = [
     visibility: "internal",
   },
   {
-    id: "c-date-fixed",
-    title: "Dana says the date is fixed; Priya says it is what they aim for",
-    kind: "conflict",
-    module: "Timeline",
-    lane: "start",
-    week: 1,
-    status: "todo",
-    owner: US,
-    side: "us",
-    why: { field: "date_fixed", answer: "Dana calls 2027-01-12 fixed and has told the board. Priya calls it what they are aiming for. Until settled there is no agreed target date, only two.", source: "" },
-    doneWhen: ["Raised in week one, with both in the room"],
-    notEvidence: [],
-    visibility: "internal",
-  },
-  {
     id: "c-capacity",
-    title: "Technical owner has about 4 hours a week, and no admin is named",
-    kind: "conflict",
+    title: "Raise: technical owner has about 4 hours a week, no admin named",
+    kind: "task",
+    conflict: true,
     module: "Prerequisites",
     lane: "start",
     week: 1,
@@ -632,14 +633,14 @@ export const items: Item[] = [
   },
   {
     id: "c-macro",
-    title: "Success means no weekly spreadsheet, but the macro stays",
-    kind: "conflict",
+    title: "Decide: retire the weekly spreadsheet, or keep the macro",
+    kind: "decision",
     module: "Scope",
     lane: "start",
     week: 1,
     status: "todo",
-    owner: US,
-    side: "us",
+    owner: `${DANA} and ${PRIYA}`,
+    side: "customer",
     why: { field: "success_signal, keep_existing", answer: "Success is Dana no longer receiving the weekly spreadsheet. Priya expects the spreadsheet macro to keep running.", source: "" },
     doneWhen: ["Decided at kickoff"],
     notEvidence: [],
@@ -647,14 +648,14 @@ export const items: Item[] = [
   },
   {
     id: "c-one-process",
-    title: "\"One process\" is stated; the handoff describes two",
-    kind: "conflict",
+    title: "Decide: one process or two, and one workspace or two",
+    kind: "decision",
     module: "Service catalog",
     lane: "start",
     week: 2,
     status: "todo",
-    owner: US,
-    side: "us",
+    owner: `${PRIYA} and ${TOMAS}`,
+    side: "customer",
     why: { field: "process_shape, team_count", answer: "Shared (unsourced), but store support is phone-first and same-shift, head office ticket-first and next-day. One workspace or two is undecided.", source: TECH_CALL },
     doneWhen: ["Settled in week 2, before build"],
     notEvidence: [],
@@ -662,8 +663,9 @@ export const items: Item[] = [
   },
   {
     id: "c-finance-register",
-    title: "The asset count comes from a finance register, not IT",
-    kind: "conflict",
+    title: "Raise: the asset count comes from a finance register, not IT",
+    kind: "task",
+    conflict: true,
     module: "Asset management",
     lane: "start",
     week: 1,
@@ -677,8 +679,9 @@ export const items: Item[] = [
   },
   {
     id: "c-legacy-expiry",
-    title: "Legacy store desk tool expires 2027-03-31, a harder date than go-live",
-    kind: "conflict",
+    title: "Raise: legacy store desk tool expires 2027-03-31",
+    kind: "task",
+    conflict: true,
     module: "Timeline",
     lane: "start",
     week: 4,
@@ -1015,6 +1018,7 @@ export const items: Item[] = [
     status: "blocked",
     owner: DANA,
     side: "customer",
+    team: "other",
     blockedBy: "The gate: security review, credentials, network access, agent approval, infrastructure owner. All UNKNOWN.",
     why: { field: "Config: discovery lead time", answer: "8 to 16 weeks from the gate opening, which has not happened. The longest pole in most deployments.", source: "" },
     doneWhen: DISC_EV,
@@ -1055,5 +1059,107 @@ export const items: Item[] = [
     notEvidence: CHANGE_NOT,
     visibility: "shared",
     window: "Not before the go-live. Phase two, ahead of the 2027-03-31 legacy tool expiry",
+  },
+];
+
+// ─── First value (inferred) ───────────────────────────────────────────────
+// The highest-volume request in a module the handoff marks day30_required: yes,
+// tied to the stated outcome. A proposal, to confirm at kickoff.
+export const firstValue: FirstValue = {
+  text: "Password resets and account unlocks (~380 a month, head office, measured) arrive through the catalog into one queue, so the open count can be read without asking anyone.",
+  basis:
+    "Section 6: the highest-volume request in a module needed live by day 30. Tied to success_outcome: one queue for both desks, and one number Dana can read without asking anyone for it.",
+};
+
+// ─── Milestone gates (inferred) ───────────────────────────────────────────
+// Exit criteria come from the board and plan. A gate turns green only when
+// every linked item is done.
+export const gates: Gate[] = [
+  {
+    id: "kickoff",
+    label: "Kickoff done",
+    exit: "The kickoff decisions recorded: target date fixed or preferred, starter set or complete catalog, and the weekly spreadsheet or the macro.",
+    linked: ["q-date-fixed", "catalog-scope", "c-macro"],
+  },
+  {
+    id: "prereqs",
+    label: "Prerequisites cleared",
+    exit: "SSO live and in use by both desks, a test instance in place, a named admin with hours budgeted, and business hours and agent groups defined.",
+    linked: ["sso", "test-instance", "admin", "agent-groups"],
+  },
+  {
+    id: "first-value",
+    label: "First value live",
+    exit: "Password resets live as a catalog item, and catalog items receiving real requests from both desks.",
+    linked: ["catalog-password", "catalog-live"],
+  },
+  {
+    id: "day30",
+    label: "Day 30 review",
+    exit: "The January date re-agreed against evidence, and the asset list expectation settled.",
+    linked: ["day30-review"],
+  },
+];
+
+// ─── People (stakeholder map) ─────────────────────────────────────────────
+// Customer-side people and roles from the handoff. Quadrants are inferred.
+// Sentiment is unknown unless the handoff states it; it does not for anyone.
+export const people: Person[] = [
+  {
+    id: "dana",
+    name: DANA,
+    role: "COO, exec sponsor (unblocks and pays)",
+    wiifm: "One queue for both desks, and one number Dana can read without asking anyone for it.",
+    engagement: "Once: commercial call, 2026-09-04. No technical call.",
+    sentiment: "unknown",
+    quadrant: "satisfied",
+  },
+  {
+    id: "priya",
+    name: PRIYA,
+    role: "IT Operations Manager, technical owner",
+    wiifm: "Has read ITIL and wants \"the useful parts\".",
+    engagement: "On every call. About 4 hours a week for this.",
+    sentiment: "unknown",
+    quadrant: "closely",
+  },
+  {
+    id: "tomas",
+    name: TOMAS,
+    role: "Leads store support",
+    wiifm: "",
+    engagement: "Not on any call yet.",
+    sentiment: "unknown",
+    quadrant: "satisfied",
+  },
+  {
+    id: "security-contact",
+    name: "Security contact",
+    role: "UNKNOWN in the handoff. Never came up on any call.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "satisfied",
+    placeholder: true,
+  },
+  {
+    id: "identity-contact",
+    name: "Identity / IT contact",
+    role: "UNKNOWN in the handoff.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "informed",
+    placeholder: true,
+  },
+  {
+    id: "admin",
+    name: "Day-to-day admin",
+    role: "UNKNOWN. Priya expects to name someone from the service desk.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "informed",
+    placeholder: true,
   },
 ];
