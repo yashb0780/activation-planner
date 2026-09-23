@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { account, firstValue, gates, items as baseItems, people } from "./data/halden";
+import { account, firstValue, gates, items as baseItems, ourTeam, people, successPlan } from "./data/halden";
 import { readPref, useTracker, writePref } from "./state";
 import type { Item, Week } from "./types";
 import { Bucket, Card } from "./components/Card";
 import { Panel } from "./components/Panel";
 import { FirstValueLine, Milestones, NeedsAttention } from "./components/Top";
 import { People } from "./components/People";
+import { SuccessPlan } from "./components/SuccessPlan";
+import { formatDate } from "./dates";
 
-type Tab = "plan" | "people";
+type Tab = "plan" | "success" | "people";
 type Lens = "lead" | "owner" | "module";
 type WeekFilter = "all" | 1 | 2 | 3 | 4;
 
@@ -26,14 +28,6 @@ interface BucketDef {
 const ownerGroup = (i: Item) => (i.team === "other" ? "other" : i.side);
 const weekRank = (w: Week) => (w === "after" ? 5 : w);
 const doneLast = (a: Item, b: Item) => Number(a.status === "done") - Number(b.status === "done");
-
-function formatDate(iso: string, withYear = false) {
-  return new Date(`${iso}T00:00:00`).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    ...(withYear ? { year: "numeric" } : {}),
-  });
-}
 
 function ownerBuckets(items: Item[], customerFirst: boolean): BucketDef[] {
   const defs: BucketDef[] = [
@@ -77,7 +71,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (customerView) setTab("plan");
+    if (customerView) setTab((t) => (t === "people" ? "plan" : t));
   }, [customerView]);
 
   const visible = useMemo(
@@ -95,7 +89,24 @@ export default function App() {
       return { pinned: [] as BucketDef[], buckets: ownerBuckets(sorted, true), resolved: [] as Item[] };
     }
     const open = inWeek.filter((i) => !(i.kind !== "task" && i.status === "done"));
-    const tasks = open.filter((i) => i.kind === "task").sort(doneLast);
+    const allTasks = open.filter((i) => i.kind === "task").sort(doneLast);
+    // The Foundation tier gets its own bucket in every grouping, ahead of the others.
+    const tasks = allTasks.filter((i) => i.lane !== "foundation");
+    const foundationGate = gates.find((g) => g.lane === "foundation");
+    const gateDone = foundationGate
+      ? foundationGate.linked.filter((id) => items.find((i) => i.id === id)?.status === "done").length
+      : 0;
+    const foundation: BucketDef = {
+      key: "foundation",
+      title: "Foundation",
+      purpose:
+        "Setup every module needs. Starts in week 1, each at its own lead time." +
+        (foundationGate
+          ? ` Clears “${foundationGate.label}”: ${gateDone} of ${foundationGate.linked.length} done.`
+          : ""),
+      color: "--b-foundation",
+      items: allTasks.filter((i) => i.lane === "foundation"),
+    };
     const pinned: BucketDef[] = [
       {
         key: "decisions",
@@ -134,8 +145,8 @@ export default function App() {
       }));
     }
     const resolved = inWeek.filter((i) => i.kind !== "task" && i.status === "done");
-    return { pinned, buckets: buckets.filter((b) => b.items.length > 0), resolved };
-  }, [inWeek, lens, customerView]);
+    return { pinned, buckets: [foundation, ...buckets].filter((b) => b.items.length > 0), resolved };
+  }, [inWeek, lens, customerView, items]);
 
   const shown = (b: BucketDef) => (expanded[b.key] ? b.items : b.items.slice(0, LIMIT));
 
@@ -224,7 +235,7 @@ export default function App() {
   );
 
   const seg = (active: boolean) =>
-    `rounded-md px-3 py-1 ${active ? "bg-raised text-ink" : "text-muted hover:text-ink"}`;
+    `whitespace-nowrap rounded-md px-2 py-1 sm:px-3 ${active ? "bg-raised text-ink" : "text-muted hover:text-ink"}`;
   const ctrl = "rounded-md border border-line px-2.5 py-1 text-muted hover:text-ink";
 
   return (
@@ -240,6 +251,9 @@ export default function App() {
           <nav className="flex gap-0.5 rounded-lg border border-line p-0.5 text-[14px]">
             <button type="button" onClick={() => setTab("plan")} className={seg(tab === "plan")}>
               Plan
+            </button>
+            <button type="button" onClick={() => setTab("success")} className={seg(tab === "success")}>
+              Success plan
             </button>
             {!customerView && (
               <button type="button" onClick={() => setTab("people")} className={seg(tab === "people")}>
@@ -289,8 +303,8 @@ export default function App() {
         {tab === "plan" && (
           <>
             <FirstValueLine
-              key={saved.firstValue ?? "default"}
-              value={saved.firstValue ?? firstValue.text}
+              key={JSON.stringify(saved.firstValue)}
+              value={saved.firstValue ?? firstValue}
               edited={saved.firstValue !== null}
               basis={firstValue.basis}
               onSave={tracker.setFirstValue}
@@ -365,6 +379,19 @@ export default function App() {
               </section>
             )}
           </section>
+        )}
+
+        {tab === "success" && (
+          <SuccessPlan
+            account={account}
+            plan={successPlan}
+            firstValue={saved.firstValue ?? firstValue}
+            firstValueEdited={saved.firstValue !== null}
+            gates={gates}
+            items={items}
+            people={people}
+            ourTeam={ourTeam}
+          />
         )}
 
         {tab === "people" && !customerView && (

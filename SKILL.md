@@ -79,7 +79,7 @@ Do not introduce product names, vendors, or tooling the handoff does not.
 
 From the **config**, extract for every module: lead time (with its conditions),
 the `Depends on` list, the `Evidence it is real` list, and the `Not evidence`
-line. Also extract the cross-cutting prerequisites, the sequencing order, the
+line. Also extract the Foundation items with their lead times, the sequencing order, the
 ordering rules, and the list of where these plans usually slip.
 
 From the **handoff**, pull forward and keep visible for every later step:
@@ -115,8 +115,16 @@ plus a payload — discovery gating asset management — they are two rows with
 two dependency lists and two evidence lists, everywhere they appear. Never
 merge them into one line, and never let the payload inherit the gate's status.
 
-**Treat the cross-cutting prerequisites as a row of their own**, sitting ahead
-of every module.
+**Foundation is a tier of its own**, sitting ahead of every module. The config
+lists its items; the skill knows only two things about them:
+
+- **Every Foundation item starts in week 1.**
+- **Foundation does not override lead time.** Each item keeps the lead time the
+  config gives it, resolved as in Step 2. A long-lead Foundation item starts in
+  week 1 and can finish later; say when, as a range, like any other long item.
+
+Each Foundation item is one row with its own status (Step 3), not one combined
+line.
 
 ## Step 2 — Resolve conditional lead times
 
@@ -193,6 +201,37 @@ Open with **Read this first**:
   and the commitments table against the lead times. Give each one a sentence on
   what to do about it and when to raise it.
 
+Then **First value**, proposed and marked `(inferred)`, to confirm at kickoff.
+Pick the highest-volume request in a module with `day30_required: yes`, and
+tie it to `success_outcome`. Write it short, never as a paragraph:
+
+- **Headline** — one line: what flows where, in plain words.
+- **Volume** — the request's volume, whose, and estimate or measured.
+- **Proof** — what the `success_judge` sees when it works, from
+  `success_outcome` or `success_signal`.
+- **Why first** — a few words on why this request leads.
+- **Why?** — the longer reasoning: which section 6 block, which rule picked it,
+  which success field it serves. This is the only part allowed to run long.
+
+Then **Milestones**: 2 to 4 gates, in order, each with a target week (from the
+plan, marked `(inferred)`). Under each gate, 2 to 4 criteria. Each criterion:
+
+- is under 7 words, a fact rather than a sentence ("Test instance ready", not
+  "A test instance should be in place before configuration starts")
+- names the one board item whose completion ticks it, in brackets after it
+- never claims a module is live on something its `Not evidence` line rules out
+
+The first gate is kickoff. It includes the success plan (Step 6). If Foundation
+has items, one gate is for Foundation clearing, and its criteria are drawn from
+the Foundation rows.
+
+Then the **Foundation** table, one row per Foundation item:
+
+| Foundation item | Lead time | Where it stands | Expected to finish | Status |
+
+Every row starts in week 1. "Expected to finish" is week 1 only when the lead
+time allows it; a long-lead item gets a range.
+
 Then one table per sequencing step, in config order:
 
 | Module | Lead time | Depends on, and where each stands | Evidence it is real | Status |
@@ -225,6 +264,17 @@ Per week: **focus**, **starting**, **reaching evidence this week** (rare, and
 only where dependencies closed in an earlier week), **needed from the
 customer** (named people, specific asks), **checkpoint**, **risks live this
 week**.
+
+Week 1 always has these, whatever the product:
+
+- every Foundation item, starting (not necessarily finishing)
+- **Draft success plan, confirm at kickoff, share by end of week 1.** Owner:
+  the assigned CSM from section 2, or *unassigned* if the handoff names none.
+  The success plan is one page built only from the handoff: their goal in
+  their words (`success_outcome`), the proposed first value, success measures
+  with their section 10 baselines (estimates stay labelled), the milestones
+  with target dates, and the named owners on both sides. It counts toward the
+  kickoff gate.
 
 Then, for every long-lead module, a **day-30 checkpoint** — a real signal of
 progress, never a completion claim. A good checkpoint is observable, is drawn
@@ -281,6 +331,12 @@ fastest way for a reader to see the difference between the two kinds of claim.
   groundwork.
 - Every section 6 request with no volume is a discovery task with an owner.
 - Gate and payload modules are separate rows with separate evidence everywhere.
+- Every Foundation item from the config has a row, starts in week 1, and keeps
+  its own lead time.
+- First value is a headline plus Volume, Proof and Why first, with the long
+  reasoning under Why?. No paragraph.
+- Every milestone has 2 to 4 criteria, each under 7 words and tied to one
+  board item. The kickoff gate includes the success plan.
 - Every evidence statement is quoted from the config, unedited.
 - Every `Blocked` names who unblocks it. Every `Gated by UNKNOWN` names the
   fields.

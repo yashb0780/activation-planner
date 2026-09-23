@@ -120,6 +120,37 @@ call. That is still the headline finding on this account.
    device count to reconcile against the customer's expected count, so this
    number will be the yardstick, and it was not built for that.
 
+### First value (proposed, confirm at kickoff) (inferred)
+
+**Password resets and unlocks flow into one queue**
+
+- **Volume:** about 380 a month, head office, measured
+- **Proof:** Dana reads the open count without asking
+- **Why first:** highest volume, needed live by day 30
+
+*Why?* Section 6: the highest-volume request in a module needed live by day
+30. Tied to `success_outcome`: one queue for both desks, and one number Dana
+can read without asking anyone for it.
+
+### Milestones (inferred)
+
+1. **Kickoff done**, by end of week 1
+   - Target date fixed or preferred (item: is 12 January 2027 fixed or preferred?)
+   - Starter set or full catalog (item: decide starter set or complete catalog)
+   - Spreadsheet or macro decided (item: decide retire the spreadsheet or keep the macro)
+   - Success plan confirmed and shared (item: draft success plan, confirm at kickoff)
+2. **Prerequisites cleared**, by day 30 (the Foundation gate)
+   - SSO live for both desks (item: set up single sign-on)
+   - Test instance ready (item: request the test instance)
+   - Admin named, hours budgeted (item: get a day-to-day admin named)
+   - Business hours and agent groups set (item: define agent groups and business hours)
+3. **First value live**, by day 30
+   - Password resets live in catalog (item: build password resets catalog item)
+   - Real requests from both desks (item: catalog items live to both desks)
+4. **Day 30 review**, by day 30
+   - January date re-agreed on evidence (item: day 30 review)
+   - Asset list expectation settled (item: day 30 review)
+
 ---
 
 ## Step 1 — Week one: cross-cutting prerequisites and opening the long gates

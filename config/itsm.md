@@ -11,14 +11,16 @@ Lead time is calendar time from kickoff to the evidence below being true, assumi
 
 Depends on is a hard prerequisite. Starting a module before its dependencies are in place produces rework, not progress.
 Evidence is what proves the module is doing work, not that it was switched on. The test for any piece of evidence: could this still be true if nobody at the customer had touched the product since go-live? If yes, it is not evidence, it is configuration.
-Cross-cutting prerequisites
-Nothing below starts cleanly without these. Missing items are week-one work, not later detail.
+Foundation
+Nothing below starts cleanly without these. Every item starts in week one. Each keeps its own lead time, so a long one starts in week one and may finish later.
 
-* Authentication: SSO configured, and user provisioning (directory sync or SCIM) agreed
-* Agent groups and business hours defined, so routing has somewhere to route
-* Inbound email or alias cutover plan, including what happens to the old address
-* A named admin on the customer side with time actually budgeted, not an interested volunteer
-* Sandbox or test instance if they have a change freeze or an audit requirement
+* Roles and permissions: agent, admin and requester roles set for each team in scope. Lead time: short.
+* Authentication: SSO configured, and user provisioning (directory sync or SCIM) agreed. Lead time: short when the identity team is in the room; long when it sits outside the buying team.
+* Workspaces: one or several, decided from how many genuinely different processes the teams run. Lead time: short once that is decided.
+* Agent groups and business hours defined, so routing has somewhere to route. Lead time: short.
+* Inbound email or alias cutover plan, including what happens to the old address. Lead time: short.
+* Sandbox or test instance if they have a change freeze or an audit requirement. Lead time: short.
+* A named admin on the customer side with time actually budgeted, not an interested volunteer. Lead time: short to name; the time budget is what slips.
 
 Module: Service catalog
 Lead time: Short for a starter set of 8 to 12 request types. Long if they insist on launching with a complete catalog, which is the most common reason a go-live date slips.
@@ -143,7 +145,7 @@ Add these rows to section 10 as well:
 Sequencing
 Default order, driven by dependencies rather than by customer enthusiasm:
 
-1. Week 1: cross-cutting prerequisites, plus open the security review and the credential requests for discovery. These are mostly waiting rather than work, which is exactly why they start first.
+1. Week 1: foundation, plus open the security review and the credential requests for discovery. These are mostly waiting rather than work, which is exactly why they start first.
 2. Weeks 1 to 4: taxonomy, then the service catalog starter set. First visible win.
 3. Weeks 2 to 6: workflow automation on the catalog items that now exist.
 4. Weeks 1 to 12, in parallel: discovery, then asset management.

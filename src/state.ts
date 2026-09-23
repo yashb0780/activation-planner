@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Decision, Item, Note, Quadrant, Sentiment, Status } from "./types";
+import type { Decision, FirstValue, Item, Note, Quadrant, Sentiment, Status } from "./types";
+
+/** The parts of First value a person can edit. */
+export type FirstValueEdit = Pick<FirstValue, "headline" | "points">;
 
 const KEY = "activation-tracker:halden:v2";
 
@@ -8,7 +11,7 @@ export interface Saved {
   notes: Record<string, Note[]>;
   answers: Record<string, string>;
   decisions: Record<string, Decision>;
-  firstValue: string | null;
+  firstValue: FirstValueEdit | null;
   quadrants: Record<string, Quadrant>;
   sentiments: Record<string, Sentiment>;
 }
@@ -27,7 +30,11 @@ function load(): Saved {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return empty;
-    return { ...empty, ...(JSON.parse(raw) as Partial<Saved>) };
+    const saved = { ...empty, ...(JSON.parse(raw) as Partial<Saved>) };
+    // Older versions saved First value as one paragraph. Drop it rather than show a broken card.
+    const fv = saved.firstValue as unknown;
+    if (fv !== null && (typeof fv !== "object" || !Array.isArray((fv as FirstValueEdit).points))) saved.firstValue = null;
+    return saved;
   } catch {
     return empty;
   }
@@ -103,7 +110,7 @@ export function useTracker(base: Item[]) {
     });
   }, []);
 
-  const setFirstValue = useCallback((text: string) => setSaved((s) => ({ ...s, firstValue: text })), []);
+  const setFirstValue = useCallback((fv: FirstValueEdit) => setSaved((s) => ({ ...s, firstValue: fv })), []);
   const setQuadrant = useCallback(
     (id: string, q: Quadrant) => setSaved((s) => ({ ...s, quadrants: { ...s.quadrants, [id]: q } })),
     [],

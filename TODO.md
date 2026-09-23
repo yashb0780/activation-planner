@@ -2,6 +2,17 @@
 
 Parked issues. Not fixed yet.
 
+## Foundation tier follow-ups (2026-09-23)
+
+1. **No `config/devtool.md` yet.** The Foundation tier was added to
+   `config/itsm.md` only. When a devtool config is written, give it a
+   Foundation section in the same shape.
+2. **Example board, plan and report not fully regenerated.** The example board
+   now has the First value and Milestones sections, but its Step 1 table, the
+   30-day plan and `public/report.html` still say "cross-cutting
+   prerequisites" and do not yet have the Foundation table or the success plan
+   task. Regenerate them with the current SKILL.md.
+
 ## SKILL.md gaps found when regenerating the example (2026-09-21)
 
 1. **Combined section 6 block vs split modules.** The handoff has one section 6

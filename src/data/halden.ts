@@ -5,7 +5,7 @@
 // labelled inferred in the UI.
 // "Us" items default to M. Lindqvist, the implementation lead who received the handoff.
 
-import type { Account, FirstValue, Gate, Item, Person } from "../types";
+import type { Account, FirstValue, Gate, Item, Person, SuccessPlan, TeamMember } from "../types";
 
 export const account: Account = {
   customer: "Halden Retail Group",
@@ -138,11 +138,30 @@ export const items: Item[] = [
     visibility: "shared",
   },
   {
+    id: "roles",
+    title: "Set up roles and permissions for both desks",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    owner: US,
+    side: "us",
+    why: {
+      field: "Config: Foundation. teams_launch",
+      answer: "Head-office IT desk (9 agents) and store support desk (14 agents) at launch.",
+      source: "",
+    },
+    doneWhen: ["Agent, admin and requester roles set for both desks"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
     id: "sso",
     title: "Set up single sign-on for both desks",
     kind: "task",
-    module: "Prerequisites",
-    lane: "start",
+    module: "Foundation",
+    lane: "foundation",
     week: 1,
     status: "blocked",
     owner: US,
@@ -156,13 +175,15 @@ export const items: Item[] = [
     doneWhen: ["SSO live and in use by both desks"],
     notEvidence: [],
     visibility: "shared",
+    window:
+      "Starts week 1. Short if the identity team is reached in week 1, long if it stays outside the buying team. Identity contact is UNKNOWN (inferred)",
   },
   {
     id: "test-instance",
     title: "Request the test instance",
     kind: "task",
-    module: "Prerequisites",
-    lane: "start",
+    module: "Foundation",
+    lane: "foundation",
     week: 1,
     status: "todo",
     owner: US,
@@ -180,8 +201,8 @@ export const items: Item[] = [
     id: "admin",
     title: "Get a day-to-day admin named, with hours budgeted",
     kind: "task",
-    module: "Prerequisites",
-    lane: "start",
+    module: "Foundation",
+    lane: "foundation",
     week: 1,
     status: "todo",
     owner: DANA,
@@ -199,15 +220,15 @@ export const items: Item[] = [
     id: "agent-groups",
     title: "Define agent groups and business hours",
     kind: "task",
-    module: "Prerequisites",
-    lane: "start",
+    module: "Foundation",
+    lane: "foundation",
     week: 1,
     status: "blocked",
     owner: US,
     side: "us",
     blockedBy: "One process or two is not settled.",
     why: {
-      field: "Config: cross-cutting prerequisites. process_shape",
+      field: "Config: Foundation. process_shape",
       answer: "Routing needs somewhere to route. Stated as one shared process, but the two desks work differently.",
       source: "",
     },
@@ -219,8 +240,8 @@ export const items: Item[] = [
     id: "mailbox-cutover",
     title: "Plan the shared mailbox cutover",
     kind: "task",
-    module: "Prerequisites",
-    lane: "start",
+    module: "Foundation",
+    lane: "foundation",
     week: 1,
     status: "todo",
     owner: US,
@@ -231,6 +252,25 @@ export const items: Item[] = [
       source: "",
     },
     doneWhen: ["An inbound email cutover plan, including what happens to the old address"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "success-plan",
+    title: "Draft success plan, confirm at kickoff, share by end of week 1",
+    kind: "task",
+    module: "Success plan",
+    lane: "quick",
+    week: 1,
+    status: "todo",
+    owner: US,
+    side: "us",
+    why: {
+      field: "csm, success_outcome, success_signal, success_number",
+      answer: "Assigned CSM: M. Lindqvist. The plan is built from their stated outcome, the proposed first value, the baselines and the milestones.",
+      source: "",
+    },
+    doneWhen: ["Success plan confirmed at kickoff and shared with Dana and Priya"],
     notEvidence: [],
     visibility: "shared",
   },
@@ -303,7 +343,7 @@ export const items: Item[] = [
     id: "q-identity-contact",
     title: "Who is the identity / IT contact?",
     kind: "question",
-    module: "Prerequisites",
+    module: "Foundation",
     lane: "start",
     week: 1,
     status: "todo",
@@ -319,7 +359,7 @@ export const items: Item[] = [
     id: "q-provisioning",
     title: "Is automated user provisioning required, and does the licence tier include it?",
     kind: "question",
-    module: "Prerequisites",
+    module: "Foundation",
     lane: "start",
     week: 1,
     status: "todo",
@@ -334,7 +374,7 @@ export const items: Item[] = [
     id: "q-data-residency",
     title: "Any data residency or regional hosting requirements?",
     kind: "question",
-    module: "Prerequisites",
+    module: "Foundation",
     lane: "start",
     week: 1,
     status: "todo",
@@ -349,7 +389,7 @@ export const items: Item[] = [
     id: "q-admin",
     title: "Who will be the day-to-day admin?",
     kind: "question",
-    module: "Prerequisites",
+    module: "Foundation",
     lane: "start",
     week: 1,
     status: "todo",
@@ -620,8 +660,8 @@ export const items: Item[] = [
     title: "Raise: technical owner has about 4 hours a week, no admin named",
     kind: "task",
     conflict: true,
-    module: "Prerequisites",
-    lane: "start",
+    module: "Foundation",
+    lane: "foundation",
     week: 1,
     status: "todo",
     owner: US,
@@ -1066,39 +1106,104 @@ export const items: Item[] = [
 // The highest-volume request in a module the handoff marks day30_required: yes,
 // tied to the stated outcome. A proposal, to confirm at kickoff.
 export const firstValue: FirstValue = {
-  text: "Password resets and account unlocks (~380 a month, head office, measured) arrive through the catalog into one queue, so the open count can be read without asking anyone.",
+  headline: "Password resets and unlocks flow into one queue",
+  points: [
+    { label: "Volume", text: "About 380 a month, head office, measured" },
+    { label: "Proof", text: "Dana reads the open count without asking" },
+    { label: "Why first", text: "Highest volume, needed live by day 30" },
+  ],
   basis:
     "Section 6: the highest-volume request in a module needed live by day 30. Tied to success_outcome: one queue for both desks, and one number Dana can read without asking anyone for it.",
 };
 
 // ─── Milestone gates (inferred) ───────────────────────────────────────────
-// Exit criteria come from the board and plan. A gate turns green only when
-// every linked item is done.
+// Criteria come from the board and plan. Each ticks when its item is done. A
+// gate turns green only when every linked item is done. Target weeks come from
+// the plan: the kickoff decisions are week 1; the rest are day-30 checkpoints.
 export const gates: Gate[] = [
   {
     id: "kickoff",
     label: "Kickoff done",
-    exit: "The kickoff decisions recorded: target date fixed or preferred, starter set or complete catalog, and the weekly spreadsheet or the macro.",
-    linked: ["q-date-fixed", "catalog-scope", "c-macro"],
+    criteria: [
+      { text: "Target date fixed or preferred", item: "q-date-fixed" },
+      { text: "Starter set or full catalog", item: "catalog-scope" },
+      { text: "Spreadsheet or macro decided", item: "c-macro" },
+      { text: "Success plan confirmed and shared", item: "success-plan" },
+    ],
+    linked: ["q-date-fixed", "catalog-scope", "c-macro", "success-plan"],
+    by: 1,
   },
   {
     id: "prereqs",
     label: "Prerequisites cleared",
-    exit: "SSO live and in use by both desks, a test instance in place, a named admin with hours budgeted, and business hours and agent groups defined.",
+    criteria: [
+      { text: "SSO live for both desks", item: "sso" },
+      { text: "Test instance ready", item: "test-instance" },
+      { text: "Admin named, hours budgeted", item: "admin" },
+      { text: "Business hours and agent groups set", item: "agent-groups" },
+    ],
     linked: ["sso", "test-instance", "admin", "agent-groups"],
+    by: 4,
+    lane: "foundation",
   },
   {
     id: "first-value",
     label: "First value live",
-    exit: "Password resets live as a catalog item, and catalog items receiving real requests from both desks.",
+    criteria: [
+      { text: "Password resets live in catalog", item: "catalog-password" },
+      { text: "Real requests from both desks", item: "catalog-live" },
+    ],
     linked: ["catalog-password", "catalog-live"],
+    by: 4,
   },
   {
     id: "day30",
     label: "Day 30 review",
-    exit: "The January date re-agreed against evidence, and the asset list expectation settled.",
+    criteria: [
+      { text: "January date re-agreed on evidence", item: "day30-review" },
+      { text: "Asset list expectation settled", item: "day30-review" },
+    ],
     linked: ["day30-review"],
+    by: 4,
   },
+];
+
+// ─── Success plan ─────────────────────────────────────────────────────────
+// Only handoff facts: section 5 for the goal and measures, section 10 for the
+// baselines. Estimates stay labelled as estimates.
+export const successPlan: SuccessPlan = {
+  goal: "One queue for both desks, and one number Dana can read without asking anyone for it.",
+  goalSource: "success_outcome",
+  judge: DANA,
+  measures: [
+    {
+      measure: "Open request count, reported monthly to the board",
+      baseline: "About 1,400 requests a month, head office. Stores UNKNOWN.",
+      basis: "Estimate. Priya, from the spreadsheet tracker, 2026-09-16",
+    },
+    {
+      measure: "Average age of open requests",
+      baseline: "No age baseline. Nearest: about 3.5 days to resolve, head office only",
+      basis: "Estimate. Priya, 2026-09-16",
+    },
+    {
+      measure: "Dana stops receiving the weekly spreadsheet by email",
+      baseline: "Sent weekly today, by a spreadsheet macro",
+      basis: "Handoff, keep_existing",
+    },
+    {
+      measure: "Share of requests arriving unstructured (inferred)",
+      baseline: "\"Nearly all of it\" arrives unstructured today",
+      basis: "Estimate. Priya, discovery call, 2026-08-27",
+    },
+  ],
+};
+
+// Our side, from section 2 of the handoff.
+export const ourTeam: TeamMember[] = [
+  { name: US, role: "Assigned CSM and implementation lead" },
+  { name: "D. Osei", role: "Rep" },
+  { name: "K. Varga", role: "SE" },
 ];
 
 // ─── People (stakeholder map) ─────────────────────────────────────────────

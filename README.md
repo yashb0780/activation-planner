@@ -95,7 +95,7 @@ site into `dist/`, which is what Vercel deploys.
    Per module: lead time (short or long, with any conditions that change it),
    what it depends on, what evidence proves it is doing work, and a
    `Not evidence` line listing what gets mistaken for that evidence. Plus the
-   cross-cutting prerequisites, the baseline metrics your product measures, a
+   foundation items (setup every module needs, each with a lead time), the baseline metrics your product measures, a
    default sequencing order, and the ways plans on your product usually slip.
 2. Hand `templates/handoff.md` to the rep and the SE, who fill it together on
    one call. The rep owns sections 1 to 5, the SE sections 6 to 10.

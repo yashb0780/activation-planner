@@ -17,6 +17,7 @@
   --ok: #5cb88a;
   /* Bucket header colours */
   --b-decision: #a58cf0;
+  --b-foundation: #4fb3bf;
   --b-question: #d9a54a;
   --b-start: #6e9cf0;
   --b-quick: #5cb88a;
@@ -43,6 +44,7 @@
   --danger: #c2453c;
   --ok: #2f8a5c;
   --b-decision: #7456d6;
+  --b-foundation: #1f7f8a;
   --b-question: #a8701a;
   --b-start: #3b6fd4;
   --b-quick: #2f8a5c;
