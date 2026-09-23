@@ -46,6 +46,15 @@ Write both, in this order, beside the handoff unless told otherwise:
 The board ranks. The plan sequences what the board ranked. Build them in that
 order.
 
+**Both files open the same way**, before anything else:
+
+1. **A status line: `Status: Draft — 0 of N sections reviewed`.** Every
+   generated file is a draft. Under every `##` section heading, put one line:
+   `- [ ] Reviewed`. The person reviewing ticks each box as they finish a
+   section, and changes the status line to `Status: Reviewed` only when every
+   box is ticked. Never write `Reviewed` yourself.
+2. **The handoff gate panel**, if Step 0 found gaps (see Step 0).
+
 ---
 
 ## Ground rules
@@ -73,13 +82,56 @@ anchored to the event that starts them — not as dates the handoff did not give
 **Vendor-neutral.** Name the customer's systems only as the handoff names them.
 Do not introduce product names, vendors, or tooling the handoff does not.
 
+**Every line says where it came from.** Every row on the board and every task in
+the plan ends with a source tag: `From: <field name>`, using the field's name
+exactly as `templates/handoff.md` writes it in the Field, Role or Metric
+column — for example `From: Security review required before deployment`. For
+a section 6 request, write `From: What they want set up first — <module>,
+request <rank>`. For a baseline row the config adds, use the config's name for
+it. If the item comes from a config default and no handoff field, write
+`From: product config`. If both, list the handoff fields first and end with
+`product config`. A source tag names the field, not its answer.
+
+**Owners are roles, not names.** The plan keeps one **People** list: every role
+on both sides, with the name the handoff gives for it, or *not named*. Our
+side: CSM, implementation lead, SE, rep. Their side: every role in section 2 of
+the handoff, plus anyone else the handoff names with a job on the account.
+Every task names an owner role on each side:
+
+- **Default:** our side is the CSM; their side is the technical owner.
+- **Override:** where the plan names someone else for a task, use their role
+  instead.
+- **More than one:** list them in order. The first is the primary.
+
+Write `Owners: us — <role>; them — <role>`. The name is looked up from the
+People list, so a change to one name changes every task that uses the role.
+
 ---
+
+## Step 0 — Check the handoff gate
+
+`templates/handoff.md` has a table called **Required before planning**. It is
+the only place the list of required fields is kept; read it from there every
+time, never from memory. For each row, read that field in the filled handoff:
+
+- **Missing:** blank, or `UNKNOWN`.
+- **Partly missing:** the answer contains `UNKNOWN` alongside something else.
+
+Build the plan either way. If any field is missing or partly missing, open both
+files, right under the status line, with a **Handoff incomplete** panel:
+
+| Field | What is missing | Who fills it |
+
+"Who fills it" is the role in the table's **Filled by** column (rep or SE),
+followed by that person's name from the handoff. If nothing is missing, write
+one line instead: `Handoff gate: all required fields filled.`
 
 ## Step 1 — Read both files and build the fact base
 
 From the **config**, extract for every module: lead time (with its conditions),
 the `Depends on` list, the `Evidence it is real` list, and the `Not evidence`
-line. Also extract the Foundation items with their lead times, the sequencing order, the
+line. Also extract the Foundation items with their lead times, each module's
+`Lead time in weeks` line, the **Drift rules**, the sequencing order, the
 ordering rules, and the list of where these plans usually slip.
 
 From the **handoff**, pull forward and keep visible for every later step:
@@ -227,18 +279,40 @@ the Foundation rows.
 
 Then the **Foundation** table, one row per Foundation item:
 
-| Foundation item | Lead time | Where it stands | Expected to finish | Status |
+| Foundation item | Lead time | Where it stands | Expected to finish | Status | From |
 
 Every row starts in week 1. "Expected to finish" is week 1 only when the lead
 time allows it; a long-lead item gets a range.
 
 Then one table per sequencing step, in config order:
 
-| Module | Lead time | Depends on, and where each stands | Evidence it is real | Status |
+| Module | Lead time | Depends on, and where each stands | Evidence it is real | Status | From |
 
 Every dependency gets its current state from the handoff, not just a name. A
 dependency list that does not say where each item stands is a copy of the
 config, not a plan.
+
+Then the **Drift check**, for every long-lead module that has a
+`Lead time in weeks` line in the config. Follow the config's **Drift rules**
+for every threshold: the buffer, whether freezes pause work, and which end of
+the lead time each flag uses. The skill never picks those numbers.
+
+- **As of:** day 1, or the date the plan is regenerated if that is later.
+- **Latest safe start:** count back from the target date by the lead time
+  (the end the config names for amber), skipping freeze days if the config
+  says freezes pause work, then subtract the buffer.
+- **Earliest finish:** count forward from the as-of date by the lead time (the
+  end the config names for red), skipping freeze days the same way.
+- **Drifting (amber):** not started, and the as-of date is after the latest
+  safe start.
+- **At risk (red):** not started, and the earliest finish is after the target
+  date. Red wins over amber.
+- **Started** means work on the module itself has begun, not groundwork.
+
+| Module | Lead time in weeks | Latest safe start | Earliest finish if started on the as-of date | Flag |
+
+Also give the date each amber module turns red if it still has not started. A
+flag is a fact about dates, never a forecast. Name the flag, not a cause.
 
 Close the board with the config's **where these plans usually slip** list,
 scored against this handoff: for each, whether it is already happening here,
@@ -260,10 +334,16 @@ project. The 30-day output answers three questions:
 2. What proof exists that it is moving.
 3. What is on track to land after day 30, and when.
 
+Open the plan with the **People** list (see Ground rules), after the status
+line and the handoff gate panel.
+
 Per week: **focus**, **starting**, **reaching evidence this week** (rare, and
 only where dependencies closed in an earlier week), **needed from the
 customer** (named people, specific asks), **checkpoint**, **risks live this
 week**.
+
+Every task under **starting** carries its owners and its source tag on its own
+line: `Owners: us — CSM; them — Technical owner · From: Target go-live date`.
 
 Week 1 always has these, whatever the product:
 
@@ -285,8 +365,8 @@ owners named for each team and the first agent-written article published. A bad
 checkpoint restates an intention, or claims the module is "on track" without
 saying what makes that visible.
 
-Give each long-lead module: what started, its day-30 signal, and an **expected
-landing window** as a range from the config's lead time, anchored to the event
+Give each long-lead module: what started, its day-30 signal, its **drift flag**
+from the board, and an **expected landing window** as a range from the config's lead time, anchored to the event
 that starts the clock — and adjusted for any freeze period in the handoff.
 Count the freeze explicitly; a freeze inside the runway is calendar the plan
 does not have.
@@ -345,6 +425,14 @@ fastest way for a reader to see the difference between the two kinds of claim.
   from the baseline table is still labelled an estimate.
 - Step 7 ran, and its downgrades are recorded.
 - Every `(inferred)` line is marked.
+- Both files open with `Status: Draft`, and every `##` section has a
+  `- [ ] Reviewed` line.
+- Step 0 ran against the **Required before planning** table, and its panel (or
+  its one line) is at the top of both files.
+- Every board row and every plan task has a `From:` tag.
+- The plan has a People list, and every task names an owner role on each side.
+- Every drift flag follows the config's Drift rules, and the board states its
+  as-of date.
 
 Then report back in a few lines: the two file paths, the single largest
 `UNKNOWN`, the longest-lead item, and any commitment in the handoff that the

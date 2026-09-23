@@ -22,6 +22,44 @@ Given a filled handoff and a product config, it:
 5. Sequences that into four weeks, then checks its own output for claims that
    do not survive the config's "Not evidence" lists.
 
+## Five checks built into every plan
+
+**1. It checks the handoff first.** A few fields have to be filled before a
+plan means much: the technical owner, the target date, the use case in the
+customer's words, and the baseline numbers. That list lives in one place, the
+**Required before planning** table at the top of `templates/handoff.md`. Add or
+remove a row there to change it. If anything is blank or `UNKNOWN`, the planner
+still builds the plan, but opens it with a **Handoff incomplete** panel saying
+what is missing and whether the rep or the SE fills it.
+
+**2. Every line says where it came from.** Each row on the board and each task
+in the plan ends with a tag such as *From: Security review required before
+deployment*, using the field's name from the handoff template. Anything that
+came from the product config rather than the handoff says *From: product
+config*. If a task looks wrong, the tag tells you which answer to go and check.
+
+**3. Owners are roles, not names.** Each plan has one **People** list: CSM, SE,
+implementation lead and rep on our side; technical owner, exec sponsor and the
+rest on theirs. Tasks point at roles, and the name is looked up. By default our
+side is the CSM and theirs is the technical owner. Change a name once and every
+task using that role follows. In the tracker you can also change one task's
+owner, and it keeps a small note: *Previously: Priya Raman, changed 23 Sep
+2026*.
+
+**4. Drift flags, by rule.** For each long-lead module, the planner works out
+the **latest safe start**: the target date, counted back by the lead time, with
+freeze weeks skipped. If the module has not started by then it is marked
+**drifting** (amber). If even the shortest lead time can no longer finish
+before the target date, it is **at risk** (red). There is no judgement in it,
+only dates. The lead times and every threshold (the safety buffer, whether a
+freeze pauses work, which end of the lead time each colour uses) live in the
+product config's **Drift rules**, never in the planner.
+
+**5. Nothing leaves draft without a review.** Every plan says **Draft**. Each
+section has a **Reviewed** box, and the plan only says **Reviewed** once every
+box is ticked. In the markdown files the reviewer ticks the boxes and changes
+the status line; in the tracker the badge changes by itself.
+
 ## The five ideas it runs on
 
 **`UNKNOWN` is a signal, not a blank.** The handoff template tells whoever
@@ -70,11 +108,22 @@ support.
 ### Running the activation tracker locally
 
 The repo also holds an interactive activation tracker: a small web app built
-from the example board and 30-day plan. **Plan** shows a proposed first value,
-four milestone gates, and the work as bucket columns you can group by lead
-time, owner, or module, with decisions and questions pinned first. **People**
-is an internal stakeholder map. **Customer view** hides everything internal
-for screen-sharing. It needs Node.js.
+from the example board and 30-day plan. It needs Node.js.
+
+- **Plan** opens with the Handoff incomplete panel, then a proposed first
+  value, four milestone gates, and the work as bucket columns you can group by
+  lead time, owner, or module. Cards show their source tag and any drift flag.
+- **Success plan** is a one-page summary for the customer.
+- **People** holds the People list (edit a name here and every task follows)
+  and an internal stakeholder map.
+- The **Internal / Customer** switch is for screen-sharing. Customer view shows
+  only this week's items, the owner on each side, and status, plus the Success
+  plan. Notes, risk commentary, drift flags and source tags stay hidden.
+- The header badge says **Draft** until every section's **Reviewed** box is
+  ticked.
+
+Drift is checked against today's date. To see how the plan looks on another
+day, add `?asof=2026-10-15` to the address.
 
 ```bash
 npm install
@@ -84,8 +133,9 @@ npm install
 npm run dev
 ```
 
-Then open the address it prints (usually http://localhost:5173). The full
-static report is at `/report.html`. Progress is saved in your browser only, and
+Then open the address it prints (usually http://localhost:5173). An older
+static report is at `/report.html`; it has not caught up with the features
+above yet. Progress is saved in your browser only, and
 **Export** downloads it as JSON. `npm run build` checks the code and builds the
 site into `dist/`, which is what Vercel deploys.
 
@@ -94,8 +144,10 @@ site into `dist/`, which is what Vercel deploys.
 1. Write your own config in `config/`, using `config/itsm.md` as the shape.
    Per module: lead time (short or long, with any conditions that change it),
    what it depends on, what evidence proves it is doing work, and a
-   `Not evidence` line listing what gets mistaken for that evidence. Plus the
-   foundation items (setup every module needs, each with a lead time), the baseline metrics your product measures, a
+   `Not evidence` line listing what gets mistaken for that evidence. Give every
+   long-lead module a `Lead time in weeks` line with numbers. Plus the
+   foundation items (setup every module needs, each with a lead time), the
+   baseline metrics your product measures, the **Drift rules** thresholds, a
    default sequencing order, and the ways plans on your product usually slip.
 2. Hand `templates/handoff.md` to the rep and the SE, who fill it together on
    one call. The rep owns sections 1 to 5, the SE sections 6 to 10.
@@ -114,8 +166,11 @@ templates/handoff.md       blank handoff — the fields the planner reads
 config/itsm.md             product modules, evidence, sequencing (the only product-specific file)
 examples/                  one filled handoff and both generated outputs
 src/                       the activation tracker app (React + TypeScript)
-src/data/halden.ts         the tracker's items, built from the example board and plan
-public/report.html         the full example report as one static page
+src/data/halden.ts         the tracker's items, People list and drift thresholds, built from the example
+src/fields.ts              handoff field names, for source tags (copied from the template)
+src/drift.ts               the drift rules
+src/owners.ts              owner roles and name lookup
+public/report.html         an older static version of the example report, not yet updated
 TODO.md                    parked issues
 ```
 

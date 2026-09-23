@@ -1,6 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
-import type { Decision, Item, Note, Status } from "../types";
-import { Avatar, SideTag, weekLabel } from "./Card";
+import { formatDate } from "../dates";
+import type { Drift } from "../drift";
+import { displayName, ownerLine, primaryName, rolesFor, useRoles } from "../owners";
+import type { OwnerChange } from "../state";
+import type { Decision, Item, Note, Role, Side, Status } from "../types";
+import { Avatar, DRIFT_LABEL, DriftChip, SideTag, weekLabel } from "./Card";
 import { StatusIcon } from "./icons";
 
 const STATUSES: { value: Status; label: string }[] = [
@@ -24,7 +28,15 @@ interface PanelProps {
   onAnswer: (text: string) => void;
   onDecide: (d: Decision) => void;
   onReopen: () => void;
+  sourceTag: string;
+  drift: Drift | null;
+  asOf: string;
+  roles: Role[];
+  history: OwnerChange[];
+  onOwner: (side: Side, roleId: string) => void;
 }
+
+const SIDE_LABEL: Record<Side, string> = { us: "Our side", customer: "Their side" };
 
 function Section({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -42,6 +54,9 @@ const quiet = "rounded-md px-2.5 py-1.5 text-[14px] text-muted hover:bg-hover";
 
 export function Panel(props: PanelProps) {
   const { item, notes, answer, decision, customerView, onClose, onStatus, onNote } = props;
+  const book = useRoles();
+  const owner = primaryName(book, item);
+  const ownerText = ownerLine(book, item, item.side).primary;
   const [draft, setDraft] = useState("");
   const [internal, setInternal] = useState(true);
   const [confirmingDone, setConfirmingDone] = useState(false);
@@ -104,7 +119,7 @@ export function Panel(props: PanelProps) {
         <span>{item.module}</span>
         <SideTag side={item.side} />
         <span className="flex items-center gap-1.5">
-          <Avatar name={item.owner} /> {item.owner}
+          <Avatar name={owner} /> {ownerText}
         </span>
         <span>· {weekLabel(item.week)}</span>
         {item.visibility === "internal" && <span className="text-warn">· Internal</span>}
@@ -251,8 +266,74 @@ export function Panel(props: PanelProps) {
           </Section>
         )}
 
+        {!customerView && (
+          <Section label="Owners">
+            <div className="flex flex-col gap-2">
+              {(["us", "customer"] as const).map((side) => {
+                const ids = rolesFor(item, side);
+                return (
+                  <label key={side} className="flex flex-wrap items-center gap-2 text-[14px]">
+                    <span className="w-20 shrink-0 text-muted">{SIDE_LABEL[side]}</span>
+                    <select
+                      value={ids[0] ?? ""}
+                      onChange={(e) => props.onOwner(side, e.target.value)}
+                      className="min-w-0 flex-1 rounded-md border border-line bg-bg px-2 py-1.5 text-[14px]"
+                    >
+                      {!ids[0] && <option value="">Not named</option>}
+                      {props.roles
+                        .filter((r) => r.side === side)
+                        .map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.label}: {r.name || "not named"}
+                          </option>
+                        ))}
+                    </select>
+                    {ids.length > 1 && (
+                      <span className="text-muted" title={ids.slice(1).map((r) => displayName(book, r)).join(", ")}>
+                        +{ids.length - 1}
+                      </span>
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+            {props.history.length > 0 && (
+              <ul className="mt-3 space-y-0.5 text-[13px] text-faint">
+                {props.history.map((h) => (
+                  <li key={`${h.at}-${h.side}`}>
+                    Previously: {h.previous} ({SIDE_LABEL[h.side].toLowerCase()}), changed {formatDate(h.at.slice(0, 10), true)}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Section>
+        )}
+
+        {!customerView && props.drift && item.lead && (
+          <Section label="Lead time and drift">
+            <p className="flex flex-wrap items-center gap-2">
+              {props.drift.flag ? <DriftChip flag={props.drift.flag} /> : <span className="text-ok">On time</span>}
+              <span className="text-[14px] text-muted">
+                {item.lead.min === item.lead.max ? item.lead.min : `${item.lead.min} to ${item.lead.max}`} weeks, from the
+                product config
+              </span>
+            </p>
+            <ul className="mt-2 space-y-0.5 text-[14px] text-muted">
+              <li>Latest safe start: {formatDate(props.drift.latestSafeStart, true)}</li>
+              <li>
+                If it starts {formatDate(props.asOf, true)}, earliest finish: {formatDate(props.drift.earliestFinish, true)}
+              </li>
+              <li>
+                {props.drift.flag === "risk"
+                  ? `${DRIFT_LABEL.risk}: it can no longer finish before the target date.`
+                  : `Turns red from ${formatDate(props.drift.redFrom, true)} if not started.`}
+              </li>
+            </ul>
+          </Section>
+        )}
+
         <Section label="Why it's here">
-          <p className="font-mono text-[13px] text-muted">{item.why.field}</p>
+          {!customerView && <p className="text-[13px] text-muted">{props.sourceTag}</p>}
           <p className="mt-1.5">{item.why.answer}</p>
           <p className="mt-1.5 text-[14px] text-faint">
             {item.why.source ? `Source: ${item.why.source}` : "No source in the handoff"}

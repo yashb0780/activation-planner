@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import type { Decision, FirstValue, Item, Note, Quadrant, Sentiment, Status } from "./types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { displayName, rolesFor, type RoleBook } from "./owners";
+import type { Decision, FirstValue, Item, Note, Quadrant, Role, Sentiment, Side, Status } from "./types";
 
 /** The parts of First value a person can edit. */
 export type FirstValueEdit = Pick<FirstValue, "headline" | "points">;
@@ -14,6 +15,20 @@ export interface Saved {
   firstValue: FirstValueEdit | null;
   quadrants: Record<string, Quadrant>;
   sentiments: Record<string, Sentiment>;
+  /** Names typed into the People list, by role ID. */
+  roleNames: Record<string, string>;
+  /** Owner roles changed on a single item, by item ID and side. */
+  ownerOverrides: Record<string, Partial<Record<Side, string[]>>>;
+  /** "Previously: ..." notes, by item ID. */
+  ownerHistory: Record<string, OwnerChange[]>;
+  /** Review ticks, by section ID. */
+  reviewed: Record<string, boolean>;
+}
+
+export interface OwnerChange {
+  previous: string;
+  side: Side;
+  at: string;
 }
 
 const empty: Saved = {
@@ -24,6 +39,10 @@ const empty: Saved = {
   firstValue: null,
   quadrants: {},
   sentiments: {},
+  roleNames: {},
+  ownerOverrides: {},
+  ownerHistory: {},
+  reviewed: {},
 };
 
 function load(): Saved {
@@ -60,7 +79,7 @@ export function writePref(key: string, value: string) {
 
 const now = () => new Date().toISOString();
 
-export function useTracker(base: Item[]) {
+export function useTracker(base: Item[], baseRoles: Role[]) {
   const [saved, setSaved] = useState<Saved>(load);
 
   useEffect(() => {
@@ -71,7 +90,22 @@ export function useTracker(base: Item[]) {
     }
   }, [saved]);
 
-  const items: Item[] = base.map((i) => ({ ...i, status: saved.status[i.id] ?? i.status }));
+  const roles: Role[] = useMemo(
+    () => baseRoles.map((r) => ({ ...r, name: saved.roleNames[r.id] ?? r.name })),
+    [baseRoles, saved.roleNames],
+  );
+  const book: RoleBook = useMemo(() => new Map(roles.map((r) => [r.id, r])), [roles]);
+
+  const withOwners = (i: Item, overrides: Saved["ownerOverrides"]): Item => ({
+    ...i,
+    ours: overrides[i.id]?.us ?? i.ours,
+    theirs: overrides[i.id]?.customer ?? i.theirs,
+  });
+
+  const items: Item[] = base.map((i) => ({
+    ...withOwners(i, saved.ownerOverrides),
+    status: saved.status[i.id] ?? i.status,
+  }));
 
   const setStatus = useCallback((id: string, status: Status) => {
     setSaved((s) => ({ ...s, status: { ...s.status, [id]: status } }));
@@ -120,6 +154,54 @@ export function useTracker(base: Item[]) {
     [],
   );
 
+  /** Change the primary owner on one side of one item. Other owners on that side stay. */
+  const setOwner = useCallback(
+    (id: string, side: Side, roleId: string) => {
+      setSaved((s) => {
+        const item = base.find((i) => i.id === id);
+        if (!item) return s;
+        const current = rolesFor(withOwners(item, s.ownerOverrides), side);
+        if (current[0] === roleId) return s;
+        const previous = current[0] ? displayName(book, current[0]) : "Not named";
+        const next = [roleId, ...current.filter((r) => r !== roleId)];
+        return {
+          ...s,
+          ownerOverrides: { ...s.ownerOverrides, [id]: { ...s.ownerOverrides[id], [side]: next } },
+          ownerHistory: { ...s.ownerHistory, [id]: [...(s.ownerHistory[id] ?? []), { previous, side, at: now() }] },
+        };
+      });
+    },
+    [base, book],
+  );
+
+  /** Rename a role on the People list. Every item using the role gets a "Previously" note. */
+  const renameRole = useCallback(
+    (roleId: string, name: string) => {
+      setSaved((s) => {
+        const role = book.get(roleId);
+        if (!role || role.name === name) return s;
+        const previous = role.name || "Not named";
+        const at = now();
+        const ownerHistory = { ...s.ownerHistory };
+        base.forEach((i) => {
+          const it = withOwners(i, s.ownerOverrides);
+          (["us", "customer"] as const).forEach((side) => {
+            if (rolesFor(it, side).includes(roleId)) {
+              ownerHistory[i.id] = [...(ownerHistory[i.id] ?? []), { previous, side, at }];
+            }
+          });
+        });
+        return { ...s, roleNames: { ...s.roleNames, [roleId]: name }, ownerHistory };
+      });
+    },
+    [base, book],
+  );
+
+  const setReviewed = useCallback(
+    (section: string, on: boolean) => setSaved((s) => ({ ...s, reviewed: { ...s.reviewed, [section]: on } })),
+    [],
+  );
+
   const reset = useCallback(() => setSaved(empty), []);
 
   const exportJson = useCallback(
@@ -128,6 +210,8 @@ export function useTracker(base: Item[]) {
         customer,
         exportedAt: now(),
         firstValue: saved.firstValue,
+        reviewed: saved.reviewed,
+        roles: roles.map((r) => ({ id: r.id, side: r.side, label: r.label, name: r.name })),
         items: items.map((i) => ({
           id: i.id,
           kind: i.kind,
@@ -136,6 +220,8 @@ export function useTracker(base: Item[]) {
           answer: saved.answers[i.id] ?? null,
           decision: saved.decisions[i.id] ?? null,
           notes: saved.notes[i.id] ?? [],
+          owners: { us: rolesFor(i, "us"), customer: rolesFor(i, "customer") },
+          ownerHistory: saved.ownerHistory[i.id] ?? [],
         })),
         people: { quadrants: saved.quadrants, sentiments: saved.sentiments },
       };
@@ -147,12 +233,17 @@ export function useTracker(base: Item[]) {
       a.click();
       URL.revokeObjectURL(url);
     },
-    [items, saved],
+    [items, roles, saved],
   );
 
   return {
     items,
+    roles,
+    book,
     saved,
+    setOwner,
+    renameRole,
+    setReviewed,
     setStatus,
     addNote,
     answer,

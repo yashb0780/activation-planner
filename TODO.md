@@ -7,11 +7,15 @@ Parked issues. Not fixed yet.
 1. **No `config/devtool.md` yet.** The Foundation tier was added to
    `config/itsm.md` only. When a devtool config is written, give it a
    Foundation section in the same shape.
-2. **Example board, plan and report not fully regenerated.** The example board
-   now has the First value and Milestones sections, but its Step 1 table, the
-   30-day plan and `public/report.html` still say "cross-cutting
-   prerequisites" and do not yet have the Foundation table or the success plan
-   task. Regenerate them with the current SKILL.md.
+2. **`public/report.html` is out of date.** The example board and plan now
+   show Foundation, source tags, the handoff gate, the People list, drift flags
+   and review boxes. The static report shows none of these, and still says
+   "cross-cutting prerequisites". The tracker labels its link "Older version,
+   being updated". Regenerate it from the current board and plan.
+3. **Tracker data is copied by hand.** `src/data/halden.ts` copies the People
+   list, drift thresholds and gate result from the example files, and
+   `src/fields.ts` copies field names from the template. Until the tracker
+   reads a handoff directly, keep them in step when either side changes.
 
 ## SKILL.md gaps found when regenerating the example (2026-09-21)
 

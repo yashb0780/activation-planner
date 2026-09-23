@@ -14,9 +14,7 @@ export type Kind = "task" | "decision" | "question";
 export type Module = string;
 
 export interface Why {
-  /** Handoff field ID(s), or the config rule, that put this item on the plan. */
-  field: string;
-  /** What the handoff says in that field. */
+  /** What the handoff says in the fields the item came from. */
   answer: string;
   /** Source recorded in the handoff. Empty when the handoff gives none. */
   source: string;
@@ -30,8 +28,12 @@ export interface Item {
   lane: Lane;
   week: Week;
   status: Status;
-  owner: string;
+  /** The side doing the work. Its first owner is the item's primary owner. */
   side: Side;
+  /** Owner roles on our side, primary first. Absent: the CSM. */
+  ours?: string[];
+  /** Owner roles on their side, primary first. Absent: the technical owner. Empty: not named. */
+  theirs?: string[];
   /** "other": owned by the customer's other teams (identity, security, infrastructure). */
   team?: "other";
   /** A conflict from the board. Hidden in customer view. */
@@ -40,6 +42,11 @@ export interface Item {
   volume?: boolean;
   blockedBy?: string;
   why: Why;
+  /** Handoff field IDs this item came from, shown as "From: ...". "config" means a product
+   *  config default. Section 6 requests use request_1, request_2 and so on. */
+  from: string[];
+  /** Lead time in weeks, from the config, for long-lead items the drift check watches. */
+  lead?: { min: number; max: number };
   /** Evidence that it is real, quoted from the config or the plan's checkpoint. */
   doneWhen: string[];
   /** The config's "Not evidence" line for this module. */
@@ -63,6 +70,8 @@ export interface Decision {
 
 export interface Account {
   customer: string;
+  /** Freeze periods from the handoff, inclusive dates. */
+  freezes: { start: string; end: string }[];
   windowStart: string;
   windowEnd: string;
   goLive: string;
@@ -110,14 +119,9 @@ export interface SuccessPlan {
   /** success_outcome, quoted. */
   goal: string;
   goalSource: string;
+  /** Role of success_judge. */
   judge: string;
   measures: Measure[];
-}
-
-/** Our side of the account, from section 2 of the handoff. */
-export interface TeamMember {
-  name: string;
-  role: string;
 }
 
 export type Quadrant = "closely" | "satisfied" | "informed" | "monitor";
@@ -125,13 +129,40 @@ export type Sentiment = "supporter" | "neutral" | "skeptic" | "unknown";
 
 export interface Person {
   id: string;
-  name: string;
+  /** The People-list role this card stands for. The name comes from the role. */
+  roleId: string;
+  /** A fuller description of the role, from the handoff. */
   role: string;
   /** What's in it for them. Only when the handoff states it. */
   wiifm: string;
   engagement: string;
   sentiment: Sentiment;
   quadrant: Quadrant;
-  /** A role the handoff lists as UNKNOWN. Drawn as an empty dashed card. */
-  placeholder?: boolean;
+}
+
+/** One role on the People list. The name is looked up from here by every item that uses the role. */
+export interface Role {
+  id: string;
+  side: Side;
+  label: string;
+  /** Empty when the handoff does not name anyone. */
+  name: string;
+}
+
+/** Thresholds from the config's Drift rules. The rules themselves live in src/drift.ts. */
+export interface DriftRules {
+  bufferWeeks: number;
+  freezePausesWork: boolean;
+  amberUses: "min" | "max";
+  redUses: "min" | "max";
+}
+
+/** A required field the handoff gate found missing or partly missing. */
+export interface GateGap {
+  field: string;
+  id: string;
+  state: "missing" | "partly";
+  detail: string;
+  /** Role that fills it: the rep or the SE. */
+  filledBy: string;
 }

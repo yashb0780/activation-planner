@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { formatDate, weekEnd } from "../dates";
 import type { FirstValueEdit } from "../state";
-import type { Account, Gate, Item, Person, SuccessPlan as Plan, TeamMember } from "../types";
+import { displayName, useRoles } from "../owners";
+import type { Account, Gate, Item, Role, SuccessPlan as Plan } from "../types";
 
 // One page, built only from data the tracker already holds: the handoff's
 // success fields and baselines, the proposed first value, the milestone gates
@@ -19,9 +20,6 @@ function Block({ title, note, children }: { title: string; note?: string; childr
   );
 }
 
-/** Role without the internal aside in brackets, e.g. "(unblocks and pays)". */
-const shortRole = (role: string) => role.replace(/\s*\([^)]*\)\s*$/, "");
-
 export function SuccessPlan({
   account,
   plan,
@@ -29,8 +27,8 @@ export function SuccessPlan({
   firstValueEdited,
   gates,
   items,
-  people,
-  ourTeam,
+  roles,
+  review,
 }: {
   account: Account;
   plan: Plan;
@@ -38,17 +36,20 @@ export function SuccessPlan({
   firstValueEdited: boolean;
   gates: Gate[];
   items: Item[];
-  people: Person[];
-  ourTeam: TeamMember[];
+  roles: Role[];
+  /** The Reviewed checkbox, or nothing in customer view. */
+  review?: ReactNode;
 }) {
+  const book = useRoles();
   const byId = new Map(items.map((i) => [i.id, i]));
-  const theirs = people.filter((p) => !p.placeholder);
-  const toName = people.filter((p) => p.placeholder);
 
   return (
     <article className="mx-auto flex w-full max-w-3xl flex-col gap-5 rounded-xl border border-line bg-panel px-5 py-5">
       <header>
-        <h2 className="text-[24px] font-semibold">Success plan</h2>
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-[24px] font-semibold">Success plan</h2>
+          {review}
+        </div>
         <p className="mt-1 text-[14px] text-muted">
           {account.customer} · Draft, to confirm at kickoff. Built from the handoff; conclusions marked (inferred).
         </p>
@@ -56,7 +57,7 @@ export function SuccessPlan({
 
       <Block title="Their goal" note={`In their words · ${plan.goalSource}`}>
         <blockquote className="border-l-2 border-accent/60 pl-3 text-[17px] leading-snug">“{plan.goal}”</blockquote>
-        <p className="mt-2 text-[14px] text-muted">Judged by {plan.judge}.</p>
+        <p className="mt-2 text-[14px] text-muted">Judged by {displayName(book, plan.judge)}.</p>
       </Block>
 
       <Block title="First value" note={firstValueEdited ? "Edited, confirm at kickoff" : "Proposed (inferred)"}>
@@ -113,33 +114,27 @@ export function SuccessPlan({
         </ol>
       </Block>
 
-      <Block title="Owners">
+      <Block title="Owners" note="From the People list">
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <h4 className="mb-1 text-[13px] font-medium uppercase tracking-wide text-faint">{account.customer}</h4>
-            <ul className="flex flex-col gap-1 text-[15px]">
-              {theirs.map((p) => (
-                <li key={p.id}>
-                  {p.name} <span className="text-muted">· {shortRole(p.role)}</span>
-                </li>
-              ))}
-              {toName.map((p) => (
-                <li key={p.id} className="text-muted">
-                  {p.name} <span className="text-faint">· to be named</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="mb-1 text-[13px] font-medium uppercase tracking-wide text-faint">Us</h4>
-            <ul className="flex flex-col gap-1 text-[15px]">
-              {ourTeam.map((m) => (
-                <li key={m.name}>
-                  {m.name} <span className="text-muted">· {m.role}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {(
+            [
+              ["customer", account.customer],
+              ["us", "Us"],
+            ] as const
+          ).map(([side, title]) => (
+            <div key={side}>
+              <h4 className="mb-1 text-[13px] font-medium uppercase tracking-wide text-faint">{title}</h4>
+              <ul className="flex flex-col gap-1 text-[15px]">
+                {roles
+                  .filter((r) => r.side === side)
+                  .map((r) => (
+                    <li key={r.id} className={r.name ? "" : "text-muted"}>
+                      {r.name || r.label} <span className={r.name ? "text-muted" : "text-faint"}>· {r.name ? r.label : "to be named"}</span>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </Block>
     </article>

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { Person, Quadrant, Sentiment } from "../types";
+import { labelOf, nameOf, useRoles } from "../owners";
+import type { Person, Quadrant, Role, Sentiment, Side } from "../types";
 
 const QUADRANTS: { id: Quadrant; label: string; hint: string }[] = [
   // Grid order: top row is high influence, right column is high involvement.
@@ -22,6 +23,52 @@ interface PeopleProps {
   sentiments: Record<string, Sentiment>;
   onMove: (id: string, q: Quadrant) => void;
   onSentiment: (id: string, s: Sentiment) => void;
+}
+
+/** The one People list: every role on both sides and who holds it. Items look names up from here. */
+export function PeopleList({ roles, onRename }: { roles: Role[]; onRename: (roleId: string, name: string) => void }) {
+  const sides: { side: Side; title: string }[] = [
+    { side: "us", title: "Our side" },
+    { side: "customer", title: "Their side" },
+  ];
+  return (
+    <section className="mt-6">
+      <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h2 className="text-[20px] font-semibold">People list</h2>
+        <span className="text-[14px] text-muted">
+          Owners on the plan are roles. Change a name here and every item with that role updates.
+        </span>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {sides.map(({ side, title }) => (
+          <div key={side} className="rounded-xl border border-line bg-panel p-3">
+            <h3 className="mb-2 text-[13px] font-medium uppercase tracking-wide text-faint">{title}</h3>
+            <ul className="flex flex-col gap-1.5">
+              {roles
+                .filter((r) => r.side === side)
+                .map((r) => (
+                  <li key={`${r.id}:${r.name}`} className="flex items-center gap-2">
+                    <label htmlFor={`role-${r.id}`} className="w-40 shrink-0 text-[14px] text-muted">
+                      {r.label}
+                    </label>
+                    <input
+                      id={`role-${r.id}`}
+                      defaultValue={r.name}
+                      placeholder="Not named"
+                      onBlur={(e) => onRename(r.id, e.target.value.trim())}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") e.currentTarget.blur();
+                      }}
+                      className="min-w-0 flex-1 rounded-md border border-line bg-bg px-2 py-1 text-[14px] outline-none focus:border-accent/60"
+                    />
+                  </li>
+                ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export function People({ people, quadrants, sentiments, onMove, onSentiment }: PeopleProps) {
@@ -108,27 +155,31 @@ function PersonCard({
   onSentiment: (s: Sentiment) => void;
 }) {
   const s = SENTIMENTS.find((x) => x.id === sentiment)!;
+  const book = useRoles();
+  const name = nameOf(book, person.roleId);
+  // A role nobody is named for is drawn as an empty dashed card.
+  const placeholder = !name;
   return (
     <article
       draggable
       onDragStart={(e) => e.dataTransfer.setData("text/plain", person.id)}
       className={`cursor-grab rounded-lg px-3.5 py-3 active:cursor-grabbing ${
-        person.placeholder ? "border border-dashed border-line bg-transparent" : "border border-line bg-bg"
+        placeholder ? "border border-dashed border-line bg-transparent" : "border border-line bg-bg"
       }`}
     >
       <div className="flex items-center gap-2">
-        {!person.placeholder && (
+        {!placeholder && (
           <span
             title={`Sentiment: ${s.label}`}
             className="h-2.5 w-2.5 shrink-0 rounded-full border border-muted"
             style={{ background: s.color }}
           />
         )}
-        <h4 className={`text-[16px] font-medium ${person.placeholder ? "text-muted" : ""}`}>{person.name}</h4>
+        <h4 className={`text-[16px] font-medium ${placeholder ? "text-muted" : ""}`}>{name || labelOf(book, person.roleId)}</h4>
         <span className="ml-auto text-[12px] text-faint">{moved ? "moved" : "(inferred)"}</span>
       </div>
       <p className="mt-0.5 text-[14px] text-muted">{person.role}</p>
-      {!person.placeholder && (
+      {!placeholder && (
         <dl className="mt-2 space-y-1 text-[14px]">
           <div>
             <dt className="inline text-faint">What's in it for them: </dt>
@@ -155,7 +206,7 @@ function PersonCard({
             ))}
           </select>
         </label>
-        {!person.placeholder && (
+        {!placeholder && (
           <label className="flex items-center gap-1 text-faint">
             Sentiment
             <select

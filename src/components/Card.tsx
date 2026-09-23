@@ -1,9 +1,11 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import type { DriftFlag } from "../drift";
+import { primaryName, useRoles } from "../owners";
 import type { Item } from "../types";
 import { EyeOffIcon, LockIcon, StatusIcon } from "./icons";
 
 export function initials(name: string): string {
-  if (name === "Unassigned") return "?";
+  if (!name || name === "Unassigned" || name === "Not named") return "?";
   const first = name.split(" and ")[0];
   const letters = first
     .replace(/\./g, "")
@@ -30,10 +32,24 @@ export function SideTag({ side }: { side: Item["side"] }) {
 export function Avatar({ name }: { name: string }) {
   return (
     <span
-      title={name}
+      title={name || "Not named"}
       className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-line bg-raised text-[11px] font-medium text-muted"
     >
       {initials(name)}
+    </span>
+  );
+}
+
+export const DRIFT_LABEL: Record<DriftFlag, string> = { drifting: "Drifting", risk: "At risk" };
+
+export function DriftChip({ flag }: { flag: DriftFlag }) {
+  return (
+    <span
+      className={`shrink-0 rounded px-1.5 py-px text-[12px] font-medium leading-5 ${
+        flag === "risk" ? "bg-danger/15 text-danger" : "bg-warn/15 text-warn"
+      }`}
+    >
+      {DRIFT_LABEL[flag]}
     </span>
   );
 }
@@ -49,9 +65,13 @@ interface CardProps {
   showWeek: boolean;
   /** Scroll into view when focused. Only for keyboard moves, so hovering never scrolls the page. */
   scrollOnFocus: boolean;
+  /** "From: ..." text. Internal view only; omit to hide. */
+  sourceTag?: string;
+  drift?: DriftFlag | null;
 }
 
-export function Card({ item, focused, onOpen, onFocus, showInternalMark, showWeek, scrollOnFocus }: CardProps) {
+export function Card({ item, focused, onOpen, onFocus, showInternalMark, showWeek, scrollOnFocus, sourceTag, drift }: CardProps) {
+  const book = useRoles();
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (focused && scrollOnFocus) ref.current?.scrollIntoView({ block: "nearest" });
@@ -79,6 +99,7 @@ export function Card({ item, focused, onOpen, onFocus, showInternalMark, showWee
           {item.title}
         </span>
       </span>
+      {sourceTag && <span className="line-clamp-2 pl-[25px] text-[12px] leading-snug text-faint">{sourceTag}</span>}
       <span className="flex w-full items-center gap-2 pl-[25px] text-[13px] text-muted">
         {item.status === "blocked" && (
           <span className="shrink-0">
@@ -91,9 +112,10 @@ export function Card({ item, focused, onOpen, onFocus, showInternalMark, showWee
           </span>
         )}
         {showWeek && <span>{weekLabel(item.week)}</span>}
+        {drift && <DriftChip flag={drift} />}
         <span className="ml-auto flex items-center gap-2">
           <SideTag side={item.side} />
-          <Avatar name={item.owner} />
+          <Avatar name={primaryName(book, item)} />
         </span>
       </span>
     </button>

@@ -21,6 +21,21 @@ The ID column is for the app. Don't edit it.
 
 ---
 
+## Required before planning
+
+*The planner checks these fields before it builds anything. This table is the only place the list is kept: add or remove a row here to change it. A field is **missing** if it is blank or `UNKNOWN`, and **partly missing** if its answer contains `UNKNOWN`. The planner still builds the plan, and opens it with a "Handoff incomplete" panel that names each gap and who fills it.*
+
+| Required field | ID | Filled by |
+|---|---|---|
+| Technical owner (does the work) | technical_owner | rep |
+| Target go-live date | target_date | rep |
+| The job, in their words (the production use case) | use_case | rep |
+| Core volume per month | core_volume | SE |
+| Time the core job takes today | core_cycle_time | SE |
+| Headcount doing the work | team_headcount | SE |
+
+---
+
 ## Account basics (CRM)
 
 | Field | ID | Answer | Source |
@@ -78,7 +93,7 @@ The ID column is for the app. Don't edit it.
 | What is driving it (audit, contract expiry, office opening, fiscal year, board promise) | date_driver | The distribution centre opens in March 2027. Dana told the board in July that the merged desk would be running before it opens. | |
 | Fixed or preferred | date_fixed | UNKNOWN. Dana describes it as fixed. Priya, on a later call, described the same date as "what we are aiming for". They have not said this to each other in front of us. | |
 | What happens to them if it slips | slip_impact | The distribution centre opens onto two separate desks, and store managers keep emailing individuals. | |
-| Known freeze periods (quarter end, holiday change freeze) | freeze_periods | No IT changes between 1 December and 6 January. Retail peak trading. | Priya, stated firmly |
+| Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) | freeze_periods | 2026-12-01 to 2027-01-06. No IT changes. Retail peak trading. | Priya, stated firmly |
 
 ---
 

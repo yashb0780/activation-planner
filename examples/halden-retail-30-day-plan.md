@@ -3,6 +3,38 @@
 
 # Draft 30-day plan — Halden Retail Group
 
+**Status: Draft — 0 of 8 sections reviewed.** Tick each section's box as you
+review it. Change this line to `Status: Reviewed` only when every box is ticked.
+
+### Handoff incomplete
+
+The plan is still built. Fill these in the handoff, then regenerate it. The
+required fields come from the **Required before planning** table in
+`templates/handoff.md`.
+
+| Field | What is missing | Who fills it |
+|---|---|---|
+| Core volume per month (whatever the product counts) | **Partly missing.** Store volume is `UNKNOWN`. Head office is ~1,400 a month, estimate. | SE — K. Varga |
+
+### People
+
+Tasks below name roles, not people. Each name is looked up here, so a change
+to one name changes every task that uses the role. Default owners: us — CSM;
+them — Technical owner. A task names other roles only where this plan does.
+
+| Side | Role | Name |
+|---|---|---|
+| Us | CSM | M. Lindqvist |
+| Us | Implementation lead | M. Lindqvist |
+| Us | SE | K. Varga |
+| Us | Rep | D. Osei |
+| Them | Technical owner | Priya Raman |
+| Them | Exec sponsor | Dana Whitfield |
+| Them | Store support lead | Tomas Berg |
+| Them | Day-to-day admin | *not named* (`UNKNOWN`) |
+| Them | Security contact | *not named* (`UNKNOWN`) |
+| Them | Identity / IT contact | *not named* (`UNKNOWN`) |
+
 **Day 1 is 2026-10-01**, the contract start date. Day 30 is 2026-10-30.
 
 **What this document is.** Most of what Halden bought has a lead time longer
@@ -23,6 +55,8 @@ inputs are open questions in the handoff, and five requests have no volume yet.
 
 ## Week 1 — 1 to 7 October
 
+- [ ] Reviewed
+
 **Focus:** Open every gate that involves waiting, start every discovery task,
 and capture the baseline before anyone configures anything.
 
@@ -31,30 +65,52 @@ and capture the baseline before anyone configures anything.
 - **The catalog scope decision** — a starter set of 8 to 12 request types, or
   a complete catalog. Unresolved in the handoff, planned as a starter set, and
   the largest single lever on the January date. Top of the list.
+  *Owners: us — CSM; them — Technical owner · From: Explicitly out of scope for now · product config*
 - **The security review.** `security_review` is `UNKNOWN`, but the config says
   to assume one exists, so the work starts now: find out from Dana Whitfield
   whether a review process exists and who owns sign-off, then open it. Status
   moves from "not started" to submitted as soon as there is someone to submit
   to.
+  *Owners: us — CSM; them — Exec sponsor · From: Security review required before deployment · Review status · Who owns security sign-off on their side · product config*
 - **Discovery credential requests** — same shape. Nobody to request from yet.
-- **Cross-cutting prerequisites:** SSO (required), the provisioning question,
-  the identity / IT contact, agent groups, business hours, the inbound mailbox
-  cutover plan, and the **test instance**, which the handoff requires
-  (`separate_envs: yes`).
+  *Owners: us — CSM; them — Exec sponsor · From: Who holds the credentials for each system above · Restrictions on installing software or outbound connections*
+- **Foundation** — every item from the config, each at its own lead time.
+  Foundation starts in week 1; it does not make a long item finish in week 1.
+  - Roles and permissions for both desks.
+    *Owners: us — CSM; them — Technical owner · From: Teams in scope at launch · product config*
+  - SSO, and the provisioning question. Blocked on the identity / IT contact.
+    *Owners: us — CSM; them — Identity / IT contact · From: Single sign-on required · Identity provider · Automated user provisioning (SCIM) required · product config*
+  - Workspaces: one or two, decided with the process question in week 2.
+    *Owners: us — CSM; them — Technical owner, Store support lead · From: Number of teams / workspaces · product config*
+  - Agent groups and business hours.
+    *Owners: us — CSM; them — Technical owner · From: One shared process, or several that genuinely differ · product config*
+  - The inbound mailbox cutover plan.
+    *Owners: us — CSM; them — Technical owner · From: Tool being replaced, or greenfield · product config*
+  - The **test instance**, which the handoff requires (`separate_envs: yes`).
+    *Owners: us — CSM; them — Technical owner · From: Separate test and production required · product config*
+  - A day-to-day admin named, with hours budgeted.
+    *Owners: us — CSM; them — Exec sponsor · From: Day-to-day admin, if different · Hours per week the technical owner has for this · product config*
+- **Draft the success plan, confirm it at kickoff, share it by end of week 1.**
+  One page: their goal in their words, the proposed first value, success
+  measures with their baselines, milestones with target dates, and the People
+  list above. It counts toward the kickoff milestone.
+  *Owners: us — CSM; them — Technical owner, Exec sponsor · From: Their stated outcome · How they will know it worked · Number attached, and who reports it upward*
 - **Taxonomy work with both desks.**
+  *Owners: us — CSM; them — Technical owner, Store support lead · From: One shared process, or several that genuinely differ · product config*
 - **Baseline capture.** Time to first response and store ticket volume, neither
   of which exists in the handoff. Both are the comparison point for workflow
   automation evidence, and neither can be recovered once configuration starts.
+  *Owners: us — CSM; them — Technical owner, Store support lead · From: Average time to first response · Core volume per month (whatever the product counts)*
 - **Five discovery tasks** — find the monthly volume for each section 6 request
   that has none:
 
-  | Request | Owner |
-  |---|---|
-  | "Till and printer faults in the stores" | Tomas Berg |
-  | "Get the store sheets off the back-room wall and onto a screen" | Tomas Berg |
-  | "Find out what is actually on the store networks" | *Unassigned* — Dana Whitfield |
-  | "Sign-off before anyone touches a store network during trading hours" | Priya Raman |
-  | "The December freeze written down somewhere other than my head" | Priya Raman |
+  | Request | Owners | From |
+  |---|---|---|
+  | "Till and printer faults in the stores" | us — CSM; them — Store support lead | What they want set up first — service catalog, request 3 |
+  | "Get the store sheets off the back-room wall and onto a screen" | us — CSM; them — Store support lead | What they want set up first — knowledge base, request 2 |
+  | "Find out what is actually on the store networks" | us — CSM; them — Exec sponsor, by default: no security or infrastructure contact is named | What they want set up first — asset management with discovery, request 2 |
+  | "Sign-off before anyone touches a store network during trading hours" | us — CSM; them — Technical owner | What they want set up first — change management, request 1 |
+  | "The December freeze written down somewhere other than my head" | us — CSM; them — Technical owner | What they want set up first — change management, request 2 |
 
 **Reaching evidence this week**
 
@@ -95,6 +151,8 @@ one.
 
 ## Week 2 — 8 to 14 October
 
+- [ ] Reviewed
+
 **Focus:** Settle the taxonomy, because five other things are written against
 it. Start the knowledge base habit.
 
@@ -104,16 +162,20 @@ it. Start the knowledge base habit.
   resets and account unlocks (~380 a month, measured) first, then new starter
   setup (~40 a month, estimate). Till and printer faults wait for their
   discovery task.
+  *Owners: us — CSM; them — Technical owner · From: What they want set up first — service catalog, request 1 · What they want set up first — service catalog, request 2*
 - **Knowledge base** — from week 2, continuously, per the config's sequencing.
   First content is the weekly repeat questions (~250 a month, estimate). Not a
   content migration: article owners per team, a review cadence, and a
   publishing decision.
+  *Owners: us — CSM; them — Technical owner · From: What they want set up first — knowledge base, request 1 · product config*
 - **Discovery credential collection**, if a security or infrastructure contact
   was named.
+  *Owners: us — CSM; them — Security contact · From: Who holds the credentials for each system above*
 - **Change management groundwork:** write down the December freeze and any
   maintenance windows. This is the config's "maintenance windows and freeze
   periods documented" dependency, and it answers Priya's own request. It is
   not the module starting.
+  *Owners: us — CSM; them — Technical owner · From: Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · What they want set up first — change management, request 2*
 
 **Reaching evidence this week**
 
@@ -142,6 +204,8 @@ head-office one.
 
 ## Week 3 — 15 to 21 October
 
+- [ ] Reviewed
+
 **Focus:** Build the starter catalog. Begin automation on the items that now
 exist.
 
@@ -152,12 +216,15 @@ exist.
   estimate) first. It is internal, so it needs no outside credentials. The
   joiners-and-leavers rule (70 a month, measured) is second and waits on HR
   system credentials, still `UNKNOWN`.
+  *Owners: us — CSM; them — Technical owner · From: What they want set up first — workflow automation, request 1 · What they want set up first — workflow automation, request 2*
 - **Asset management groundwork:** agree the asset model — what is tracked, at
   what depth, and what is out of scope. One boundary is already set: stock in
   the distribution centres.
+  *Owners: us — CSM; them — Technical owner · From: Explicitly out of scope for now · product config*
 - **Change management groundwork:** name the change-board members, and collect
   real examples of each change type. Store network work during trading hours
   is the first one on record.
+  *Owners: us — CSM; them — Technical owner · From: What they want set up first — change management, request 1 · product config*
 
 **Reaching evidence this week**
 
@@ -183,6 +250,8 @@ real traffic, and is the asset model written down.
 
 ## Week 4 — 22 to 30 October
 
+- [ ] Reviewed
+
 **Focus:** Get real requests flowing through live items. Leave room.
 
 **Starting**
@@ -190,7 +259,9 @@ real traffic, and is the asset model written down.
 - Catalog items live to both desks, and the adoption measurement window opens.
   This is what `day30_required: yes` asked for on the catalog: something live.
   It is not yet the evidence.
+  *Owners: us — CSM; them — Technical owner · From: Must something here be live by day 30?*
 - The first routing rule enabled in production.
+  *Owners: us — CSM; them — Technical owner · From: What they want set up first — workflow automation, request 1*
 
 **Reaching evidence this week**
 
@@ -221,45 +292,50 @@ rather than intent, and where the asset list expectation is settled.
 
 ## Where this stands at day 30
 
+- [ ] Reviewed
+
 Not a pass/fail list. Three categories.
 
 ### Started and moving, with proof
 
-| Module | Day-30 checkpoint — the observable signal |
-|---|---|
-| Cross-cutting prerequisites | SSO live and in use by both desks. A test instance in place. A named day-to-day admin with hours budgeted in writing, not a volunteer. Business hours and agent groups defined for both desks. |
-| Service catalog | 8 to 12 items live in production, each with a named owner recorded on the item, receiving real requests from both desks. Password resets first. The two-week adoption window has opened. |
-| Workflow automation | The routing rule enabled and visible in execution logs firing on real tickets, not test records. Coverage is the long part and has not started. |
-| Knowledge base | Article owners named per team, a review cadence agreed, a publishing decision made, and the first agent-written article published during ticket work. |
-| Baseline and discovery tasks | Time to first response and store volume captured before configuration, labelled as measured or estimated. Each of the five requests with no volume either has one, or has a named person and a date. |
+| Module | Day-30 checkpoint — the observable signal | From |
+|---|---|---|
+| Foundation | SSO live and in use by both desks. A test instance in place. A named day-to-day admin with hours budgeted in writing, not a volunteer. Business hours and agent groups defined for both desks. | From: Single sign-on required · Separate test and production required · Day-to-day admin, if different · One shared process, or several that genuinely differ · product config |
+| Service catalog | 8 to 12 items live in production, each with a named owner recorded on the item, receiving real requests from both desks. Password resets first. The two-week adoption window has opened. | From: Products and tiers purchased · Must something here be live by day 30? · product config · What they want set up first — service catalog, request 1 |
+| Workflow automation | The routing rule enabled and visible in execution logs firing on real tickets, not test records. Coverage is the long part and has not started. | From: Products and tiers purchased · product config · What they want set up first — workflow automation, request 1 |
+| Knowledge base | Article owners named per team, a review cadence agreed, a publishing decision made, and the first agent-written article published during ticket work. | From: Products and tiers purchased · product config · What they want set up first — knowledge base, request 1 |
+| Baseline and discovery tasks | Time to first response and store volume captured before configuration, labelled as measured or estimated. Each of the five requests with no volume either has one, or has a named person and a date. | From: Average time to first response · Core volume per month (whatever the product counts) · What they want set up first |
 
 ### Started as waiting, with the gate as the signal
 
-| Module | Day-30 checkpoint — the observable signal |
-|---|---|
-| Discovery | The gate, not the scans. Signals in order: a named security owner; confirmation of whether a review is required; the questionnaire returned if one exists; a named security contact; credentials received for *n* of the platforms in scope; subnet list supplied; scanner host agreed. Each is observable and each would be false if nothing had happened. |
+| Module | Day-30 checkpoint — the observable signal | From |
+|---|---|---|
+| Discovery | The gate, not the scans. Signals in order: a named security owner; confirmation of whether a review is required; the questionnaire returned if one exists; a named security contact; credentials received for *n* of the platforms in scope; subnet list supplied; scanner host agreed. Each is observable and each would be false if nothing had happened. | From: Products and tiers purchased · Security review required before deployment · Who holds the credentials for each system above · product config |
 
 ### Groundwork only, and correctly so
 
-| Module | First step taken, and why it stops there |
-|---|---|
-| Asset management | The asset model agreed in writing — tracked, at what depth, out of scope — and process owners named. It is behind the discovery gate, so groundwork is as far as it can honestly go. The asset list Priya expects by day 30 is not here, and the plan says so at the day-30 review. |
-| Change management | Change-board members named, the December freeze and maintenance windows written down, and real examples of each change type collected. Config ordering rule: change management before trustworthy asset data produces a process nobody believes. Starting the module now would produce a process, not a working one. |
+| Module | First step taken, and why it stops there | From |
+|---|---|---|
+| Asset management | The asset model agreed in writing — tracked, at what depth, out of scope — and process owners named. It is behind the discovery gate, so groundwork is as far as it can honestly go. The asset list Priya expects by day 30 is not here, and the plan says so at the day-30 review. | From: Products and tiers purchased · Explicitly out of scope for now · product config |
+| Change management | Change-board members named, the December freeze and maintenance windows written down, and real examples of each change type collected. Config ordering rule: change management before trustworthy asset data produces a process nobody believes. Starting the module now would produce a process, not a working one. | From: Products and tiers purchased · Process or method they follow today · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config |
 
 ## On track to land after day 30
 
+- [ ] Reviewed
+
 Windows are the config's lead times, anchored to the event that starts the
 clock, with the 1 December to 6 January freeze counted. They are windows, not
-dates.
+dates. Drift flags come from the board's drift check, as of day 1, using the
+config's Drift rules.
 
-| Module | Window | What has to stay true |
-|---|---|---|
-| Service catalog | Adoption evidence earliest mid-November, if items went live in week 4 and both desks route traffic to them | Starter set, not a complete catalog. Both desk leads bought into one taxonomy. |
-| Knowledge base | 6 to 10 weeks from week 2, so mid-November to mid-December, with the freeze pushing the back half into January | The write path holds. Agents keep writing articles during ticket work after the novelty passes. |
-| Workflow automation | Per-rule, days. Coverage that moves the numbers, 8 weeks plus from a settled taxonomy — if it settles in week 2, that is early December, inside the freeze, so January in practice (inferred: enabling rules is an IT change) | Taxonomy stays settled. HR system credentials arrive. |
-| Discovery | 8 to 16 weeks **from the gate opening, which has not happened**. If the gate opens by 30 October and the freeze halts the work, early February to late March (inferred: agent deployment and firewall changes are IT changes). | The gate opens in October. Every week it stays shut moves this window one week. |
-| Asset management | After discovery. Not before February on the most favourable reading, and plausibly after the 2027-03-31 legacy tool expiry. | Discovery output reconciles against an expected count — and the only count available comes from a finance register, labelled an estimate. |
-| Change management | Not reachable before the 2027-01-12 go-live. 8 to 12 weeks, longer where no process exists, and no process exists here. Realistically a phase-two item ahead of the 2027-03-31 legacy tool expiry. | Exec backing becomes real. Config: change management fails on adoption, never on configuration. |
+| Module | Window | What has to stay true | Drift flag (as of day 1) | From |
+|---|---|---|---|---|
+| Service catalog | Adoption evidence earliest mid-November, if items went live in week 4 and both desks route traffic to them | Starter set, not a complete catalog. Both desk leads bought into one taxonomy. | Not checked: planned as a starter set, which is short | From: Products and tiers purchased · Must something here be live by day 30? · product config |
+| Knowledge base | 6 to 10 weeks from week 2, so mid-November to mid-December, with the freeze pushing the back half into January | The write path holds. Agents keep writing articles during ticket work after the novelty passes. | **Drifting (amber)**. Turns red 2026-10-26 if not started | From: Products and tiers purchased · Target go-live date · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config |
+| Workflow automation | Per-rule, days. Coverage that moves the numbers, 8 weeks plus from a settled taxonomy — if it settles in week 2, that is early December, inside the freeze, so January in practice (inferred: enabling rules is an IT change) | Taxonomy stays settled. HR system credentials arrive. | On time on day 1. Turns red 2026-10-12, before the first rule is planned | From: Products and tiers purchased · Target go-live date · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config |
+| Discovery | 8 to 16 weeks **from the gate opening, which has not happened**. If the gate opens by 30 October and the freeze halts the work, early February to late March (inferred: agent deployment and firewall changes are IT changes). | The gate opens in October. Every week it stays shut moves this window one week. | **Drifting (amber)**. Turns red 2026-10-12 if not started | From: Products and tiers purchased · Target go-live date · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config |
+| Asset management | After discovery. Not before February on the most favourable reading, and plausibly after the 2027-03-31 legacy tool expiry. | Discovery output reconciles against an expected count — and the only count available comes from a finance register, labelled an estimate. | Counted inside discovery | From: Products and tiers purchased · Known asset count · product config |
+| Change management | Not reachable before the 2027-01-12 go-live. 8 to 12 weeks, longer where no process exists, and no process exists here. Realistically a phase-two item ahead of the 2027-03-31 legacy tool expiry. | Exec backing becomes real. Config: change management fails on adoption, never on configuration. | **Drifting (amber)**. Turns red 2026-10-12 if not started | From: Products and tiers purchased · Target go-live date · Process or method they follow today · product config |
 
 **What this means for the January date, said plainly.** A go-live on 2027-01-12
 covering one queue, a starter catalog, routing automation and a working
@@ -270,6 +346,8 @@ day-30 review, alongside the two dates nobody has connected: the distribution
 centre in March, and the legacy store desk tool expiring 2027-03-31.
 
 ## What would change this plan
+
+- [ ] Reviewed
 
 1. **The discovery gate opening, or not.** Four of its five dependencies are
    `UNKNOWN` and most route to the exec sponsor. This single conversation moves
@@ -285,6 +363,8 @@ centre in March, and the legacy store desk tool expiring 2027-03-31.
    earlier one.
 
 ## Downgrades applied in review
+
+- [ ] Reviewed
 
 Step 7 of the skill, run against this draft. Each claim below was written, then
 caught by a `Not evidence` line in `config/itsm.md`, then restated.

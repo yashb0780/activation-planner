@@ -1,14 +1,36 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { primaryName, useRoles } from "../owners";
 import type { FirstValueEdit } from "../state";
 import type { FirstValue, Gate, Item } from "../types";
 import { Avatar } from "./Card";
+
+/** One section's "Reviewed" tick. The Draft badge turns to Reviewed when every section is ticked. */
+export function ReviewBox({ checked, onChange }: { checked: boolean; onChange: (on: boolean) => void }) {
+  return (
+    <label
+      className={`flex shrink-0 items-center gap-1.5 rounded-md border px-2 py-0.5 text-[13px] ${
+        checked ? "border-ok/60 text-ok" : "border-line text-muted"
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="accent-[var(--ok)]"
+      />
+      Reviewed
+    </label>
+  );
+}
 
 export function FirstValueLine({
   value,
   edited,
   basis,
   onSave,
+  review,
 }: {
+  review?: ReactNode;
   value: FirstValueEdit;
   edited: boolean;
   basis: FirstValue["basis"];
@@ -27,6 +49,8 @@ export function FirstValueLine({
         <span className="rounded-full border border-warn/50 px-2 py-px text-[12px] text-warn">
           {edited ? "Edited, confirm at kickoff" : "Proposed, confirm at kickoff (inferred)"}
         </span>
+        <span className="ml-auto" />
+        {review}
         {!editing && (
           <button
             type="button"
@@ -34,7 +58,7 @@ export function FirstValueLine({
               setDraft(value);
               setEditing(true);
             }}
-            className="ml-auto rounded-md px-2.5 py-1 text-[14px] text-muted hover:bg-hover hover:text-ink"
+            className="rounded-md px-2.5 py-1 text-[14px] text-muted hover:bg-hover hover:text-ink"
           >
             Edit
           </button>
@@ -112,14 +136,15 @@ export function FirstValueLine({
   );
 }
 
-export function Milestones({ gates, items }: { gates: Gate[]; items: Item[] }) {
+export function Milestones({ gates, items, review }: { gates: Gate[]; items: Item[]; review?: ReactNode }) {
   const byId = new Map(items.map((i) => [i.id, i]));
   const isDone = (id: string) => byId.get(id)?.status === "done";
   return (
     <section>
-      <div className="mb-2 flex items-baseline gap-2">
+      <div className="mb-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
         <h2 className="text-[20px] font-semibold">Milestones</h2>
         <span className="text-[13px] text-faint">Gates and exit criteria inferred from the board</span>
+        {review && <span className="ml-auto self-center">{review}</span>}
       </div>
       <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {gates.map((g, n) => {
@@ -168,8 +193,18 @@ export function Milestones({ gates, items }: { gates: Gate[]; items: Item[] }) {
   );
 }
 
-export function NeedsAttention({ items, onOpen }: { items: Item[]; onOpen: (id: string) => void }) {
+export function NeedsAttention({
+  items,
+  atRisk,
+  onOpen,
+}: {
+  items: Item[];
+  atRisk: Set<string>;
+  onOpen: (id: string) => void;
+}) {
+  const book = useRoles();
   if (!items.length) return null;
+  const label = (i: Item) => (atRisk.has(i.id) ? "At risk" : i.conflict ? "Conflict" : "Blocked");
   return (
     <section className="rounded-xl border border-line bg-panel px-4 py-3">
       <h2 className="mb-1 text-[13px] font-medium uppercase tracking-wide text-faint">Needs attention</h2>
@@ -181,11 +216,11 @@ export function NeedsAttention({ items, onOpen }: { items: Item[]; onOpen: (id: 
               onClick={() => onOpen(i.id)}
               className="flex w-full items-center gap-3 rounded-md px-1.5 py-1.5 text-left hover:bg-hover"
             >
-              <span className={`w-16 shrink-0 text-[14px] ${i.conflict ? "text-warn" : "text-danger"}`}>
-                {i.conflict ? "Conflict" : "Blocked"}
+              <span className={`w-16 shrink-0 text-[14px] ${label(i) === "Conflict" ? "text-warn" : "text-danger"}`}>
+                {label(i)}
               </span>
               <span className="min-w-0 flex-1 truncate">{i.title}</span>
-              <Avatar name={i.owner} />
+              <Avatar name={primaryName(book, i)} />
             </button>
           </li>
         ))}

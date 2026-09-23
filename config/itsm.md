@@ -41,6 +41,7 @@ Evidence it is real
 Not evidence: items built, portal branded, a test request submitted by the admin.
 Module: Knowledge base
 Lead time: Long, 6 to 10 weeks. The tool is ready on day one. The content, the owners, and the habit of writing articles are the actual work.
+Lead time in weeks: 6 to 10
 Depends on
 
 * The same taxonomy as the catalog, so articles file where tickets live
@@ -59,6 +60,7 @@ Evidence it is real
 Not evidence: N articles imported, search works, the portal is live.
 Module: Workflow automation
 Lead time: Short per workflow, often days. Long to reach coverage that changes the team's numbers, 8 weeks plus. Plan it as a sequence of small deliveries, never as one project.
+Lead time in weeks: 8 (coverage that changes the team's numbers; no upper end given)
 Depends on
 
 * Catalog and taxonomy settled. Automation written against fields that are still moving gets rewritten.
@@ -76,6 +78,7 @@ Evidence it is real
 Not evidence: rules built, a test ticket firing correctly, a walkthrough of the builder.
 Module: Asset management and discovery
 Lead time: Long, 8 to 16 weeks, and the longest pole in most deployments. Discovery is a separate and earlier project from asset management. Split them in the plan or the dates will lie.
+Lead time in weeks: 8 to 16 (discovery; asset management follows inside the same range)
 Discovery (the gate)
 Depends on
 
@@ -110,6 +113,7 @@ Evidence it is real
 Not evidence: a populated asset list, a dashboard with a device count, one successful scan.
 Module: Change management
 Lead time: Long, 8 to 12 weeks, and longer where no change process exists today. You are implementing a process, not a module. If they already run a change board somewhere else, this is a migration and moves faster.
+Lead time in weeks: 8 to 12
 Depends on
 
 * Asset and CMDB data of usable quality, otherwise impact analysis is theatre
@@ -141,6 +145,16 @@ Add these rows to section 10 as well:
 * asset_count: known asset count
 * change_volume: changes per month, and share that are emergency
 * kb_articles: existing knowledge articles
+
+Drift rules
+Used to flag long-lead items that are starting too late. The planner applies these as fixed rules, with no judgement. Change the numbers here, never in the skill.
+
+* Applies to: modules whose lead time is Long and has a "Lead time in weeks" line.
+* Safety buffer: 0 weeks. The latest safe start moves this many weeks earlier.
+* Freeze periods pause work: yes. Days inside a freeze period from the handoff do not count toward a lead time.
+* Drifting (amber) uses: the long end of the lead time.
+* At risk (red) uses: the short end of the lead time.
+* When a module gives one number, it is both ends.
 
 Sequencing
 Default order, driven by dependencies rather than by customer enthusiasm:
