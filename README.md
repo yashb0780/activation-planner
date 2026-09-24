@@ -121,12 +121,17 @@ support.
 The repo also holds an interactive activation tracker: a small web app built
 from the example board and 30-day plan. It needs Node.js.
 
-- **Plan** opens with the Handoff incomplete panel, then a proposed first
-  value, four milestone gates, and the work as dense rows grouped by week
-  (or by lead time, owner, or module) under collapsible headers. Each row has
-  a **status pill** (Not started, In progress, On hold, Done) and an **owner
-  pill**, both clickable. On hold asks for a short reason; Done asks for proof.
-  Drift shows as a separate small flag.
+- **Activation plan** opens with the Handoff incomplete panel, then a
+  proposed first value, four milestone gates, and the work as dense rows
+  grouped by week (or by lead time, owner, or module) under collapsible
+  headers. Each row has a **status pill** (Not started grey, In progress
+  orange, On hold yellow, Done green) and an **owner pill**, both clickable.
+  On hold opens the side panel and only takes effect once a reason is saved;
+  Done asks for proof. Drift shows as a separate outlined warning chip
+  ("Drifting" or "At risk"), never as a coloured pill.
+- Opening an item shows **Why it's here** (the handoff fields it came from,
+  as pills, and what we know, as short bullets) and **Done when**: two or
+  three checks anyone could verify by looking.
 - **Success plan** is a one-page summary for the customer.
 - **People** holds the People list (edit a name here and every task follows)
   and an internal stakeholder map.
@@ -156,8 +161,8 @@ npm run dev
 
 Then open the address it prints (usually http://localhost:5173). An older
 static report is at `/report.html`; it has not caught up with the features
-above yet. Progress is saved in your browser only, and
-**Export** downloads it as JSON. `npm run build` checks the code and builds the
+above yet. Progress is saved in your browser only. **Export** (downloads it as
+JSON) and **Reset** (asks first) are in the ⌘K menu. `npm run build` checks the code and builds the
 site into `dist/`, which is what Vercel deploys.
 
 ### Setting it up for your product

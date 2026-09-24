@@ -21,7 +21,7 @@ function Root() {
           setId(e.target.value);
           writePref("activation-tracker:dataset", e.target.value);
         }}
-        className="rounded-md border border-line bg-panel px-2 py-0.5 text-xs text-muted transition-colors hover:border-line-strong"
+        className="max-w-44 shrink-0 truncate rounded-md border border-line bg-panel px-2 py-0.5 text-xs text-muted transition-colors hover:border-line-strong"
       >
         {datasets.map((d) => (
           <option key={d.id} value={d.id}>

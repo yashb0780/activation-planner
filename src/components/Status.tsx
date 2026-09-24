@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { DriftFlag } from "../drift";
 import { displayName, rolesFor, useRoles } from "../owners";
 import type { Item, Role, Side, Status } from "../types";
@@ -30,37 +29,40 @@ export function StatusDot({ status }: { status: Status }) {
 
 export const FLAG_LABEL: Record<DriftFlag, string> = { drifting: "Drifting", risk: "At risk" };
 
-/** The drift flag: small, separate from status. */
+/** The drift flag: an outlined chip with a warning icon and a word. Never a filled pill,
+ *  so it cannot be mistaken for a status. */
 export function DriftFlagChip({ flag }: { flag: DriftFlag }) {
   const color = flag === "risk" ? "var(--flag-risk)" : "var(--flag-drift)";
   return (
     <span
-      className="inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 text-xs font-medium"
-      style={{ color, background: tint(color, 14) }}
+      className="inline-flex shrink-0 items-center gap-1 rounded-sm border border-line-strong px-1.5 text-xs font-medium text-ink"
       title={flag === "risk" ? "At risk: can no longer finish before the target date" : "Drifting: past its latest safe start"}
     >
-      <span aria-hidden>⚑</span>
+      <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden>
+        <path d="M8 1.5 L15 14 H1 Z" fill="none" stroke={color} strokeWidth="1.6" strokeLinejoin="round" />
+        <path d="M8 6 V9.5" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+        <circle cx="8" cy="11.8" r="0.9" fill={color} />
+      </svg>
       {FLAG_LABEL[flag]}
     </span>
   );
 }
 
-/** The status pill with its menu. On hold asks for a reason; Done hands off to the proof form. */
+/** The status pill with its menu. On hold and Done do not change the status here: they open
+ *  the side panel, which asks for a reason or for proof first. */
 export function StatusMenu({
   item,
   onStatus,
-  onHold,
+  onRequestHold,
   onRequestDone,
   openSignal,
 }: {
   item: Item;
   onStatus: (s: Status) => void;
-  onHold: (reason: string) => void;
+  onRequestHold: () => void;
   onRequestDone: () => void;
   openSignal?: number;
 }) {
-  const [mode, setMode] = useState<"list" | "hold">("list");
-  const [reason, setReason] = useState("");
   const s = STATUS[item.status];
   return (
     <Dropdown
@@ -76,72 +78,29 @@ export function StatusMenu({
         </>
       }
     >
-      {(close) =>
-        mode === "list" ? (
-          <ListBox<Status>
-            value={item.status}
-            options={ORDER.map((v) => ({
-              value: v,
-              label: (
-                <span className="inline-flex items-center gap-2">
-                  <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: STATUS[v].color }} />
-                  {STATUS[v].label}
-                  {v === "hold" && <span className="text-xs text-faint">needs a reason</span>}
-                  {v === "done" && <span className="text-xs text-faint">needs proof</span>}
-                </span>
-              ),
-            }))}
-            onPick={(v) => {
-              if (v === item.status) return close();
-              if (v === "done") {
-                close();
-                onRequestDone();
-              } else if (v === "hold") {
-                setReason("");
-                setMode("hold");
-              } else {
-                onStatus(v);
-                close();
-              }
-            }}
-          />
-        ) : (
-          <form
-            className="flex w-72 flex-col gap-2 px-3 py-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!reason.trim()) return;
-              onHold(reason.trim());
-              setMode("list");
-              close();
-            }}
-          >
-            <label className="text-xs text-muted" htmlFor={`hold-${item.id}`}>
-              Why is it on hold?
-            </label>
-            <input
-              id={`hold-${item.id}`}
-              autoFocus
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="A short reason"
-              className="rounded-md border border-line bg-bg px-2 py-1 text-sm outline-none focus:border-accent"
-            />
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={!reason.trim()}
-                className="rounded-md bg-accent px-2.5 py-1 text-xs font-medium text-on-accent disabled:opacity-40"
-              >
-                Put on hold
-              </button>
-              <button type="button" onClick={() => setMode("list")} className="rounded-md px-2 py-1 text-xs text-muted hover:bg-hover">
-                Back
-              </button>
-            </div>
-          </form>
-        )
-      }
+      {(close) => (
+        <ListBox<Status>
+          value={item.status}
+          options={ORDER.map((v) => ({
+            value: v,
+            label: (
+              <span className="inline-flex items-center gap-2">
+                <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: STATUS[v].color }} />
+                {STATUS[v].label}
+                {v === "hold" && <span className="text-xs text-faint">asks for a reason</span>}
+                {v === "done" && <span className="text-xs text-faint">asks for proof</span>}
+              </span>
+            ),
+          }))}
+          onPick={(v) => {
+            close();
+            if (v === item.status && v !== "hold") return;
+            if (v === "done") onRequestDone();
+            else if (v === "hold") onRequestHold();
+            else onStatus(v);
+          }}
+        />
+      )}
     </Dropdown>
   );
 }

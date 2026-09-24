@@ -378,6 +378,26 @@ week**.
 Every task under **starting** carries its owners and its source tag on its own
 line: `Owners: us — CSM; them — Technical owner · From: Target go-live date`.
 
+Every task also gets a **Done when** line: **2 to 3 short checks anyone could
+verify by looking**. Specific, not vague, and not complicated. Each check is a
+thing you can see: a decision recorded, a person able to log in, a test request
+landing in the right place. For example, for setting up workspaces:
+
+- One-or-two workspace decision recorded
+- Workspace set up and both teams can log in
+- A test request reaches the right team in each workspace
+
+Not "workspaces configured appropriately", and not a paragraph. Where the
+module has config evidence, "Done when" does not replace it: the evidence stays
+quoted from the config, unedited, in its own place. "Done when" is the
+checklist for this task; evidence is what proves the module is doing work.
+
+Where the plan explains why a task is there, write **what we know** as short
+bullet points, each one fact from the handoff or the config ("Team 1:
+Head-office IT", "Open question: one workspace or two, decided in week 2"),
+never one long sentence. Keep the call or document and its date as the source
+underneath.
+
 Week 1 always has these, whatever the product, in this order:
 
 - **Kickoff setup**, first: every item from the config's Kickoff setup section
@@ -473,6 +493,8 @@ fastest way for a reader to see the difference between the two kinds of claim.
 - The plan has a People list, and every task names an owner role on each side.
 - Every drift flag follows the config's Drift rules, and the board states its
   as-of date.
+- Every task has a "Done when" of 2 to 3 short checks someone could verify by
+  looking. None of them softens a config evidence line.
 
 Then report back in a few lines: the two file paths, the single largest
 `UNKNOWN`, the longest-lead item, and any commitment in the handoff that the

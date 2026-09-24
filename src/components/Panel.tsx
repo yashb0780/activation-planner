@@ -23,7 +23,8 @@ interface PanelProps {
   onAnswer: (text: string) => void;
   onDecide: (d: Decision) => void;
   onReopen: () => void;
-  sourceTag: string;
+  /** The handoff fields (or "product config") this item came from, one name each. */
+  sources: string[];
   /** Field name for one checklist line's sources. */
   fieldName: (ids: string[]) => string;
   checks: number[];
@@ -35,6 +36,17 @@ interface PanelProps {
   onOwner: (side: Side, roleId: string) => void;
   /** Goes up by one each time x is pressed, or Done is picked on a row: open the done form. */
   doneRequest?: number;
+  /** Goes up by one each time On hold is picked on a row: open the reason box. */
+  holdRequest?: number;
+}
+
+/** A small rounded heading inside a section. */
+function PillHeading({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex rounded-full border border-line bg-raised px-2.5 py-0.5 text-xs font-semibold text-muted">
+      {children}
+    </span>
+  );
 }
 
 function Section({ label, children, aside }: { label: string; children: ReactNode; aside?: ReactNode }) {
@@ -86,6 +98,16 @@ export function Panel(props: PanelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.doneRequest]);
 
+  // On hold picked on a row: open the reason box. Nothing changes until a reason is saved.
+  useEffect(() => {
+    if (!props.holdRequest) return;
+    setConfirmingDone(false);
+    setHoldText(item.holdReason ?? "");
+    setHolding(true);
+    // Only when a request comes in.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.holdRequest]);
+
   const visibleNotes = customerView ? notes.filter((n) => !n.internal) : notes;
   const needsCheck = item.notEvidence.length > 0;
   const canConfirm = doneNote.trim().length > 0 && (!needsCheck || notEvidenceChecked);
@@ -118,7 +140,7 @@ export function Panel(props: PanelProps) {
     <aside
       role="dialog"
       aria-label={item.title}
-      className="fixed inset-y-0 right-0 z-30 flex w-full max-w-[var(--panel-width)] flex-col border-l border-line bg-panel shadow-[var(--shadow-menu)]"
+      className="fixed inset-y-0 right-0 z-30 flex w-full max-w-[var(--panel-width)] flex-col overflow-hidden rounded-l-2xl border-l border-line bg-panel shadow-[var(--shadow-menu)]"
     >
       <header className="flex items-start gap-3 px-5 pb-2 pt-5">
         <h2 className="flex-1 text-lg font-semibold">{item.title}</h2>
@@ -386,18 +408,47 @@ export function Panel(props: PanelProps) {
         )}
 
         <Section label="Why it's here">
-          {!customerView && <p className="text-xs text-muted">{props.sourceTag}</p>}
-          <p className="mt-1.5">{item.why.answer}</p>
-          <p className="mt-1.5 text-xs text-faint">{item.why.source ? `Source: ${item.why.source}` : "No source in the handoff"}</p>
+          {!customerView && (
+            <div className="mb-4">
+              <PillHeading>Source</PillHeading>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {props.sources.map((src) => (
+                  <span key={src} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink">
+                    {src}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          <PillHeading>What we know</PillHeading>
+          <ul className="mt-2 list-disc space-y-1 pl-5 marker:text-faint">
+            {item.why.facts.map((f) => (
+              <li key={f}>{f}</li>
+            ))}
+          </ul>
+          <p className="mt-3 text-xs text-faint">{item.why.source ? `From: ${item.why.source}` : "No call or document recorded in the handoff"}</p>
         </Section>
 
         <Section label="Done when">
-          <ul className="list-disc space-y-1 pl-5">
+          <ul className="flex flex-col gap-1.5">
             {item.doneWhen.map((d) => (
-              <li key={d}>{d}</li>
+              <li key={d} className="flex items-start gap-2.5">
+                <span aria-hidden className="mt-1 h-3.5 w-3.5 shrink-0 rounded-sm border border-line-strong" />
+                {d}
+              </li>
             ))}
           </ul>
         </Section>
+
+        {item.evidence && item.evidence.length > 0 && (
+          <Section label="Evidence it is real (from the config)">
+            <ul className="list-disc space-y-1 pl-5 text-muted marker:text-faint">
+              {item.evidence.map((d) => (
+                <li key={d}>{d}</li>
+              ))}
+            </ul>
+          </Section>
+        )}
 
         {item.notEvidence.length > 0 && (
           <Section label="Not evidence">

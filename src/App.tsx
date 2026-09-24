@@ -22,7 +22,7 @@ type Tab = "plan" | "success" | "people";
 const REVIEW_SECTIONS = [
   { id: "first-value", label: "First value" },
   { id: "milestones", label: "Milestones" },
-  { id: "plan", label: "Plan" },
+  { id: "plan", label: "Activation plan" },
   { id: "success-plan", label: "Success plan" },
 ] as const;
 
@@ -49,7 +49,8 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [openId, setOpenId] = useState<string | null>(null);
   const [keyboardNav, setKeyboardNav] = useState(false);
-  const [doneRequest, setDoneRequest] = useState(0);
+  // A request to open the panel on its done form or its On hold reason box, for one item.
+  const [panelRequest, setPanelRequest] = useState<{ id: string; kind: "done" | "hold"; n: number } | undefined>();
   const [menuRequest, setMenuRequest] = useState<MenuRequest | undefined>();
   const [commandsOpen, setCommandsOpen] = useState(false);
   const [customerView, setCustomerView] = useState(false);
@@ -120,20 +121,32 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
   );
 
   /** Open an item's panel on its done form (tasks) or its record/answer form (decisions, questions). */
-  const requestDone = useCallback((id: string) => {
+  const requestPanel = useCallback((id: string, kind: "done" | "hold") => {
     setSelectedId(id);
     setOpenId(id);
-    setDoneRequest((n) => n + 1);
+    setPanelRequest((r) => ({ id, kind, n: (r?.n ?? 0) + 1 }));
+  }, []);
+  const requestDone = useCallback((id: string) => requestPanel(id, "done"), [requestPanel]);
+
+  /** Open an item's panel with nothing pre-opened. */
+  const openPanel = useCallback((id: string) => {
+    setPanelRequest(undefined);
+    setOpenId(id);
+  }, []);
+  const closePanel = useCallback(() => {
+    setPanelRequest(undefined);
+    setOpenId(null);
   }, []);
 
   const actions: RowActions = useMemo(
     () => ({
       onStatus: tracker.setStatus,
-      onHold: tracker.setHold,
+      // On hold asks for a reason in the side panel first. Closing the panel changes nothing.
+      onRequestHold: (id: string) => requestPanel(id, "hold"),
       onRequestDone: requestDone,
       onOwner: tracker.setOwner,
     }),
-    [tracker.setStatus, tracker.setHold, requestDone, tracker.setOwner],
+    [tracker.setStatus, requestPanel, requestDone, tracker.setOwner],
   );
 
   const openItem = visible.find((i) => i.id === openId);
@@ -165,7 +178,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
       }
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const k = e.key.toLowerCase();
-      if (e.key === "Escape") setOpenId(null);
+      if (e.key === "Escape") closePanel();
       else if (k === "v") {
         e.preventDefault();
         setCustomerView((c) => !c);
@@ -178,7 +191,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
         move(-1);
       } else if (e.key === "Enter" && selectedId && t.tagName !== "BUTTON") {
         e.preventDefault();
-        setOpenId(selectedId);
+        openPanel(selectedId);
       } else if (k === "x" && selectedId) {
         // Opens the done form. The proof note is still required.
         e.preventDefault();
@@ -188,7 +201,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
         setMenuRequest((m) => ({ id: selectedId, kind: k === "s" ? "status" : "owner", n: (m?.n ?? 0) + 1 }));
       }
     },
-    [customerView, tab, move, selectedId, requestDone],
+    [customerView, tab, move, selectedId, requestDone, openPanel, closePanel],
   );
 
   useEffect(() => {
@@ -205,12 +218,12 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
   const open = (id: string) => {
     setSelectedId(id);
     setKeyboardNav(false);
-    setOpenId(id);
+    openPanel(id);
   };
 
   const commands: Command[] = useMemo(() => {
     const cmds: Command[] = [
-      { id: "tab-plan", label: customerView ? "Go to This week" : "Go to Plan", hint: "Tab", run: () => setTab("plan") },
+      { id: "tab-plan", label: customerView ? "Go to This week" : "Go to Activation plan", hint: "Tab", run: () => setTab("plan") },
       { id: "tab-success", label: "Go to Success plan", hint: "Tab", run: () => setTab("success") },
       {
         id: "view",
@@ -227,6 +240,16 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
         { id: "collapse", label: "Collapse all groups", hint: "Plan", run: () => setCollapsed(Object.fromEntries(groups.map((g) => [g.key, true]))) },
         { id: "expand", label: "Expand all groups", hint: "Plan", run: () => setCollapsed({}) },
         { id: "export", label: "Export progress as JSON", run: () => tracker.exportJson(account.customer) },
+        {
+          id: "reset",
+          label: "Reset everything saved in this browser…",
+          hint: "Asks first",
+          confirm: {
+            message: "Reset everything saved in this browser for this tracker? Statuses, notes, answers, owner changes and review ticks are cleared. This cannot be undone.",
+            action: "Reset",
+          },
+          run: () => tracker.reset(),
+        },
         ...visible.map((i) => ({
           id: `item-${i.id}`,
           label: i.title,
@@ -249,28 +272,39 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
       <div className={`min-h-screen transition-[padding] ${openItem ? "xl:pr-[var(--panel-width)]" : ""}`}>
         <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
           <div className="mx-auto flex max-w-[var(--page-max)] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
-            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+            <div className="flex min-w-0 shrink-0 flex-col leading-tight">
               <h1 className="truncate text-base font-semibold">{account.customer}</h1>
-              <span className="tabular text-xs text-faint">
-                {formatDate(account.windowStart)} – {formatDate(account.windowEnd, true)}
-              </span>
-              <span className="whitespace-nowrap text-xs text-muted">Product: {account.product}</span>
-              {switcher}
-              <span
-                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-line px-2 py-0.5 text-xs text-muted"
-                title={allReviewed ? "Every section has been reviewed" : "Tick Reviewed on every section to clear the draft"}
-              >
-                <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${allReviewed ? "bg-st-done" : "bg-flag-drift"}`} />
-                {allReviewed
-                  ? "Reviewed"
-                  : customerView
-                    ? "Draft"
-                    : `Draft · ${reviewedCount} of ${REVIEW_SECTIONS.length} reviewed`}
+              <span className="flex items-center gap-2 text-xs text-faint">
+                <span className="tabular">
+                  {formatDate(account.windowStart)} – {formatDate(account.windowEnd, true)}
+                </span>
+                <span
+                  className="inline-flex items-center gap-1 whitespace-nowrap text-muted"
+                  title={allReviewed ? "Every section has been reviewed" : "Tick Reviewed on every section to clear the draft"}
+                >
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${allReviewed ? "bg-st-done" : "bg-flag-drift"}`} />
+                  {allReviewed ? "Reviewed" : customerView ? "Draft" : `Draft ${reviewedCount}/${REVIEW_SECTIONS.length}`}
+                </span>
               </span>
             </div>
-            <nav className="flex flex-wrap gap-0.5 text-sm">
+            <div className="flex min-w-0 shrink-0 flex-col leading-tight">
+              <span className="text-xs text-faint">Product</span>
+              <span className="truncate text-sm font-semibold">{account.product}</span>
+              {account.productUrl && (
+                <a
+                  href={account.productUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-muted underline-offset-2 hover:text-ink hover:underline"
+                >
+                  {account.productUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                </a>
+              )}
+            </div>
+            {switcher}
+            <nav className="flex shrink-0 flex-wrap gap-0.5 text-sm">
               <button type="button" onClick={() => setTab("plan")} className={seg(tab === "plan")}>
-                {customerView ? "This week" : "Plan"}
+                {customerView ? "This week" : "Activation plan"}
               </button>
               <button type="button" onClick={() => setTab("success")} className={seg(tab === "success")}>
                 Success plan
@@ -280,14 +314,8 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
                   People
                 </button>
               )}
-              <a href="/report.html" className={`${seg(false)} inline-flex items-center gap-1.5`} title="Older version, being updated">
-                Full report ↗
-                <span className="rounded-sm border border-line px-1 text-xs text-faint">
-                  Older version<span className="hidden sm:inline">, being updated</span>
-                </span>
-              </a>
             </nav>
-            <div className="ml-auto flex flex-wrap items-center gap-2 text-sm">
+            <div className="ml-auto flex shrink-0 items-center gap-2 text-sm">
               <span
                 role="group"
                 aria-label="View"
@@ -301,28 +329,26 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
                   Customer
                 </button>
               </span>
-              <button type="button" onClick={() => setCommandsOpen(true)} className={ghost} title="Command menu (⌘K or Ctrl+K)">
+              <a href="/report.html" className={`${ghost} inline-flex items-center gap-1.5`} title="Full report: an older version, being updated">
+                Report ↗<span className="rounded-full border border-line px-1.5 text-xs text-faint">older</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setCommandsOpen(true)}
+                className={ghost}
+                title="Command menu: jump anywhere, export, reset (⌘K or Ctrl+K)"
+              >
                 ⌘K
               </button>
-              <button type="button" onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))} className={ghost}>
-                {theme === "dark" ? "Light" : "Dark"}
+              <button
+                type="button"
+                onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+                className={ghost}
+                aria-label={theme === "dark" ? "Use light theme" : "Use dark theme"}
+                title={theme === "dark" ? "Use light theme" : "Use dark theme"}
+              >
+                {theme === "dark" ? "☀" : "☾"}
               </button>
-              {!customerView && (
-                <>
-                  <button type="button" onClick={() => tracker.exportJson(account.customer)} className={ghost}>
-                    Export
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm("Reset everything saved in this browser for this tracker?")) tracker.reset();
-                    }}
-                    className={`${ghost} hover:text-flag-risk`}
-                  >
-                    Reset
-                  </button>
-                </>
-              )}
             </div>
           </div>
         </header>
@@ -348,7 +374,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
 
               <section className="flex flex-col gap-3">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                  <h2 className="text-lg font-semibold">Plan</h2>
+                  <h2 className="text-lg font-semibold">Activation plan</h2>
                   {review("plan")}
                   <label className="ml-auto flex items-center gap-2 text-xs text-muted">
                     Group by
@@ -371,7 +397,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
                     setKeyboardNav(false);
                     setSelectedId(id);
                   }}
-                  onOpen={(id) => setOpenId(id)}
+                  onOpen={openPanel}
                   info={info}
                   roles={roles}
                   actions={actions}
@@ -422,7 +448,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
             answer={saved.answers[openItem.id]}
             decision={saved.decisions[openItem.id]}
             customerView={customerView}
-            onClose={() => setOpenId(null)}
+            onClose={closePanel}
             onStatus={(s) => tracker.setStatus(openItem.id, s)}
             onHold={(r) => tracker.setHold(openItem.id, r)}
             fieldName={(ids) => ids.map((f) => fieldLabel(f, openItem.module, configFieldLabels)).join(" · ")}
@@ -432,13 +458,17 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
             onAnswer={(text) => tracker.answer(openItem.id, text)}
             onDecide={(d) => tracker.decide(openItem.id, d)}
             onReopen={() => tracker.reopen(openItem.id)}
-            sourceTag={sourceTag(openItem.from, openItem.module, configFieldLabels)}
+            sources={[
+              ...openItem.from.filter((f) => f !== "config"),
+              ...openItem.from.filter((f) => f === "config"),
+            ].map((f) => fieldLabel(f, openItem.module, configFieldLabels))}
             drift={drifts.get(openItem.id) ?? null}
             asOf={asOf}
             roles={roles}
             history={saved.ownerHistory[openItem.id] ?? []}
             onOwner={(side, roleId) => tracker.setOwner(openItem.id, side, roleId)}
-            doneRequest={doneRequest}
+            doneRequest={panelRequest?.id === openItem.id && panelRequest.kind === "done" ? panelRequest.n : undefined}
+            holdRequest={panelRequest?.id === openItem.id && panelRequest.kind === "hold" ? panelRequest.n : undefined}
           />
         )}
 

@@ -65,46 +65,60 @@ and capture the baseline before anyone configures anything.
 - **Kickoff setup**, first: quick base-level setup done at kickoff.
   - Roles and permissions for both desks.
     *Owners: us — CSM; them — Technical owner · From: Teams in scope at launch · product config*
+    *Done when:* Agent, admin and requester roles exist for both desks · All 23 agents have the right role · One agent from each desk can log in and see their queue
   - Workspace setup, once one workspace or two is decided in week 2.
     *Owners: us — CSM; them — Technical owner, Store support lead · From: Number of teams / workspaces · product config*
+    *Done when:* One-or-two workspace decision recorded · Workspace set up and both teams (Head-office IT, Store support) can log in · A test request reaches the right team in each workspace
   - **Draft the success plan, confirm it at kickoff, share it by end of week 1.**
     One page: their goal in their words, the proposed first value, success
     measures with their baselines, milestones with target dates, and the People
     list above. It counts toward the kickoff milestone.
     *Owners: us — CSM; them — Technical owner, Exec sponsor · From: Their stated outcome · How they will know it worked · Number attached, and who reports it upward*
+    *Done when:* One-page success plan drafted · Confirmed with Dana and Priya at kickoff · Shared with both by end of week 1
 - **The six open questions** from the board, asked at kickoff, each with its
   checklist to tick off as the answers come in.
   *Owners: us — CSM; them — Technical owner, Exec sponsor, Store support lead · From: every `UNKNOWN` in the handoff, listed per question on the board*
+  *Done when:* Every checklist line ticked, or given an owner and a date · Each answer saved on its question
 - **The catalog scope decision** — a starter set of 8 to 12 request types, or
   a complete catalog. Unresolved in the handoff, planned as a starter set, and
   the largest single lever on the January date. Top of the list.
   *Owners: us — CSM; them — Technical owner · From: Explicitly out of scope for now · product config*
+  *Done when:* Starter set or complete catalog, recorded · If starter set: the 8 to 12 request types listed
 - **The security review.** `security_review` is `UNKNOWN`, but the config says
   to assume one exists, so the work starts now: find out from Dana Whitfield
   whether a review process exists and who owns sign-off, then open it. Status
   moves from "not started" to submitted as soon as there is someone to submit
   to.
   *Owners: us — CSM; them — Exec sponsor · From: Security review required before deployment · Review status · Who owns security sign-off on their side · product config*
+  *Done when:* Security owner named · Review opened, or confirmed not needed, in writing · Sign-off received
 - **Discovery credential requests** — same shape. Nobody to request from yet.
   *Owners: us — CSM; them — Exec sponsor · From: Who holds the credentials for each system above · Restrictions on installing software or outbound connections*
+  *Done when:* Credentials received for each platform in scope · Subnet list supplied · Scanner host agreed
 - **Foundation** — every item from the config, each at its own lead time.
   Foundation starts in week 1; it does not make a long item finish in week 1.
   - SSO, and the provisioning question. Blocked on the identity / IT contact.
     *Owners: us — CSM; them — Identity / IT contact · From: Single sign-on required · Identity provider · Automated user provisioning (SCIM) required · product config*
+    *Done when:* SSO switched on for both desks · One agent from each desk signs in through SSO
   - Agent groups and business hours.
     *Owners: us — CSM; them — Technical owner · From: One shared process, or several that genuinely differ · product config*
+    *Done when:* An agent group exists for each desk · Business hours set for each group · A test ticket reaches the right group
   - The inbound mailbox cutover plan.
     *Owners: us — CSM; them — Technical owner · From: Tool being replaced, or greenfield · product config*
+    *Done when:* Cutover date agreed · The plan says what happens to the old address · A test email to the old address lands in the new queue
   - The **test instance**, which the handoff requires (`separate_envs: yes`).
     *Owners: us — CSM; them — Technical owner · From: Separate test and production required · product config*
+    *Done when:* Test instance exists · Priya can log in to it · A change can be tried there before production
   - A day-to-day admin named, with hours budgeted.
     *Owners: us — CSM; them — Exec sponsor · From: Day-to-day admin, if different · Hours per week the technical owner has for this · product config*
+    *Done when:* An admin is named · Their weekly hours for this are written down · They have admin access to the product
 - **Taxonomy work with both desks.**
   *Owners: us — CSM; them — Technical owner, Store support lead · From: One shared process, or several that genuinely differ · product config*
+  *Done when:* Categories and form fields written down · Signed off by both desk leads, not just head office
 - **Baseline capture.** Time to first response and store ticket volume, neither
   of which exists in the handoff. Both are the comparison point for workflow
   automation evidence, and neither can be recovered once configuration starts.
   *Owners: us — CSM; them — Technical owner, Store support lead · From: Average time to first response · Core volume per month (whatever the product counts)*
+  *Done when:* Time to first response recorded, labelled measured or estimate · Store volume recorded the same way · Both captured before anything is configured
 - **Five discovery tasks** — find the monthly volume for each section 6 request
   that has none. Each is a checklist line under open question 1, 4 or 5:
 
@@ -167,19 +181,23 @@ it. Start the knowledge base habit.
   setup (~40 a month, estimate). Till and printer faults wait for their
   discovery task.
   *Owners: us — CSM; them — Technical owner · From: What they want set up first — service catalog, request 1 · What they want set up first — service catalog, request 2*
+  *Done when:* Both items published in the catalog · A real request raised through each · Each reaches the right team without being reassigned
 - **Knowledge base** — from week 2, continuously, per the config's sequencing.
   First content is the weekly repeat questions (~250 a month, estimate). Not a
   content migration: article owners per team, a review cadence, and a
   publishing decision.
   *Owners: us — CSM; them — Technical owner · From: What they want set up first — knowledge base, request 1 · product config*
+  *Done when:* Article owners named for each desk · Review cadence and publishing rule agreed · First article written by an agent during ticket work
 - **Discovery credential collection**, if a security or infrastructure contact
   was named.
   *Owners: us — CSM; them — Security contact · From: Who holds the credentials for each system above*
+  *Done when:* A security or infrastructure contact named · Credentials received for each platform in scope
 - **Change management groundwork:** write down the December freeze and any
   maintenance windows. This is the config's "maintenance windows and freeze
   periods documented" dependency, and it answers Priya's own request. It is
   not the module starting.
   *Owners: us — CSM; them — Technical owner · From: Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · What they want set up first — change management, request 2*
+  *Done when:* Freeze dates written down in the product · Maintenance windows written down · Priya confirms both
 
 **Reaching evidence this week**
 
@@ -221,14 +239,17 @@ exist.
   joiners-and-leavers rule (70 a month, measured) is second and waits on HR
   system credentials, still `UNKNOWN`.
   *Owners: us — CSM; them — Technical owner · From: What they want set up first — workflow automation, request 1 · What they want set up first — workflow automation, request 2*
+  *Done when:* Routing rule switched on in production · A store ticket lands with the store desk · A head-office ticket lands with head office
 - **Asset management groundwork:** agree the asset model — what is tracked, at
   what depth, and what is out of scope. One boundary is already set: stock in
   the distribution centres.
   *Owners: us — CSM; them — Technical owner · From: Explicitly out of scope for now · product config*
+  *Done when:* What is tracked, written down · At what depth, written down · What is out of scope, written down
 - **Change management groundwork:** name the change-board members, and collect
   real examples of each change type. Store network work during trading hours
   is the first one on record.
   *Owners: us — CSM; them — Technical owner · From: What they want set up first — change management, request 1 · product config*
+  *Done when:* Change-board members named · A real example each of a standard, normal and emergency change
 
 **Reaching evidence this week**
 
@@ -264,8 +285,10 @@ real traffic, and is the asset model written down.
   This is what `day30_required: yes` asked for on the catalog: something live.
   It is not yet the evidence.
   *Owners: us — CSM; them — Technical owner · From: Must something here be live by day 30?*
+  *Done when:* Starter items visible to both desks · Both desks have raised real requests through them
 - The first routing rule enabled in production.
   *Owners: us — CSM; them — Technical owner · From: What they want set up first — workflow automation, request 1*
+  *Done when:* Rule switched on in production · Its execution log shows it firing on a real ticket
 
 **Reaching evidence this week**
 

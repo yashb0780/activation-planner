@@ -16,8 +16,8 @@ export type Kind = "task" | "decision" | "question";
 export type Module = string;
 
 export interface Why {
-  /** What the handoff says in the fields the item came from. */
-  answer: string;
+  /** What we know, as short bullet points drawn from the handoff and the config. */
+  facts: string[];
   /** Source recorded in the handoff. Empty when the handoff gives none. */
   source: string;
 }
@@ -51,8 +51,10 @@ export interface Item {
   from: string[];
   /** Lead time in weeks, from the config, for long-lead items the drift check watches. */
   lead?: { min: number; max: number };
-  /** Evidence that it is real, quoted from the config or the plan's checkpoint. */
+  /** 2 to 3 short checks anyone could verify by looking. */
   doneWhen: string[];
+  /** The config's "Evidence it is real" lines for this module, quoted unedited. */
+  evidence?: string[];
   /** The config's "Not evidence" line for this module. */
   notEvidence: string[];
   visibility: Visibility;
@@ -74,8 +76,10 @@ export interface Decision {
 
 export interface Account {
   customer: string;
-  /** The product being activated, shown as plain text ("Product: ..."). */
+  /** The product being activated, shown as plain text. */
   product: string;
+  /** The product's website, shown as a small plain link under its name. Optional. */
+  productUrl?: string;
   /** Freeze periods from the handoff, inclusive dates. */
   freezes: { start: string; end: string }[];
   windowStart: string;

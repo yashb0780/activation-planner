@@ -18,7 +18,8 @@ export interface RowInfo {
 
 export interface RowActions {
   onStatus: (id: string, s: Status) => void;
-  onHold: (id: string, reason: string) => void;
+  /** Open the side panel on the reason box. The status changes only once a reason is saved. */
+  onRequestHold: (id: string) => void;
   onRequestDone: (id: string) => void;
   onOwner: (id: string, side: Side, roleId: string) => void;
 }
@@ -89,7 +90,7 @@ function Row({
         <StatusMenu
           item={item}
           onStatus={(s) => actions.onStatus(item.id, s)}
-          onHold={(r) => actions.onHold(item.id, r)}
+          onRequestHold={() => actions.onRequestHold(item.id)}
           onRequestDone={() => actions.onRequestDone(item.id)}
           openSignal={mine?.kind === "status" ? mine.n : undefined}
         />
@@ -146,7 +147,10 @@ export function PlanList(props: Props) {
         const done = all.filter((i) => i.status === "done").length;
         const isCollapsed = Boolean(collapsed[g.key]);
         return (
-          <section key={g.key} className="rounded-lg border border-line bg-panel">
+          <section
+            key={g.key}
+            className="rounded-lg border border-line bg-panel [&>div:last-child_[role=row]:last-child]:rounded-b-lg"
+          >
             <button
               type="button"
               onClick={() => onToggle(g.key)}
