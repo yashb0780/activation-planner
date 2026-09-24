@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { readPref, useTracker, writePref } from "./state";
-import type { Dataset, Item } from "./types";
+import type { Dataset, Item, Status } from "./types";
 import { Panel } from "./components/Panel";
 import { FirstValueLine, Milestones, NeedsAttention, ReviewBox } from "./components/Top";
 import { People, PeopleList } from "./components/People";
@@ -50,7 +50,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
   const [openId, setOpenId] = useState<string | null>(null);
   const [keyboardNav, setKeyboardNav] = useState(false);
   // A request to open the panel on its done form or its On hold reason box, for one item.
-  const [panelRequest, setPanelRequest] = useState<{ id: string; kind: "done" | "hold"; n: number } | undefined>();
+  const [panelRequest, setPanelRequest] = useState<{ id: string; kind: "done" | "hold" | "note"; n: number } | undefined>();
   const [menuRequest, setMenuRequest] = useState<MenuRequest | undefined>();
   const [commandsOpen, setCommandsOpen] = useState(false);
   const [customerView, setCustomerView] = useState(false);
@@ -121,7 +121,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
   );
 
   /** Open an item's panel on its done form (tasks) or its record/answer form (decisions, questions). */
-  const requestPanel = useCallback((id: string, kind: "done" | "hold") => {
+  const requestPanel = useCallback((id: string, kind: "done" | "hold" | "note") => {
     setSelectedId(id);
     setOpenId(id);
     setPanelRequest((r) => ({ id, kind, n: (r?.n ?? 0) + 1 }));
@@ -140,7 +140,11 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
 
   const actions: RowActions = useMemo(
     () => ({
-      onStatus: tracker.setStatus,
+      // In progress changes at once, and opens the panel on an optional note.
+      onStatus: (id: string, st: Status) => {
+        tracker.setStatus(id, st);
+        if (st === "progress") requestPanel(id, "note");
+      },
       // On hold asks for a reason in the side panel first. Closing the panel changes nothing.
       onRequestHold: (id: string) => requestPanel(id, "hold"),
       onRequestDone: requestDone,
@@ -272,12 +276,13 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
       <div className={`min-h-screen transition-[padding] ${openItem ? "xl:pr-[var(--panel-width)]" : ""}`}>
         <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
           <div className="mx-auto flex max-w-[var(--page-max)] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
-            <div className="flex min-w-0 shrink-0 flex-col leading-tight">
-              <h1 className="truncate text-base font-semibold">{account.customer}</h1>
-              <span className="flex items-center gap-2 text-xs text-faint">
+            {(() => {
+              const dates = (
                 <span className="tabular">
                   {formatDate(account.windowStart)} – {formatDate(account.windowEnd, true)}
                 </span>
+              );
+              const draft = (
                 <span
                   className="inline-flex items-center gap-1 whitespace-nowrap text-muted"
                   title={allReviewed ? "Every section has been reviewed" : "Tick Reviewed on every section to clear the draft"}
@@ -285,12 +290,8 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
                   <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${allReviewed ? "bg-st-done" : "bg-flag-drift"}`} />
                   {allReviewed ? "Reviewed" : customerView ? "Draft" : `Draft ${reviewedCount}/${REVIEW_SECTIONS.length}`}
                 </span>
-              </span>
-            </div>
-            <div className="flex min-w-0 shrink-0 flex-col leading-tight">
-              <span className="text-xs text-faint">Product</span>
-              <span className="truncate text-sm font-semibold">{account.product}</span>
-              {account.productUrl && (
+              );
+              const link = account.productUrl && (
                 <a
                   href={account.productUrl}
                   target="_blank"
@@ -299,8 +300,39 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
                 >
                   {account.productUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
                 </a>
-              )}
-            </div>
+              );
+              const customer = `${account.customer}${data.fictionalCustomer ? " (fictional)" : ""}`;
+              return data.productFirst ? (
+                <>
+                  <div className="flex min-w-0 shrink-0 flex-col leading-tight">
+                    <h1 className="truncate text-lg font-semibold">{account.product}</h1>
+                    {link}
+                  </div>
+                  <div className="flex min-w-0 shrink-0 flex-col leading-tight text-xs text-faint">
+                    <span className="truncate text-muted">Customer: {customer}</span>
+                    <span className="flex items-center gap-2">
+                      {dates}
+                      {draft}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex min-w-0 shrink-0 flex-col leading-tight">
+                    <h1 className="truncate text-base font-semibold">{customer}</h1>
+                    <span className="flex items-center gap-2 text-xs text-faint">
+                      {dates}
+                      {draft}
+                    </span>
+                  </div>
+                  <div className="flex min-w-0 shrink-0 flex-col leading-tight">
+                    <span className="text-xs text-faint">Product</span>
+                    <span className="truncate text-sm font-semibold">{account.product}</span>
+                    {link}
+                  </div>
+                </>
+              );
+            })()}
             {switcher}
             <nav className="flex shrink-0 flex-wrap gap-0.5 text-sm">
               <button type="button" onClick={() => setTab("plan")} className={seg(tab === "plan")}>
@@ -351,6 +383,9 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
               </button>
             </div>
           </div>
+          {data.disclaimer && (
+            <p className="mx-auto max-w-[var(--page-max)] border-t border-line px-4 py-1 text-xs text-faint">{data.disclaimer}</p>
+          )}
         </header>
 
         <main className="mx-auto flex max-w-[var(--page-max)] flex-col gap-4 px-4 pb-16 pt-4">
@@ -469,6 +504,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
             onOwner={(side, roleId) => tracker.setOwner(openItem.id, side, roleId)}
             doneRequest={panelRequest?.id === openItem.id && panelRequest.kind === "done" ? panelRequest.n : undefined}
             holdRequest={panelRequest?.id === openItem.id && panelRequest.kind === "hold" ? panelRequest.n : undefined}
+            noteRequest={panelRequest?.id === openItem.id && panelRequest.kind === "note" ? panelRequest.n : undefined}
           />
         )}
 

@@ -185,6 +185,12 @@ export interface Dataset {
   label: string;
   /** Footer line, e.g. "Illustrative example. X is fictional." */
   note: string;
+  /** Show the product as the header title, with the customer underneath. For a product demo. */
+  productFirst?: boolean;
+  /** Mark the customer as fictional in the header. */
+  fictionalCustomer?: boolean;
+  /** A quiet line under the header, e.g. an unofficial-demo disclaimer. */
+  disclaimer?: string;
   account: Account;
   items: Item[];
   roles: Role[];

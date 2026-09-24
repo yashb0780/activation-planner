@@ -6,21 +6,22 @@ import { Dropdown, ListBox } from "./ui";
 // Status: Not started, In progress, On hold, Done. Each has its own colour from
 // the theme. Drift is not a status: it is a separate small flag.
 
-export const STATUS: Record<Status, { label: string; color: string }> = {
-  todo: { label: "Not started", color: "var(--st-todo)" },
-  progress: { label: "In progress", color: "var(--st-progress)" },
-  hold: { label: "On hold", color: "var(--st-hold)" },
-  done: { label: "Done", color: "var(--st-done)" },
+/** color: the dot and the pill tint. ink: the pill's text. */
+export const STATUS: Record<Status, { label: string; color: string; ink: string }> = {
+  todo: { label: "Not started", color: "var(--st-todo)", ink: "var(--st-todo-ink)" },
+  progress: { label: "In progress", color: "var(--st-progress)", ink: "var(--st-progress-ink)" },
+  hold: { label: "On hold", color: "var(--st-hold)", ink: "var(--st-hold-ink)" },
+  done: { label: "Done", color: "var(--st-done)", ink: "var(--st-done-ink)" },
 };
+/** Background of a status pill. */
+export const pillBg = (s: Status) => `color-mix(in srgb, ${STATUS[s].color} 20%, transparent)`;
 const ORDER: Status[] = ["todo", "progress", "hold", "done"];
-
-const tint = (color: string, pct: number) => `color-mix(in srgb, ${color} ${pct}%, transparent)`;
 
 /** Dot and label, read-only. */
 export function StatusDot({ status }: { status: Status }) {
   const s = STATUS[status];
   return (
-    <span className="inline-flex items-center gap-2 text-xs font-medium" style={{ color: s.color }}>
+    <span className="inline-flex items-center gap-2 text-xs font-medium" style={{ color: s.ink }}>
       <span aria-hidden className="h-2 w-2 shrink-0 rounded-full" style={{ background: s.color }} />
       {s.label}
     </span>
@@ -68,7 +69,7 @@ export function StatusMenu({
     <Dropdown
       label={`Status: ${s.label}. Change status`}
       title={item.status === "hold" && item.holdReason ? `On hold: ${item.holdReason}` : undefined}
-      style={{ color: s.color, background: tint(s.color, 14) }}
+      style={{ color: s.ink, background: pillBg(item.status) }}
       className="hover:brightness-110"
       openSignal={openSignal}
       content={

@@ -36,9 +36,12 @@ conclusions as `(inferred)`.
 
 ## Rules
 
-**Public repo.** Committed files must never contain customer names, employer
-names, or real account data. Examples stay fictional (see `examples/halden-*`).
-Real configs and private demos go in `private-*` files in `config/`,
+**Public repo.** Customer names are always fictional, in every committed file
+(see `examples/halden-*` and `examples/coreweave-*`). No real account data, and
+no employer names. A real company name is allowed only for the **product being
+demoed**, as plain text (no logo, brand colours or visual identity), and only
+with the disclaimer "Unofficial demo. Not affiliated with {company}." wherever
+the demo is shown. Anything else real goes in `private-*` files in `config/`,
 `examples/` and `src/data/`, which git ignores. The public build must work
 without them.
 

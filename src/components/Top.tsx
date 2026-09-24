@@ -206,7 +206,7 @@ export function NeedsAttention({
   if (!items.length) return null;
   const label = (i: Item) => (atRisk.has(i.id) ? "At risk" : i.conflict ? "Conflict" : "On hold");
   const color = (i: Item) =>
-    atRisk.has(i.id) ? "var(--flag-risk)" : i.conflict ? "var(--muted)" : "var(--st-hold)";
+    atRisk.has(i.id) ? "var(--flag-risk)" : i.conflict ? "var(--muted)" : "var(--st-hold-ink)";
   return (
     <section className="rounded-xl border border-line bg-panel px-4 py-3">
       <h2 className="mb-1 text-xs font-medium text-faint">Needs attention</h2>

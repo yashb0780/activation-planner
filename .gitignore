@@ -1,5 +1,6 @@
-# Private files: real products, demos and anything with a real company name.
-# Never committed. The public build works without them.
+# Private files: anything that should stay off the public repo (a real
+# customer, account data, an unannounced demo). Never committed. The public
+# build works without them.
 config/private-*
 examples/private-*
 src/data/private-*

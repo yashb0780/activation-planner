@@ -22,11 +22,16 @@
   --accent: #c58af9;
   --on-accent: #1b1024;   /* text on an accent background */
 
-  /* Status pills: grey, orange, yellow, green. */
-  --st-todo: #8b8f98;     /* Not started */
-  --st-progress: #f0883e; /* In progress */
-  --st-hold: #e6c74c;     /* On hold */
-  --st-done: #4db880;     /* Done */
+  /* Status pills: grey, orange, yellow, green. --st-* is the dot and the pill tint;
+     --st-*-ink is the pill's text, so every pill stays readable in both themes. */
+  --st-todo: #8b8f98;         /* Not started */
+  --st-todo-ink: #b3b6bd;
+  --st-progress: #f0883e;     /* In progress */
+  --st-progress-ink: #f5a36c;
+  --st-hold: #eab308;         /* On hold: true yellow */
+  --st-hold-ink: #facc15;
+  --st-done: #4db880;         /* Done */
+  --st-done-ink: #62c990;
 
   /* Drift flags. Never shown as a filled pill: always an outlined chip with a
      warning icon and a word, so they cannot be mistaken for a status. */
@@ -51,10 +56,14 @@
   --accent: #8a3fcb;
   --on-accent: #ffffff;
 
-  --st-todo: #6f737c;
-  --st-progress: #c2570c;
-  --st-hold: #8f7200;
+  --st-todo: #7a7e87;
+  --st-todo-ink: #50545c;
+  --st-progress: #ea6c0c;
+  --st-progress-ink: #9a3a04;
+  --st-hold: #eab308;         /* same yellow; dark text keeps the pill readable */
+  --st-hold-ink: #3f2e00;
   --st-done: #23865a;
+  --st-done-ink: #17613f;
 
   --flag-drift: #b7790f;
   --flag-risk: #c8433a;

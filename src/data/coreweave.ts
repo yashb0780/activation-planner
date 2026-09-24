@@ -1,0 +1,1202 @@
+// Unofficial demo. Not affiliated with CoreWeave. Product: CoreWeave, named as
+// plain text only (no logo, colours or visual identity). The customer,
+// Veltmoor Labs, is fictional. Built only from examples/coreweave-handoff.md,
+// -board.md and -30-day-plan.md, and config/coreweave.md. Lead times there are
+// VERIFY placeholders, shown in the app as estimates, so every drift flag here
+// rests on an estimate.
+
+import type { Account, Dataset, DriftRules, FirstValue, Gate, GateGap, Item, Person, Role, SuccessPlan } from "../types";
+
+const account: Account = {
+  customer: "Veltmoor Labs",
+  product: "CoreWeave",
+  productUrl: "https://coreweave.com",
+  windowStart: "2026-10-05",
+  windowEnd: "2026-11-03",
+  goLive: "2026-12-01",
+  // freeze_periods: "2026-11-16 to 2026-11-20. Team offsite, no infrastructure changes."
+  freezes: [{ start: "2026-11-16", end: "2026-11-20" }],
+};
+
+const roles: Role[] = [
+  { id: "csm", side: "us", label: "CSM", name: "A. Moreau" },
+  { id: "impl_lead", side: "us", label: "Implementation lead", name: "A. Moreau" },
+  { id: "se", side: "us", label: "SE", name: "J. Petrov" },
+  { id: "rep", side: "us", label: "Rep", name: "L. Chandra" },
+  { id: "technical_owner", side: "customer", label: "Technical owner", name: "Ravi Castellanos" },
+  { id: "exec_sponsor", side: "customer", label: "Exec sponsor", name: "Ines Okafor" },
+  { id: "research_lead", side: "customer", label: "Research lead", name: "Mira Stenholm" },
+  { id: "security_contact", side: "customer", label: "Security contact", name: "Ines Okafor" },
+  { id: "admin", side: "customer", label: "Day-to-day admin", name: "" },
+  { id: "identity_contact", side: "customer", label: "Identity / IT contact", name: "" },
+  { id: "data_owner", side: "customer", label: "Data owner", name: "" },
+];
+
+// Demo defaults from the config's Drift rules (VERIFY).
+const driftRules: DriftRules = { bufferWeeks: 0, freezePausesWork: true, amberUses: "max", redUses: "min" };
+
+const gateGaps: GateGap[] = [
+  {
+    field: "Time the core job takes today",
+    id: "core_cycle_time",
+    state: "missing",
+    detail: "UNKNOWN: nobody has timed a full training run on the current setup.",
+    filledBy: "se",
+  },
+];
+
+const configFieldLabels: Record<string, string> = {
+  gpu_utilization: "Average GPU utilization today",
+  job_failure_rate: "Share of training jobs that fail or are restarted by hand",
+  queue_wait: "Average time a job waits before it starts",
+  dataset_size: "Total training data to move",
+};
+
+// Evidence and "Not evidence" lines, quoted from config/coreweave.md.
+const COMPUTE_EV = [
+  "GPUs in the plan running the customer's own jobs above an agreed utilization, sustained for two consecutive weeks",
+  "Capacity use reviewed weekly by a named customer owner, from the product's own dashboards rather than a spreadsheet",
+  "No job queued for lack of capacity that the plan says should exist",
+];
+const COMPUTE_NOT = ["Nodes provisioned", "A test job run by us", "Capacity showing on the invoice"];
+const CKS_EV = [
+  "Production workloads deployed by the customer's own team through their own pipeline, not by us",
+  "Workloads survive a node being replaced without a person stepping in",
+  "The customer's on-call gets paged by this cluster's alerts, and has responded to one",
+];
+const CKS_NOT = ["Cluster created", "kubectl works", "A hello-world pod", "A demo deployed by the SE"];
+const SUNK_EV = [
+  "Researchers submitting real training jobs without help from us or the platform engineer",
+  "A multi-node job resumes from checkpoint after a node failure, without manual repair",
+  "Queue wait time and job failure rate reported against the handoff baseline",
+];
+const SUNK_NOT = ["Slurm installed", "sinfo shows nodes", "A test job submitted by the admin"];
+const DATA_EV = [
+  "The priority datasets are copied and checksummed, with the gap against their own inventory explained",
+  "Training reads from CoreWeave storage, not across clouds",
+];
+const STORAGE_EV = [
+  "Checkpoints written to CoreWeave storage by real training runs",
+  "The copy in their old cloud is no longer the source of truth, and they have said so in writing",
+  "Storage cost and growth reviewed by a named owner",
+];
+const STORAGE_NOT = ["Buckets created", "A sample dataset uploaded", "A transfer started"];
+const OBS_EV = [
+  "Their on-call receives alerts from the product's alerting and has acted on one",
+  "GPU utilization reviewed in a standing weekly meeting from the product's dashboards",
+];
+
+const TECH_CALL = "Technical call, 2026-09-03";
+const COMMERCIAL = "Commercial call, 2026-09-09";
+
+const items: Item[] = [
+  // ─── Week 1 ────────────────────────────────────────────────────────────
+  {
+    id: "d-capacity",
+    title: "Decide: sign the capacity plan (GPU type, region, start date)",
+    kind: "decision",
+    module: "Compute capacity",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    theirs: ["exec_sponsor"],
+    why: {
+      facts: [
+        "64 GPUs reserved for 12 months",
+        "GPU type: as on the order form",
+        "Training data must stay in the US",
+        "No capacity start date in the handoff",
+      ],
+      source: "Order form",
+    },
+    from: ["contract_size", "data_residency", "config"],
+    doneWhen: [
+      "Capacity plan signed",
+      "It names GPU type, region and start date",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "d-dataset-help",
+    title: "Decide: what \"help moving your datasets\" covers, and who pays to move data out",
+    kind: "decision",
+    module: "Storage and data migration",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    ours: ["rep", "csm"],
+    theirs: ["exec_sponsor"],
+    why: {
+      facts: [
+        "Promised on the commercial call, never defined",
+        "180 TB to move, measured",
+        "Bucket owner: UNKNOWN",
+      ],
+      source: COMMERCIAL,
+    },
+    from: ["commitments", "dataset_size"],
+    doneWhen: [
+      "What we do and what they do, written down",
+      "Who pays to move data out, agreed",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "d-one-cluster",
+    title: "Decide: one cluster or two, for research and infrastructure",
+    kind: "decision",
+    module: "CoreWeave Kubernetes Service",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    ours: ["se"],
+    theirs: ["technical_owner", "research_lead"],
+    why: {
+      facts: [
+        "Team 1: Research, batch jobs on Slurm",
+        "Team 2: ML infrastructure, services on Kubernetes",
+        "Open question: one cluster or two",
+      ],
+      source: TECH_CALL,
+    },
+    from: ["team_count", "process_shape"],
+    doneWhen: [
+      "One cluster or two, recorded",
+      "Ravi and Mira both agree",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "security-review",
+    title: "Get their security questionnaire, then answer it",
+    kind: "task",
+    module: "Security review",
+    lane: "start",
+    week: 1,
+    status: "hold",
+    side: "customer",
+    ours: ["se"],
+    theirs: ["security_contact"],
+    holdReason: "Their questionnaire has not been sent.",
+    why: {
+      facts: [
+        "Review required: yes",
+        "Status: not started",
+        "Sign-off: Ines Okafor",
+        "Which security reports they want: not said",
+      ],
+      source: COMMERCIAL,
+    },
+    from: ["security_review", "security_review_status", "security_signoff", "security_open_items"],
+    doneWhen: [
+      "Questionnaire received",
+      "Our answers sent",
+      "Ines signs off in writing",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "egress",
+    title: "Find the data owner and get approval to move data out",
+    kind: "task",
+    module: "Storage and data migration",
+    lane: "start",
+    week: 1,
+    status: "hold",
+    side: "customer",
+    theirs: ["data_owner"],
+    holdReason: "Bucket owner UNKNOWN.",
+    why: {
+      facts: [
+        "Ravi holds the cluster and registry credentials",
+        "Data bucket owner: UNKNOWN",
+        "180 TB to move",
+      ],
+      source: "",
+    },
+    from: ["credential_holders", "dataset_size", "config"],
+    doneWhen: [
+      "Data owner named",
+      "Approval to move data out, in writing",
+    ],
+    notEvidence: STORAGE_NOT,
+    visibility: "shared",
+  },
+  {
+    id: "org-setup",
+    title: "Set up the organization and projects",
+    kind: "task",
+    module: "Kickoff setup",
+    lane: "kickoff",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Two teams at launch",
+        "One cluster or two: not decided",
+        "How an organization is created: estimate",
+      ],
+      source: "",
+    },
+    from: ["team_count", "config"],
+    doneWhen: [
+      "Organization exists",
+      "A project per team, if they choose two",
+      "Ravi can log in",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "roles",
+    title: "Set up roles and permissions for both teams",
+    kind: "task",
+    module: "Kickoff setup",
+    lane: "kickoff",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Research: 14 people",
+        "ML infrastructure: 3 people",
+        "They need different access",
+      ],
+      source: "",
+    },
+    from: ["teams_launch", "config"],
+    doneWhen: [
+      "A role exists for each team",
+      "All 17 people have the right role",
+      "Ravi has checked the list",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "org-admin",
+    title: "Get a day-to-day admin named, with hours budgeted",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    theirs: ["exec_sponsor"],
+    why: {
+      facts: [
+        "Admin: UNKNOWN",
+        "A platform engineer is planned, not hired",
+        "Ravi: about 10 hours a week, also trains models",
+      ],
+      source: TECH_CALL,
+    },
+    from: ["admin", "owner_capacity", "config"],
+    doneWhen: [
+      "An admin is named",
+      "Their weekly hours are written down",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "sso",
+    title: "Set up single sign-on for both teams",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "hold",
+    side: "us",
+    theirs: ["identity_contact"],
+    holdReason: "Identity / IT contact UNKNOWN.",
+    why: {
+      facts: [
+        "SSO required",
+        "Their identity provider has SSO available",
+        "Identity / IT contact: UNKNOWN",
+      ],
+      source: TECH_CALL,
+    },
+    from: ["sso_required", "identity_provider", "teams_launch", "config"],
+    doneWhen: [
+      "SSO switched on",
+      "Someone from each team signs in through SSO",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+    window: "Short if their identity owner is reached in week 1; long if not (inferred). SSO support: estimate.",
+  },
+  {
+    id: "network",
+    title: "Set up the VPC, and decide on a private link for the data move",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    side: "us",
+    ours: ["se"],
+    why: {
+      facts: [
+        "Their data sits in their current cloud's object storage",
+        "Private link for the move: not discussed",
+      ],
+      source: "",
+    },
+    from: ["integrations", "config"],
+    doneWhen: [
+      "VPC created",
+      "Transfer path decided: internet or private link",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "billing",
+    title: "Set up billing with budget alerts to a named owner",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    side: "us",
+    theirs: ["exec_sponsor"],
+    why: {
+      facts: [
+        "Not discussed in the handoff",
+        "The config lists it as Foundation",
+      ],
+      source: "",
+    },
+    from: ["config"],
+    doneWhen: [
+      "Billing set up",
+      "A budget alert reaches a named person",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "support",
+    title: "Name the support path and escalation route",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Not discussed in the handoff",
+        "Support channels: estimate",
+      ],
+      source: "",
+    },
+    from: ["config"],
+    doneWhen: [
+      "Who they contact, written down",
+      "How to escalate, written down",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "c-capacity",
+    title: "Raise: technical owner has about 10 hours a week and also trains models",
+    kind: "task",
+    conflict: true,
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    side: "us",
+    theirs: ["exec_sponsor"],
+    why: {
+      facts: [
+        "Ravi: about 10 hours a week, his own estimate",
+        "He also trains models",
+        "No admin named",
+      ],
+      source: TECH_CALL,
+    },
+    from: ["owner_capacity", "admin", "config"],
+    doneWhen: [
+      "Raised with Ines",
+      "Her answer recorded in the notes",
+    ],
+    notEvidence: [],
+    visibility: "internal",
+  },
+  {
+    id: "c-two-weeks",
+    title: "Raise: \"jobs within two weeks\" was promised before a capacity date exists",
+    kind: "task",
+    conflict: true,
+    module: "Compute capacity",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "us",
+    ours: ["se"],
+    why: {
+      facts: [
+        "Promised: jobs on the new cluster within two weeks",
+        "Said by the SE on the demo call",
+        "Compute lead time depends on the capacity plan",
+      ],
+      source: "Demo call 2026-09-01, recorded",
+    },
+    from: ["commitments", "config"],
+    doneWhen: [
+      "Capacity date confirmed",
+      "Promise checked against it before it is repeated",
+    ],
+    notEvidence: [],
+    visibility: "internal",
+  },
+  {
+    id: "success-plan",
+    title: "Draft success plan, confirm at kickoff, share by end of week 1",
+    kind: "task",
+    module: "Success plan",
+    lane: "kickoff",
+    week: 1,
+    status: "todo",
+    side: "us",
+    theirs: ["technical_owner", "exec_sponsor"],
+    why: {
+      facts: [
+        "Assigned CSM: A. Moreau",
+        "Built from their goal, the first value, the baselines and the milestones",
+      ],
+      source: "",
+    },
+    from: ["success_outcome", "success_signal", "success_number"],
+    doneWhen: [
+      "One-page success plan drafted",
+      "Confirmed with Ines and Ravi at kickoff",
+      "Shared with both by end of week 1",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "baseline-run",
+    title: "Time a full reference training run on the current setup",
+    kind: "task",
+    module: "Baseline",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    ours: ["se"],
+    why: {
+      facts: [
+        "Time to train their reference model: UNKNOWN",
+        "The success number needs it",
+      ],
+      source: "",
+    },
+    from: ["core_cycle_time"],
+    doneWhen: [
+      "A full reference run timed",
+      "Result recorded as measured",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  // Open questions, grouped as a CSM would ask them on a call
+  {
+    id: "q-setup",
+    title: "Walk me through your current setup and where your data lives.",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    theirs: ["technical_owner"],
+    why: {
+      facts: [
+        "Data owner: UNKNOWN",
+        "Transfer path: never discussed",
+        "Both sit on the longest pole",
+      ],
+      source: "",
+    },
+    from: ["credential_holders", "integrations"],
+    checklist: [
+      { text: "Who owns the data buckets on your current cloud?", from: ["credential_holders"] },
+      { text: "How should the data move: over the internet or a private link? (supported options are an estimate)", from: ["integrations"] },
+    ],
+    doneWhen: [
+      "Every checklist line ticked, or given an owner and a date",
+      "Their answer saved on the question",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-access",
+    title: "Who works on each system today, and who has admin access?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    theirs: ["exec_sponsor", "technical_owner"],
+    why: {
+      facts: [
+        "Admin: UNKNOWN",
+        "Identity owner: UNKNOWN",
+        "Provisioning: UNKNOWN",
+      ],
+      source: "",
+    },
+    from: ["admin", "identity_contact", "provisioning_required"],
+    checklist: [
+      { text: "Who will be the day-to-day admin? The platform engineer Ravi wants is not hired.", from: ["admin"] },
+      { text: "Who is the identity / IT contact? SSO is required.", from: ["identity_contact"] },
+      { text: "Is automated user provisioning required?", from: ["provisioning_required"] },
+    ],
+    doneWhen: [
+      "Every checklist line ticked, or given an owner and a date",
+      "Their answer saved on the question",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-day30",
+    title: "What has to be true on day 30 for this to feel like a win?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    theirs: ["technical_owner", "research_lead"],
+    why: {
+      facts: [
+        "Out of scope for SUNK and observability: UNKNOWN",
+        "Reference training time: UNKNOWN",
+      ],
+      source: "",
+    },
+    from: ["out_of_scope", "core_cycle_time"],
+    checklist: [
+      { text: "What is out of scope for SUNK and observability?", from: ["out_of_scope"] },
+      { text: "How long does a full training run take today? Time it before anything moves.", from: ["core_cycle_time"] },
+    ],
+    doneWhen: [
+      "Every checklist line ticked, or given an owner and a date",
+      "Their answer saved on the question",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-volumes",
+    title: "What else runs on the cluster that we have not counted yet?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    theirs: ["research_lead"],
+    why: {
+      facts: [
+        "2 requests have no volume, so they are not ranked yet",
+      ],
+      source: "",
+    },
+    from: ["request_2@sunk", "request_1@observability"],
+    checklist: [
+      { text: "Multi-node fine-tunes: how many a month?", from: ["request_2@sunk"] },
+      { text: "GPU nodes going bad: how often does a researcher notice first?", from: ["request_1@observability"] },
+    ],
+    doneWhen: [
+      "Every checklist line ticked, or given an owner and a date",
+      "Their answer saved on the question",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-agreement",
+    title: "Who else was part of the decision, and what else did you consider?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    ours: ["rep"],
+    why: {
+      facts: [
+        "Alternatives considered: UNKNOWN",
+        "Blocks no module; not yet a finding",
+      ],
+      source: "",
+    },
+    from: ["alternatives"],
+    checklist: [
+      { text: "What alternatives did they consider?", from: ["alternatives"] },
+    ],
+    doneWhen: [
+      "Every checklist line ticked, or given an owner and a date",
+      "Their answer saved on the question",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+
+  // ─── Week 2 ────────────────────────────────────────────────────────────
+  {
+    id: "cks-cluster",
+    title: "Stand up the CKS cluster on the allocated capacity",
+    kind: "task",
+    module: "CoreWeave Kubernetes Service",
+    lane: "quick",
+    week: 2,
+    status: "todo",
+    side: "us",
+    ours: ["impl_lead"],
+    why: {
+      facts: [
+        "Needed live by day 30: their services on the new cluster",
+        "Depends on capacity and on their images",
+      ],
+      source: TECH_CALL,
+    },
+    from: ["day30_required", "config"],
+    doneWhen: [
+      "Cluster running on the allocated GPUs",
+      "Ravi's team can deploy to it",
+    ],
+    evidence: CKS_EV,
+    notEvidence: CKS_NOT,
+    visibility: "shared",
+  },
+  {
+    id: "cks-eval-jobs",
+    title: "Move eval and data-prep jobs, through their own pipeline",
+    kind: "task",
+    module: "CoreWeave Kubernetes Service",
+    lane: "quick",
+    week: 2,
+    status: "todo",
+    side: "us",
+    ours: ["impl_lead"],
+    why: {
+      facts: [
+        "About 1,200 jobs a month, measured",
+        "Highest volume, so first",
+        "Needs no data migration",
+      ],
+      source: "Ravi, job scheduler export, 2026-09-12",
+    },
+    from: ["request_1"],
+    doneWhen: [
+      "Jobs deployed by their own pipeline",
+      "Jobs run for a week with no manual restart",
+    ],
+    evidence: CKS_EV,
+    notEvidence: CKS_NOT,
+    visibility: "shared",
+  },
+  {
+    id: "registry",
+    title: "Move container images to a registry the cluster can pull from",
+    kind: "task",
+    module: "CoreWeave Kubernetes Service",
+    lane: "quick",
+    week: 2,
+    status: "todo",
+    side: "us",
+    ours: ["se"],
+    why: {
+      facts: [
+        "Their container registry is on their current cloud",
+      ],
+      source: "",
+    },
+    from: ["integrations", "config"],
+    doneWhen: [
+      "Images in a registry the cluster can reach",
+      "A pull works with no old-cloud credentials",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "data-move",
+    title: "Start moving the priority datasets",
+    kind: "task",
+    module: "Storage and data migration",
+    lane: "start",
+    week: 2,
+    status: "todo",
+    side: "us",
+    ours: ["se"],
+    theirs: ["data_owner"],
+    why: {
+      facts: [
+        "\"Move the curated speech corpus\"",
+        "About 180 TB, one-time, measured",
+      ],
+      source: "Ravi, storage report, 2026-09-12",
+    },
+    from: ["request_1"],
+    lead: { min: 3, max: 10 },
+    doneWhen: [
+      "Priority datasets copied",
+      "Checksums match",
+      "Gap against their inventory explained",
+    ],
+    evidence: DATA_EV,
+    notEvidence: STORAGE_NOT,
+    visibility: "shared",
+  },
+  {
+    id: "observability",
+    title: "Route alerts to their on-call",
+    kind: "task",
+    module: "Observability",
+    lane: "quick",
+    week: 2,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "From week 2, continuously (config)",
+        "Alerts go to Ravi by default",
+      ],
+      source: "",
+    },
+    from: ["config"],
+    doneWhen: [
+      "Alerts route to their on-call",
+      "One real alert acted on",
+    ],
+    evidence: OBS_EV,
+    notEvidence: ["Dashboards exist", "A screenshot in a slide"],
+    visibility: "shared",
+  },
+
+  // ─── Week 3 ────────────────────────────────────────────────────────────
+  {
+    id: "port-sweeps",
+    title: "Port the ablation sweep scripts to the new paths",
+    kind: "task",
+    module: "SUNK",
+    lane: "earned",
+    week: 3,
+    status: "todo",
+    side: "customer",
+    ours: ["se"],
+    theirs: ["research_lead"],
+    why: {
+      facts: [
+        "About 400 jobs a month, measured",
+        "Runbooks: \"mostly in Ravi's head\"",
+      ],
+      source: "Ravi, job scheduler export, 2026-09-12",
+    },
+    from: ["request_1", "docs_location"],
+    doneWhen: [
+      "Sweep scripts use the new paths",
+      "One sweep runs end to end",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "notebooks",
+    title: "Notebook servers for the researchers",
+    kind: "task",
+    module: "CoreWeave Kubernetes Service",
+    lane: "quick",
+    week: 3,
+    status: "todo",
+    side: "us",
+    ours: ["impl_lead"],
+    why: {
+      facts: [
+        "About 30 users, estimate",
+      ],
+      source: TECH_CALL,
+    },
+    from: ["request_2"],
+    doneWhen: [
+      "Notebook servers available",
+      "A researcher opens one and runs code",
+    ],
+    notEvidence: CKS_NOT,
+    visibility: "shared",
+  },
+  {
+    id: "checkpoint-storage",
+    title: "Choose checkpoint storage and set access policies",
+    kind: "task",
+    module: "Storage and data migration",
+    lane: "earned",
+    week: 3,
+    status: "todo",
+    side: "us",
+    ours: ["se"],
+    why: {
+      facts: [
+        "\"Checkpoints written somewhere we trust\"",
+        "About 6 TB a month, estimate",
+      ],
+      source: TECH_CALL,
+    },
+    from: ["request_2", "config"],
+    doneWhen: [
+      "Storage type chosen",
+      "Access set per team",
+      "A test checkpoint written and read back",
+    ],
+    notEvidence: STORAGE_NOT,
+    visibility: "shared",
+  },
+
+  // ─── Week 4 ────────────────────────────────────────────────────────────
+  {
+    id: "sunk-sweeps",
+    title: "Run the first ported sweeps on SUNK",
+    kind: "task",
+    module: "SUNK",
+    lane: "earned",
+    week: 4,
+    status: "todo",
+    side: "us",
+    ours: ["impl_lead"],
+    theirs: ["research_lead"],
+    why: {
+      facts: [
+        "Needed by day 30: the nightly ablation sweeps on Slurm",
+        "Only once training data is readable from the new cluster",
+      ],
+      source: "Mira, technical call, 2026-09-03",
+    },
+    from: ["day30_required", "config"],
+    lead: { min: 3, max: 8 },
+    doneWhen: [
+      "Nightly sweeps run on SUNK",
+      "Submitted by researchers, not by us",
+    ],
+    evidence: SUNK_EV,
+    notEvidence: SUNK_NOT,
+    visibility: "shared",
+  },
+  {
+    id: "day30-review",
+    title: "Day 30 review with Ines and Ravi",
+    kind: "task",
+    module: "Timeline",
+    lane: "start",
+    week: 4,
+    status: "todo",
+    side: "us",
+    theirs: ["exec_sponsor", "technical_owner"],
+    why: {
+      facts: [
+        "Target: 2026-12-01, fixed",
+        "Re-check the v3 start against evidence",
+      ],
+      source: COMMERCIAL,
+    },
+    from: ["target_date", "date_fixed"],
+    doneWhen: [
+      "Meeting held with Ines and Ravi",
+      "v3 start date re-checked and written down",
+      "The rest of the data move agreed",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "c-renewal",
+    title: "Raise: their current cloud renews 2027-01-31",
+    kind: "task",
+    conflict: true,
+    module: "Timeline",
+    lane: "start",
+    week: 4,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Their current cloud renews 2027-01-31",
+        "Recorded only in the handoff notes",
+        "Whether they keep capacity there: not said",
+      ],
+      source: "",
+    },
+    from: ["notes"],
+    doneWhen: [
+      "Raised at the day 30 review",
+      "Their answer recorded in the notes",
+    ],
+    notEvidence: [],
+    visibility: "internal",
+  },
+
+  // ─── After day 30 ──────────────────────────────────────────────────────
+  {
+    id: "storage-in-use",
+    title: "Checkpoints written to CoreWeave storage by real runs",
+    kind: "task",
+    module: "Storage and data migration",
+    lane: "earned",
+    week: "after",
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Behind data migration",
+        "3 to 10 weeks from approval (estimate)",
+      ],
+      source: "",
+    },
+    from: ["config"],
+    doneWhen: [
+      "Real training runs write checkpoints here",
+      "They say the old copy is no longer the source of truth",
+    ],
+    evidence: STORAGE_EV,
+    notEvidence: STORAGE_NOT,
+    visibility: "shared",
+    window: "Late October to mid-December if the move is approved in week 1 (estimate)",
+  },
+  {
+    id: "capacity-evidence",
+    title: "Reserved GPUs above the agreed utilization for two weeks",
+    kind: "task",
+    module: "Compute capacity",
+    lane: "earned",
+    week: "after",
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Utilization threshold: estimate",
+        "Baseline today: about 45%, estimate",
+      ],
+      source: "Ravi, 2026-09-12",
+    },
+    from: ["gpu_utilization", "config"],
+    doneWhen: [
+      "Utilization above the agreed threshold",
+      "True for two weeks in a row",
+    ],
+    evidence: COMPUTE_EV,
+    notEvidence: COMPUTE_NOT,
+    visibility: "shared",
+    window: "Set by the capacity plan (estimate)",
+  },
+  {
+    id: "v3-run",
+    title: "The v3 pre-training run starts",
+    kind: "task",
+    module: "SUNK",
+    lane: "earned",
+    week: "after",
+    status: "todo",
+    side: "customer",
+    theirs: ["research_lead"],
+    why: {
+      facts: [
+        "One run, 64 GPUs, about six weeks, estimate",
+        "The event the target date is for",
+      ],
+      source: "Mira, technical call, 2026-09-03",
+    },
+    from: ["request_3", "target_date"],
+    doneWhen: [
+      "The run starts on 2026-12-01",
+      "It resumes from checkpoint after a node failure",
+    ],
+    evidence: SUNK_EV,
+    notEvidence: SUNK_NOT,
+    visibility: "shared",
+    window: "2026-12-01, fixed",
+  },
+];
+
+const firstValue: FirstValue = {
+  headline: "Eval and data-prep jobs run on the new cluster",
+  points: [
+    { label: "Volume", text: "About 1,200 jobs a month, measured" },
+    { label: "Proof", text: "Jobs run without anyone restarting them" },
+    { label: "Why first", text: "Highest volume, needed live by day 30" },
+  ],
+  basis:
+    "Section 6: the highest-volume request in a module needed live by day 30. It needs no data migration, so it can prove the cluster before the long work lands. Tied to success_signal: a week where no researcher asks Ravi to restart a job.",
+};
+
+const gates: Gate[] = [
+  {
+    id: "kickoff",
+    label: "Kickoff done",
+    criteria: [
+      { text: "Capacity plan signed", item: "d-capacity" },
+      { text: "Dataset move scope defined", item: "d-dataset-help" },
+      { text: "One cluster or two decided", item: "d-one-cluster" },
+      { text: "Success plan confirmed and shared", item: "success-plan" },
+    ],
+    linked: ["d-capacity", "d-dataset-help", "d-one-cluster", "success-plan"],
+    by: 1,
+  },
+  {
+    id: "foundation",
+    label: "Foundation cleared",
+    criteria: [
+      { text: "SSO live for both teams", item: "sso" },
+      { text: "Admin named, hours budgeted", item: "org-admin" },
+      { text: "VPC and network ready", item: "network" },
+      { text: "Security questionnaire returned", item: "security-review" },
+    ],
+    linked: ["sso", "org-admin", "network", "security-review"],
+    by: 4,
+    lane: "foundation",
+  },
+  {
+    id: "first-value",
+    label: "First value live",
+    criteria: [
+      { text: "Eval jobs running on CKS", item: "cks-eval-jobs" },
+      { text: "Deployed by their own pipeline", item: "cks-eval-jobs" },
+    ],
+    linked: ["cks-eval-jobs"],
+    by: 4,
+  },
+  {
+    id: "day30",
+    label: "Day 30 review",
+    criteria: [
+      { text: "v3 start re-checked on evidence", item: "day30-review" },
+      { text: "Data move window agreed", item: "day30-review" },
+    ],
+    linked: ["day30-review"],
+    by: 4,
+  },
+];
+
+const successPlan: SuccessPlan = {
+  goal: "The v3 run starts on time and finishes without anyone babysitting the cluster.",
+  goalSource: "success_outcome",
+  judge: "exec_sponsor",
+  measures: [
+    {
+      measure: "GPU hours to a finished checkpoint, reported to the board each quarter",
+      baseline: "UNKNOWN: no full run has been timed",
+      basis: "Missing in the handoff. Timing a reference run is a week-1 task.",
+    },
+    {
+      measure: "A full week where no researcher asks Ravi to restart a job",
+      baseline: "About 12% of jobs fail or are restarted by hand today",
+      basis: "Estimate. Ravi, 2026-09-12",
+    },
+    {
+      measure: "Average GPU utilization (inferred)",
+      baseline: "About 45% today",
+      basis: "Estimate. Ravi, 2026-09-12",
+    },
+    {
+      measure: "Time a job waits before it starts (inferred)",
+      baseline: "About 6 hours in busy weeks",
+      basis: "Estimate. Mira, 2026-09-12",
+    },
+  ],
+};
+
+// Stakeholder map. Quadrants are inferred; sentiment is unknown unless the handoff states it.
+const people: Person[] = [
+  {
+    id: "ines",
+    roleId: "exec_sponsor",
+    role: "CTO and co-founder, exec sponsor, and acting security contact",
+    wiifm: "v3 results in the Q1 investor update.",
+    engagement: "Discovery and commercial calls.",
+    sentiment: "unknown",
+    quadrant: "satisfied",
+  },
+  {
+    id: "ravi",
+    roleId: "technical_owner",
+    role: "Head of ML Infrastructure, technical owner",
+    wiifm: "\"We spend more time finding GPUs than using them.\"",
+    engagement: "On every call. About 10 hours a week for this, and also trains models.",
+    sentiment: "unknown",
+    quadrant: "closely",
+  },
+  {
+    id: "mira",
+    roleId: "research_lead",
+    role: "Head of research",
+    wiifm: "The nightly sweeps running without restarts.",
+    engagement: "Technical call, 2026-09-03. \"I'll believe it when the sweeps run.\"",
+    sentiment: "unknown",
+    quadrant: "closely",
+  },
+  {
+    id: "admin",
+    roleId: "admin",
+    role: "UNKNOWN. A platform engineer is planned, not hired.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "informed",
+  },
+  {
+    id: "identity",
+    roleId: "identity_contact",
+    role: "UNKNOWN in the handoff.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "informed",
+  },
+  {
+    id: "data-owner",
+    roleId: "data_owner",
+    role: "Owner of the data buckets on their current cloud. UNKNOWN.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "satisfied",
+  },
+];
+
+export const dataset: Dataset = {
+  id: "coreweave",
+  label: "CoreWeave demo (Veltmoor Labs)",
+  note: "Veltmoor Labs is fictional. Timelines are estimates.",
+  productFirst: true,
+  fictionalCustomer: true,
+  disclaimer: "Unofficial demo. Not affiliated with CoreWeave. Customer is fictional and timelines are estimates.",
+  account,
+  items,
+  roles,
+  gates,
+  firstValue,
+  successPlan,
+  people,
+  gateGaps,
+  driftRules,
+  configFieldLabels,
+};

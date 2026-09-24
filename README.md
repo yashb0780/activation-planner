@@ -189,8 +189,10 @@ contents.
 README.md                  this file
 SKILL.md                   how to read a handoff and generate the two outputs
 templates/handoff.md       blank handoff — the fields the planner reads
-config/itsm.md             product modules, evidence, sequencing (the only product-specific file)
-examples/                  one filled handoff and both generated outputs
+config/itsm.md             example product config (fictional ITSM product)
+config/coreweave.md        unofficial demo product config; unconfirmed points marked VERIFY
+examples/                  two filled handoffs, each with its board and 30-day plan
+src/data/coreweave.ts      the tracker's default example (unofficial CoreWeave demo)
 src/                       the activation tracker app (React + TypeScript)
 src/data/halden.ts         the tracker's items, People list and drift thresholds, built from the example
 src/fields.ts              handoff field names, for source tags (copied from the template)
@@ -201,15 +203,26 @@ public/report.html         an older static version of the example report, not ye
 TODO.md                    parked issues
 ```
 
-`.gitignore` excludes every `private-*` file in `config/`, `examples/` and
-`src/data/`, so real products and private demos never reach the public repo.
-A private config for the same product as a public one is merged in, and wins
-on name collisions. A private config for a different product stands alone.
+### Examples, real names and private files
 
-A private tracker demo is a file `src/data/private-<name>.ts` that exports
-`dataset`, in the same shape as `src/data/halden.ts`. When one exists, the
-tracker shows a switch between examples. The public build has none, so it
-shows no switch.
+The tracker opens on an **unofficial CoreWeave demo**: a fictional customer,
+Veltmoor Labs, activating onto CoreWeave (`config/coreweave.md`,
+`examples/coreweave-*`, `src/data/coreweave.ts`). It is not affiliated with
+CoreWeave. The product is named as plain text only, and every timeline is an
+estimate: unconfirmed points are marked VERIFY in the config and shown as
+"estimate" in the app. The fictional ITSM example, Halden Retail Group, is in
+the example switch.
+
+The rule for real names: a real company may be named only as the **product
+being demoed**, with the unofficial-demo disclaimer, and never with its logo,
+colours or visual identity. **Customers are always fictional.**
+
+`.gitignore` still excludes every `private-*` file in `config/`, `examples/`
+and `src/data/`, for anything that should stay off the public repo. A private
+config for the same product as a public one is merged in, and wins on name
+collisions; one for a different product stands alone. A private tracker demo
+is a file `src/data/private-<name>.ts` that exports `dataset`, in the same shape
+as `src/data/halden.ts`; when present, it joins the example switch.
 
 ## What it will not do
 

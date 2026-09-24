@@ -1,9 +1,9 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { formatDate } from "../dates";
 import type { Drift } from "../drift";
 import type { OwnerChange } from "../state";
 import type { Decision, Item, Note, Role, Side, Status } from "../types";
-import { DriftFlagChip, FLAG_LABEL, OwnerMenu, STATUS } from "./Status";
+import { DriftFlagChip, FLAG_LABEL, OwnerMenu, pillBg, STATUS } from "./Status";
 import { weekLabel } from "./ui";
 
 const ORDER: Status[] = ["todo", "progress", "hold", "done"];
@@ -38,6 +38,8 @@ interface PanelProps {
   doneRequest?: number;
   /** Goes up by one each time On hold is picked on a row: open the reason box. */
   holdRequest?: number;
+  /** Goes up by one each time In progress is picked on a row: focus the optional note box. */
+  noteRequest?: number;
 }
 
 /** A small rounded heading inside a section. */
@@ -78,6 +80,8 @@ export function Panel(props: PanelProps) {
   const [decided, setDecided] = useState("");
   const [by, setBy] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const noteBox = useRef<HTMLTextAreaElement>(null);
+  const [noteHint, setNoteHint] = useState(false);
 
   useEffect(() => {
     setDraft("");
@@ -89,6 +93,7 @@ export function Panel(props: PanelProps) {
     setAnswerText("");
     setDecided("");
     setBy("");
+    setNoteHint(false);
   }, [item.id]);
 
   // x on a row, or Done picked from a row's menu: open the done form. The proof note is still required.
@@ -107,6 +112,14 @@ export function Panel(props: PanelProps) {
     // Only when a request comes in.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.holdRequest]);
+
+  // In progress picked on a row: the status has already changed; offer an optional note.
+  useEffect(() => {
+    if (!props.noteRequest) return;
+    setNoteHint(true);
+    noteBox.current?.scrollIntoView({ block: "center" });
+    noteBox.current?.focus();
+  }, [props.noteRequest]);
 
   const visibleNotes = customerView ? notes.filter((n) => !n.internal) : notes;
   const needsCheck = item.notEvidence.length > 0;
@@ -170,7 +183,7 @@ export function Panel(props: PanelProps) {
                   className={`inline-flex h-[var(--pill-height)] items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors ${
                     on ? "border-transparent" : "border-line text-muted hover:bg-hover"
                   }`}
-                  style={on ? { color: STATUS[s].color, background: `color-mix(in srgb, ${STATUS[s].color} 14%, transparent)` } : undefined}
+                  style={on ? { color: STATUS[s].ink, background: pillBg(s) } : undefined}
                 >
                   <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: STATUS[s].color }} />
                   {STATUS[s].label}
@@ -180,7 +193,7 @@ export function Panel(props: PanelProps) {
           </div>
           {item.status === "hold" && item.holdReason && !holding && (
             <p className="mt-3 text-sm">
-              <span className="font-medium" style={{ color: STATUS.hold.color }}>
+              <span className="font-medium" style={{ color: STATUS.hold.ink }}>
                 On hold:
               </span>{" "}
               {item.holdReason}{" "}
@@ -473,7 +486,14 @@ export function Panel(props: PanelProps) {
               </li>
             ))}
           </ul>
-          <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} placeholder="Add a note" className={`${field} mt-3`} />
+          <textarea
+            ref={noteBox}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            rows={3}
+            placeholder={noteHint ? "Optional: what started, and who is on it" : "Add a note"}
+            className={`${field} mt-3`}
+          />
           <div className="mt-2 flex items-center justify-between">
             <label className="flex items-center gap-2 text-xs text-muted">
               <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} className="accent-[var(--accent)]" />
