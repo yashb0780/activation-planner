@@ -1,93 +1,28 @@
 @import "tailwindcss";
+@import "./theme.css";
 
-/* Colour tokens. Dark is the default; [data-theme="light"] overrides. */
-:root,
-[data-theme="dark"] {
-  --bg: #0f1011;
-  --panel: #151618;
-  --raised: #1b1c1f;
-  --hover: #202125;
-  --border: #26272b;
-  --text: #e6e6e8;
-  --muted: #8a8b91;
-  --faint: #5d5e64;
-  --accent: #7c8cf5;
-  --warn: #d9a54a;
-  --danger: #e0685f;
-  --ok: #5cb88a;
-  /* Bucket header colours */
-  --b-decision: #a58cf0;
-  --b-foundation: #4fb3bf;
-  --b-question: #d9a54a;
-  --b-start: #6e9cf0;
-  --b-quick: #5cb88a;
-  --b-earned: #c08ae0;
-  --b-after: #8a8b91;
-  --b-us: #6e9cf0;
-  --b-customer: #5cb88a;
-  --b-other: #e08a5c;
-  --b-resolved: #8a8b91;
-  color-scheme: dark;
-}
-
-[data-theme="light"] {
-  --bg: #fbfbfc;
-  --panel: #ffffff;
-  --raised: #f4f4f6;
-  --hover: #eeeef1;
-  --border: #e3e3e8;
-  --text: #1b1b1f;
-  --muted: #6b6c73;
-  --faint: #9a9ba2;
-  --accent: #4f5fd6;
-  --warn: #b07a18;
-  --danger: #c2453c;
-  --ok: #2f8a5c;
-  --b-decision: #7456d6;
-  --b-foundation: #1f7f8a;
-  --b-question: #a8701a;
-  --b-start: #3b6fd4;
-  --b-quick: #2f8a5c;
-  --b-earned: #9a4fc4;
-  --b-after: #6b6c73;
-  --b-us: #3b6fd4;
-  --b-customer: #2f8a5c;
-  --b-other: #c0622c;
-  --b-resolved: #6b6c73;
-  color-scheme: light;
-}
-
-@theme inline {
-  --color-bg: var(--bg);
-  --color-panel: var(--panel);
-  --color-raised: var(--raised);
-  --color-hover: var(--hover);
-  --color-line: var(--border);
-  --color-ink: var(--text);
-  --color-muted: var(--muted);
-  --color-faint: var(--faint);
-  --color-accent: var(--accent);
-  --color-warn: var(--warn);
-  --color-danger: var(--danger);
-  --color-ok: var(--ok);
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
-}
-
+/* Base styles. All values come from theme.css. */
 html,
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 :focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 2px solid var(--accent);
   outline-offset: 1px;
+}
+
+/* Numbers line up in counts and dates. */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }

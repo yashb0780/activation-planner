@@ -38,7 +38,9 @@ conclusions as `(inferred)`.
 
 **Public repo.** Committed files must never contain customer names, employer
 names, or real account data. Examples stay fictional (see `examples/halden-*`).
-Real configs go in `config/private-*`, which git ignores.
+Real configs and private demos go in `private-*` files in `config/`,
+`examples/` and `src/data/`, which git ignores. The public build must work
+without them.
 
 **Scope.** Only work inside this folder. Never read or modify other folders in
 `~/projects`.

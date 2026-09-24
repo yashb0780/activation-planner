@@ -15,8 +15,12 @@ and do not edit the config to make a plan fit.
    `templates/handoff.md`.
 2. **The product config** — the file in `config/` matching what the
    `products` field in **Account basics** names. If only one config exists,
-   use it. If several could match, ask rather than guess. A
-   `config/private-*.md` file is read in addition and wins on name collisions.
+   use it. If several could match, ask rather than guess. Each config's first
+   line names its product. A `config/private-*.md` file for the **same**
+   product is read in addition and wins on name collisions. A private config
+   for a **different** product is a product config of its own: use it only when
+   the handoff's `products` field names that product, and never mix it into
+   another product's plan.
 
 ### How the handoff is laid out
 
@@ -130,7 +134,8 @@ one line instead: `Handoff gate: all required fields filled.`
 
 From the **config**, extract for every module: lead time (with its conditions),
 the `Depends on` list, the `Evidence it is real` list, and the `Not evidence`
-line. Also extract the Foundation items with their lead times, each module's
+line. Also extract the Kickoff setup items, the Foundation items with their
+lead times, each module's
 `Lead time in weeks` line, the **Drift rules**, the sequencing order, the
 ordering rules, and the list of where these plans usually slip.
 
@@ -166,6 +171,13 @@ From the **handoff**, pull forward and keep visible for every later step:
 plus a payload — discovery gating asset management — they are two rows with
 two dependency lists and two evidence lists, everywhere they appear. Never
 merge them into one line, and never let the payload inherit the gate's status.
+
+**Kickoff setup comes first.** It is the quick base-level setup done at
+kickoff: things like roles and permissions and workspace setup. Each config
+lists its own items in a **Kickoff setup** section. The skill always adds one
+item of its own, whatever the product: the success plan (Step 6). If a config
+has no Kickoff setup section, the success plan is the whole group. Every
+Kickoff setup item is week 1, listed before decisions and questions.
 
 **Foundation is a tier of its own**, sitting ahead of every module. The config
 lists its items; the skill knows only two things about them:
@@ -246,9 +258,25 @@ Open with **Read this first**:
 - customer, handoff date, who filled it, which config files were read
 - the production use case, quoted
 - the target date, what drives it, fixed or preferred, and every freeze period
-- **Open questions** — a table of every `UNKNOWN`: the question, the module it
-  blocks, the date it risks, and who to ask. Where the handoff names nobody,
-  write *unassigned* and route it to the exec sponsor.
+- **Open questions**, grouped the way a CSM would ask them on a call: **5 to 7
+  open questions**, not a form. Group every `UNKNOWN`, and every discovery
+  task (a request with no volume), under the open question that would draw it
+  out. For example:
+  - "Walk me through your current setup and the systems involved." (install
+    restrictions, credentials, what is on each network, where documentation
+    lives, data residency)
+  - "Who works on each system today, and who has admin access?" (security,
+    identity and admin contacts, sign-off, provisioning)
+  - "What has to be true on day 30 for this to feel like a win?" (what must be
+    live by day 30, what is out of scope, the missing baselines)
+
+  Under each open question, keep every original question as a checklist line
+  (`- [ ]`), each with its own `From:` tag, so the answer can be ticked off
+  line by line. The open question's own `From:` tag lists every field it
+  covers. Nothing from the handoff is dropped, only regrouped. For each open
+  question give the modules it blocks, the date it risks, and who to ask.
+  Where the handoff names nobody, write *unassigned* and route it to the exec
+  sponsor.
 - **Conflicts** — the handoff against itself, the handoff against the config,
   and the commitments table against the lead times. Give each one a sentence on
   what to do about it and when to raise it.
@@ -276,6 +304,11 @@ plan, marked `(inferred)`). Under each gate, 2 to 4 criteria. Each criterion:
 The first gate is kickoff. It includes the success plan (Step 6). If Foundation
 has items, one gate is for Foundation clearing, and its criteria are drawn from
 the Foundation rows.
+
+Then the **Kickoff setup** table, one row per item from the config's Kickoff
+setup section, plus the success plan:
+
+| Kickoff setup item | Where it stands | Status | From |
 
 Then the **Foundation** table, one row per Foundation item:
 
@@ -345,8 +378,10 @@ week**.
 Every task under **starting** carries its owners and its source tag on its own
 line: `Owners: us — CSM; them — Technical owner · From: Target go-live date`.
 
-Week 1 always has these, whatever the product:
+Week 1 always has these, whatever the product, in this order:
 
+- **Kickoff setup**, first: every item from the config's Kickoff setup section
+- the open questions, to ask at kickoff
 - every Foundation item, starting (not necessarily finishing)
 - **Draft success plan, confirm at kickoff, share by end of week 1.** Owner:
   the assigned CSM from section 2, or *unassigned* if the handoff names none.
@@ -409,7 +444,12 @@ fastest way for a reader to see the difference between the two kinds of claim.
   does not define.
 - Every purchased module has a first step inside 30 days, even if it is only
   groundwork.
-- Every section 6 request with no volume is a discovery task with an owner.
+- Every section 6 request with no volume is a discovery task with an owner,
+  listed as a checklist line under one of the open questions.
+- There are 5 to 7 open questions. Every `UNKNOWN` sits as a checklist line
+  under one of them, and each open question's `From:` tag lists every field
+  it covers.
+- Week 1 opens with Kickoff setup: the config's items plus the success plan.
 - Gate and payload modules are separate rows with separate evidence everywhere.
 - Every Foundation item from the config has a row, starts in week 1, and keeps
   its own lead time.

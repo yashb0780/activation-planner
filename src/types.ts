@@ -1,7 +1,9 @@
-/** foundation: the config's Foundation tier. Starts in week 1, keeps its own lead time. */
-export type Lane = "foundation" | "start" | "quick" | "earned";
+/** kickoff: quick setup done at kickoff, first in week 1 (the config's Kickoff setup, plus the success plan).
+ *  foundation: the config's Foundation tier. Starts in week 1, keeps its own lead time. */
+export type Lane = "kickoff" | "foundation" | "start" | "quick" | "earned";
 export type Week = 1 | 2 | 3 | 4 | "after";
-export type Status = "todo" | "progress" | "blocked" | "done";
+/** Not started, In progress, On hold (needs a reason), Done (needs a proof note). */
+export type Status = "todo" | "progress" | "hold" | "done";
 export type Side = "us" | "customer";
 export type Visibility = "internal" | "shared";
 
@@ -38,9 +40,11 @@ export interface Item {
   team?: "other";
   /** A conflict from the board. Hidden in customer view. */
   conflict?: boolean;
-  /** A question whose answer is a monthly volume. */
-  volume?: boolean;
-  blockedBy?: string;
+  /** Why it is on hold. From the handoff when the plan starts it on hold. */
+  holdReason?: string;
+  /** For a grouped question: the detail it covers, one line per original question.
+   *  Ticked off as the answer comes in. Each line names the handoff fields it came from. */
+  checklist?: { text: string; from: string[] }[];
   why: Why;
   /** Handoff field IDs this item came from, shown as "From: ...". "config" means a product
    *  config default. Section 6 requests use request_1, request_2 and so on. */
@@ -70,6 +74,8 @@ export interface Decision {
 
 export interface Account {
   customer: string;
+  /** The product being activated, shown as plain text ("Product: ..."). */
+  product: string;
   /** Freeze periods from the handoff, inclusive dates. */
   freezes: { start: string; end: string }[];
   windowStart: string;
@@ -165,4 +171,24 @@ export interface GateGap {
   detail: string;
   /** Role that fills it: the rep or the SE. */
   filledBy: string;
+}
+
+/** Everything the tracker shows for one customer. The public example and any
+ *  private demo (src/data/private-*.ts, git-ignored) each export one. */
+export interface Dataset {
+  id: string;
+  /** Short name for the example switch. */
+  label: string;
+  /** Footer line, e.g. "Illustrative example. X is fictional." */
+  note: string;
+  account: Account;
+  items: Item[];
+  roles: Role[];
+  gates: Gate[];
+  firstValue: FirstValue;
+  successPlan: SuccessPlan;
+  people: Person[];
+  gateGaps: GateGap[];
+  driftRules: DriftRules;
+  configFieldLabels: Record<string, string>;
 }

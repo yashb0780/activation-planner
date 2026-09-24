@@ -75,13 +75,18 @@ const SPECIAL: Record<string, string> = {
   section_6: "What they want set up first",
 };
 
+/** One source ID as its handoff field name. */
+export function fieldLabel(id: string, module: string, extra: Record<string, string> = {}): string {
+  // "request_2" is a section 6 request in this item's module; "request_2@knowledge base"
+  // names the module, for a grouped question that spans several.
+  const req = /^request_(\d+)(?:@(.+))?$/.exec(id);
+  if (req) return `What they want set up first — ${req[2] ?? module.toLowerCase()}, request ${req[1]}`;
+  return extra[id] ?? HANDOFF_FIELDS[id] ?? SPECIAL[id] ?? id;
+}
+
 /** "From: ..." text for an item. Handoff fields first, "product config" last. */
 export function sourceTag(from: string[], module: string, extra: Record<string, string> = {}): string {
-  const label = (id: string) => {
-    const req = /^request_(\d+)$/.exec(id);
-    if (req) return `What they want set up first — ${module.toLowerCase()}, request ${req[1]}`;
-    return extra[id] ?? HANDOFF_FIELDS[id] ?? SPECIAL[id] ?? id;
-  };
+  const label = (id: string) => fieldLabel(id, module, extra);
   const ordered = [...from.filter((f) => f !== "config"), ...from.filter((f) => f === "config")];
   return `From: ${ordered.map(label).join(" · ")}`;
 }

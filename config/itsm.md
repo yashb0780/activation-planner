@@ -11,12 +11,16 @@ Lead time is calendar time from kickoff to the evidence below being true, assumi
 
 Depends on is a hard prerequisite. Starting a module before its dependencies are in place produces rework, not progress.
 Evidence is what proves the module is doing work, not that it was switched on. The test for any piece of evidence: could this still be true if nobody at the customer had touched the product since go-live? If yes, it is not evidence, it is configuration.
+Kickoff setup
+Quick base-level setup done at kickoff, first in week one. The planner adds the customer success plan to this list for every product.
+
+* Roles and permissions: agent, admin and requester roles set for each team in scope.
+* Workspace setup: one workspace or several, set up for the teams in scope.
+
 Foundation
 Nothing below starts cleanly without these. Every item starts in week one. Each keeps its own lead time, so a long one starts in week one and may finish later.
 
-* Roles and permissions: agent, admin and requester roles set for each team in scope. Lead time: short.
 * Authentication: SSO configured, and user provisioning (directory sync or SCIM) agreed. Lead time: short when the identity team is in the room; long when it sits outside the buying team.
-* Workspaces: one or several, decided from how many genuinely different processes the teams run. Lead time: short once that is decided.
 * Agent groups and business hours defined, so routing has somewhere to route. Lead time: short.
 * Inbound email or alias cutover plan, including what happens to the old address. Lead time: short.
 * Sandbox or test instance if they have a change freeze or an audit requirement. Lead time: short.

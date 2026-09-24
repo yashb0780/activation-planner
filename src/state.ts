@@ -5,8 +5,6 @@ import type { Decision, FirstValue, Item, Note, Quadrant, Role, Sentiment, Side,
 /** The parts of First value a person can edit. */
 export type FirstValueEdit = Pick<FirstValue, "headline" | "points">;
 
-const KEY = "activation-tracker:halden:v2";
-
 export interface Saved {
   status: Record<string, Status>;
   notes: Record<string, Note[]>;
@@ -23,6 +21,10 @@ export interface Saved {
   ownerHistory: Record<string, OwnerChange[]>;
   /** Review ticks, by section ID. */
   reviewed: Record<string, boolean>;
+  /** Why an item is on hold, when set here rather than in the plan. */
+  holdReasons: Record<string, string>;
+  /** Ticked checklist lines on grouped questions: item ID → line indexes. */
+  checks: Record<string, number[]>;
 }
 
 export interface OwnerChange {
@@ -43,16 +45,20 @@ const empty: Saved = {
   ownerOverrides: {},
   ownerHistory: {},
   reviewed: {},
+  holdReasons: {},
+  checks: {},
 };
 
-function load(): Saved {
+function load(key: string): Saved {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return empty;
     const saved = { ...empty, ...(JSON.parse(raw) as Partial<Saved>) };
     // Older versions saved First value as one paragraph. Drop it rather than show a broken card.
     const fv = saved.firstValue as unknown;
     if (fv !== null && (typeof fv !== "object" || !Array.isArray((fv as FirstValueEdit).points))) saved.firstValue = null;
+    // Older versions called On hold "blocked".
+    for (const [id, st] of Object.entries(saved.status)) if ((st as string) === "blocked") saved.status[id] = "hold";
     return saved;
   } catch {
     return empty;
@@ -79,16 +85,16 @@ export function writePref(key: string, value: string) {
 
 const now = () => new Date().toISOString();
 
-export function useTracker(base: Item[], baseRoles: Role[]) {
-  const [saved, setSaved] = useState<Saved>(load);
+export function useTracker(key: string, base: Item[], baseRoles: Role[]) {
+  const [saved, setSaved] = useState<Saved>(() => load(key));
 
   useEffect(() => {
     try {
-      localStorage.setItem(KEY, JSON.stringify(saved));
+      localStorage.setItem(key, JSON.stringify(saved));
     } catch {
       // See writePref.
     }
-  }, [saved]);
+  }, [key, saved]);
 
   const roles: Role[] = useMemo(
     () => baseRoles.map((r) => ({ ...r, name: saved.roleNames[r.id] ?? r.name })),
@@ -105,10 +111,28 @@ export function useTracker(base: Item[], baseRoles: Role[]) {
   const items: Item[] = base.map((i) => ({
     ...withOwners(i, saved.ownerOverrides),
     status: saved.status[i.id] ?? i.status,
+    holdReason: saved.holdReasons[i.id] ?? i.holdReason,
   }));
 
   const setStatus = useCallback((id: string, status: Status) => {
     setSaved((s) => ({ ...s, status: { ...s.status, [id]: status } }));
+  }, []);
+
+  /** Put an item on hold. A reason is required. */
+  const setHold = useCallback((id: string, reason: string) => {
+    setSaved((s) => ({
+      ...s,
+      status: { ...s.status, [id]: "hold" },
+      holdReasons: { ...s.holdReasons, [id]: reason },
+    }));
+  }, []);
+
+  const toggleCheck = useCallback((id: string, line: number) => {
+    setSaved((s) => {
+      const on = s.checks[id] ?? [];
+      const next = on.includes(line) ? on.filter((n) => n !== line) : [...on, line];
+      return { ...s, checks: { ...s.checks, [id]: next } };
+    });
   }, []);
 
   const addNote = useCallback((id: string, text: string, internal: boolean) => {
@@ -154,7 +178,7 @@ export function useTracker(base: Item[], baseRoles: Role[]) {
     [],
   );
 
-  /** Change the primary owner on one side of one item. Other owners on that side stay. */
+  /** Replace the primary owner on one side of one item. Any co-owners after it stay. */
   const setOwner = useCallback(
     (id: string, side: Side, roleId: string) => {
       setSaved((s) => {
@@ -163,7 +187,7 @@ export function useTracker(base: Item[], baseRoles: Role[]) {
         const current = rolesFor(withOwners(item, s.ownerOverrides), side);
         if (current[0] === roleId) return s;
         const previous = current[0] ? displayName(book, current[0]) : "Not named";
-        const next = [roleId, ...current.filter((r) => r !== roleId)];
+        const next = [roleId, ...current.slice(1).filter((r) => r !== roleId)];
         return {
           ...s,
           ownerOverrides: { ...s.ownerOverrides, [id]: { ...s.ownerOverrides[id], [side]: next } },
@@ -220,6 +244,8 @@ export function useTracker(base: Item[], baseRoles: Role[]) {
           answer: saved.answers[i.id] ?? null,
           decision: saved.decisions[i.id] ?? null,
           notes: saved.notes[i.id] ?? [],
+          holdReason: i.status === "hold" ? (i.holdReason ?? null) : null,
+          checklist: i.checklist?.map((c, n) => ({ line: c.text, answered: (saved.checks[i.id] ?? []).includes(n) })),
           owners: { us: rolesFor(i, "us"), customer: rolesFor(i, "customer") },
           ownerHistory: saved.ownerHistory[i.id] ?? [],
         })),
@@ -242,6 +268,8 @@ export function useTracker(base: Item[], baseRoles: Role[]) {
     book,
     saved,
     setOwner,
+    setHold,
+    toggleCheck,
     renameRole,
     setReviewed,
     setStatus,

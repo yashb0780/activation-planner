@@ -62,6 +62,19 @@ and capture the baseline before anyone configures anything.
 
 **Starting**
 
+- **Kickoff setup**, first: quick base-level setup done at kickoff.
+  - Roles and permissions for both desks.
+    *Owners: us — CSM; them — Technical owner · From: Teams in scope at launch · product config*
+  - Workspace setup, once one workspace or two is decided in week 2.
+    *Owners: us — CSM; them — Technical owner, Store support lead · From: Number of teams / workspaces · product config*
+  - **Draft the success plan, confirm it at kickoff, share it by end of week 1.**
+    One page: their goal in their words, the proposed first value, success
+    measures with their baselines, milestones with target dates, and the People
+    list above. It counts toward the kickoff milestone.
+    *Owners: us — CSM; them — Technical owner, Exec sponsor · From: Their stated outcome · How they will know it worked · Number attached, and who reports it upward*
+- **The six open questions** from the board, asked at kickoff, each with its
+  checklist to tick off as the answers come in.
+  *Owners: us — CSM; them — Technical owner, Exec sponsor, Store support lead · From: every `UNKNOWN` in the handoff, listed per question on the board*
 - **The catalog scope decision** — a starter set of 8 to 12 request types, or
   a complete catalog. Unresolved in the handoff, planned as a starter set, and
   the largest single lever on the January date. Top of the list.
@@ -76,12 +89,8 @@ and capture the baseline before anyone configures anything.
   *Owners: us — CSM; them — Exec sponsor · From: Who holds the credentials for each system above · Restrictions on installing software or outbound connections*
 - **Foundation** — every item from the config, each at its own lead time.
   Foundation starts in week 1; it does not make a long item finish in week 1.
-  - Roles and permissions for both desks.
-    *Owners: us — CSM; them — Technical owner · From: Teams in scope at launch · product config*
   - SSO, and the provisioning question. Blocked on the identity / IT contact.
     *Owners: us — CSM; them — Identity / IT contact · From: Single sign-on required · Identity provider · Automated user provisioning (SCIM) required · product config*
-  - Workspaces: one or two, decided with the process question in week 2.
-    *Owners: us — CSM; them — Technical owner, Store support lead · From: Number of teams / workspaces · product config*
   - Agent groups and business hours.
     *Owners: us — CSM; them — Technical owner · From: One shared process, or several that genuinely differ · product config*
   - The inbound mailbox cutover plan.
@@ -90,11 +99,6 @@ and capture the baseline before anyone configures anything.
     *Owners: us — CSM; them — Technical owner · From: Separate test and production required · product config*
   - A day-to-day admin named, with hours budgeted.
     *Owners: us — CSM; them — Exec sponsor · From: Day-to-day admin, if different · Hours per week the technical owner has for this · product config*
-- **Draft the success plan, confirm it at kickoff, share it by end of week 1.**
-  One page: their goal in their words, the proposed first value, success
-  measures with their baselines, milestones with target dates, and the People
-  list above. It counts toward the kickoff milestone.
-  *Owners: us — CSM; them — Technical owner, Exec sponsor · From: Their stated outcome · How they will know it worked · Number attached, and who reports it upward*
 - **Taxonomy work with both desks.**
   *Owners: us — CSM; them — Technical owner, Store support lead · From: One shared process, or several that genuinely differ · product config*
 - **Baseline capture.** Time to first response and store ticket volume, neither
@@ -102,7 +106,7 @@ and capture the baseline before anyone configures anything.
   automation evidence, and neither can be recovered once configuration starts.
   *Owners: us — CSM; them — Technical owner, Store support lead · From: Average time to first response · Core volume per month (whatever the product counts)*
 - **Five discovery tasks** — find the monthly volume for each section 6 request
-  that has none:
+  that has none. Each is a checklist line under open question 1, 4 or 5:
 
   | Request | Owners | From |
   |---|---|---|

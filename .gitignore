@@ -1,4 +1,8 @@
+# Private files: real products, demos and anything with a real company name.
+# Never committed. The public build works without them.
 config/private-*
+examples/private-*
+src/data/private-*
 .DS_Store
 node_modules
 dist

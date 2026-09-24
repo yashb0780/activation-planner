@@ -2,13 +2,13 @@ import { useState, type ReactNode } from "react";
 import { primaryName, useRoles } from "../owners";
 import type { FirstValueEdit } from "../state";
 import type { FirstValue, Gate, Item } from "../types";
-import { Avatar } from "./Card";
+import { Avatar } from "./ui";
 
 /** One section's "Reviewed" tick. The Draft badge turns to Reviewed when every section is ticked. */
 export function ReviewBox({ checked, onChange }: { checked: boolean; onChange: (on: boolean) => void }) {
   return (
     <label
-      className={`flex shrink-0 items-center gap-1.5 rounded-md border px-2 py-0.5 text-[13px] ${
+      className={`flex shrink-0 items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs ${
         checked ? "border-ok/60 text-ok" : "border-line text-muted"
       }`}
     >
@@ -40,13 +40,13 @@ export function FirstValueLine({
   const [draft, setDraft] = useState(value);
   const [whyOpen, setWhyOpen] = useState(false);
   const input =
-    "w-full rounded-md border border-line bg-bg px-2.5 py-1.5 text-[15px] outline-none focus:border-accent/60";
+    "w-full rounded-md border border-line bg-bg px-2.5 py-1.5 text-sm outline-none focus:border-accent/60";
 
   return (
-    <section className="rounded-xl border border-line bg-panel px-5 py-4">
+    <section className="rounded-xl border border-line bg-panel px-4 py-3">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="text-[20px] font-semibold">First value</h2>
-        <span className="rounded-full border border-warn/50 px-2 py-px text-[12px] text-warn">
+        <h2 className="text-base font-semibold">First value</h2>
+        <span className="rounded-sm border border-line px-1.5 text-xs text-muted">
           {edited ? "Edited, confirm at kickoff" : "Proposed, confirm at kickoff (inferred)"}
         </span>
         <span className="ml-auto" />
@@ -58,7 +58,7 @@ export function FirstValueLine({
               setDraft(value);
               setEditing(true);
             }}
-            className="rounded-md px-2.5 py-1 text-[14px] text-muted hover:bg-hover hover:text-ink"
+            className="rounded-md px-2.5 py-1 text-sm text-muted hover:bg-hover hover:text-ink"
           >
             Edit
           </button>
@@ -78,12 +78,12 @@ export function FirstValueLine({
             setEditing(false);
           }}
         >
-          <label className="flex flex-col gap-1 text-[13px] text-muted">
+          <label className="flex flex-col gap-1 text-xs text-muted">
             Headline
             <input value={draft.headline} onChange={(e) => setDraft({ ...draft, headline: e.target.value })} className={input} />
           </label>
           {draft.points.map((p, n) => (
-            <label key={p.label} className="flex flex-col gap-1 text-[13px] text-muted">
+            <label key={p.label} className="flex flex-col gap-1 text-xs text-muted">
               {p.label}
               <input
                 value={p.text}
@@ -98,13 +98,13 @@ export function FirstValueLine({
             </label>
           ))}
           <div className="flex gap-2">
-            <button type="submit" className="rounded-md bg-accent px-3 py-1.5 text-[14px] font-medium text-bg">
+            <button type="submit" className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-bg">
               Save
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
-              className="rounded-md px-2.5 py-1.5 text-[14px] text-muted hover:bg-hover"
+              className="rounded-md px-2.5 py-1.5 text-sm text-muted hover:bg-hover"
             >
               Cancel
             </button>
@@ -112,11 +112,11 @@ export function FirstValueLine({
         </form>
       ) : (
         <>
-          <p className="mt-1.5 text-[17px] font-medium leading-snug">{value.headline}</p>
-          <dl className="mt-2 grid gap-x-6 gap-y-2 text-[15px] sm:grid-cols-3">
+          <p className="mt-1.5 text-base font-semibold leading-snug">{value.headline}</p>
+          <dl className="mt-2 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
             {value.points.map((p) => (
               <div key={p.label}>
-                <dt className="text-[12px] uppercase tracking-wide text-faint">{p.label}</dt>
+                <dt className="text-xs text-faint">{p.label}</dt>
                 <dd>{p.text}</dd>
               </div>
             ))}
@@ -127,11 +127,11 @@ export function FirstValueLine({
         type="button"
         onClick={() => setWhyOpen((o) => !o)}
         aria-expanded={whyOpen}
-        className="mt-2 text-[13px] text-muted hover:text-ink"
+        className="mt-2 text-xs text-muted hover:text-ink"
       >
         {whyOpen ? "▾" : "▸"} Why?
       </button>
-      {whyOpen && <p className="mt-1 text-[13px] leading-relaxed text-faint">{basis}</p>}
+      {whyOpen && <p className="mt-1 text-xs leading-relaxed text-faint">{basis}</p>}
     </section>
   );
 }
@@ -142,8 +142,8 @@ export function Milestones({ gates, items, review }: { gates: Gate[]; items: Ite
   return (
     <section>
       <div className="mb-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-        <h2 className="text-[20px] font-semibold">Milestones</h2>
-        <span className="text-[13px] text-faint">Gates and exit criteria inferred from the board</span>
+        <h2 className="text-base font-semibold">Milestones</h2>
+        <span className="text-xs text-faint">Gates and exit criteria inferred from the board</span>
         {review && <span className="ml-auto self-center">{review}</span>}
       </div>
       <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -158,15 +158,15 @@ export function Milestones({ gates, items, review }: { gates: Gate[]; items: Ite
             >
               <div className="flex items-center gap-2">
                 <span
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold ${
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
                     passed ? "bg-ok text-bg" : "border border-line text-muted"
                   }`}
                 >
                   {passed ? "✓" : n + 1}
                 </span>
-                <h3 className={`text-[16px] font-medium ${passed ? "text-ok" : ""}`}>{g.label}</h3>
+                <h3 className={`text-sm font-medium ${passed ? "text-ok" : ""}`}>{g.label}</h3>
               </div>
-              <ul className="mt-2 flex flex-col gap-0.5 text-[14px] leading-snug">
+              <ul className="mt-2 flex flex-col gap-0.5 text-sm leading-snug">
                 {g.criteria.map((c) => {
                   const ok = isDone(c.item);
                   return (
@@ -182,7 +182,7 @@ export function Milestones({ gates, items, review }: { gates: Gate[]; items: Ite
                   );
                 })}
               </ul>
-              <p className="mt-2 text-[13px] tabular-nums text-faint">
+              <p className="mt-2 text-xs tabular-nums text-faint">
                 {done} of {linked.length} linked items done
               </p>
             </li>
@@ -204,10 +204,12 @@ export function NeedsAttention({
 }) {
   const book = useRoles();
   if (!items.length) return null;
-  const label = (i: Item) => (atRisk.has(i.id) ? "At risk" : i.conflict ? "Conflict" : "Blocked");
+  const label = (i: Item) => (atRisk.has(i.id) ? "At risk" : i.conflict ? "Conflict" : "On hold");
+  const color = (i: Item) =>
+    atRisk.has(i.id) ? "var(--flag-risk)" : i.conflict ? "var(--muted)" : "var(--st-hold)";
   return (
     <section className="rounded-xl border border-line bg-panel px-4 py-3">
-      <h2 className="mb-1 text-[13px] font-medium uppercase tracking-wide text-faint">Needs attention</h2>
+      <h2 className="mb-1 text-xs font-medium text-faint">Needs attention</h2>
       <ul>
         {items.map((i) => (
           <li key={i.id}>
@@ -216,7 +218,7 @@ export function NeedsAttention({
               onClick={() => onOpen(i.id)}
               className="flex w-full items-center gap-3 rounded-md px-1.5 py-1.5 text-left hover:bg-hover"
             >
-              <span className={`w-16 shrink-0 text-[14px] ${label(i) === "Conflict" ? "text-warn" : "text-danger"}`}>
+              <span className="w-20 shrink-0 text-xs font-semibold" style={{ color: color(i) }}>
                 {label(i)}
               </span>
               <span className="min-w-0 flex-1 truncate">{i.title}</span>

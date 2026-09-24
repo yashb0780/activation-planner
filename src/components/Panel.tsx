@@ -1,20 +1,14 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { formatDate } from "../dates";
 import type { Drift } from "../drift";
-import { displayName, ownerLine, primaryName, rolesFor, useRoles } from "../owners";
 import type { OwnerChange } from "../state";
 import type { Decision, Item, Note, Role, Side, Status } from "../types";
-import { Avatar, DRIFT_LABEL, DriftChip, SideTag, weekLabel } from "./Card";
-import { StatusIcon } from "./icons";
+import { DriftFlagChip, FLAG_LABEL, OwnerMenu, STATUS } from "./Status";
+import { weekLabel } from "./ui";
 
-const STATUSES: { value: Status; label: string }[] = [
-  { value: "todo", label: "Todo" },
-  { value: "progress", label: "In progress" },
-  { value: "blocked", label: "Blocked" },
-  { value: "done", label: "Done" },
-];
-
+const ORDER: Status[] = ["todo", "progress", "hold", "done"];
 const KIND_LABEL = { task: "Task", decision: "Decision", question: "Question" } as const;
+const SIDE_LABEL: Record<Side, string> = { us: "Our side", customer: "Their side" };
 
 interface PanelProps {
   item: Item;
@@ -24,42 +18,48 @@ interface PanelProps {
   customerView: boolean;
   onClose: () => void;
   onStatus: (s: Status) => void;
+  onHold: (reason: string) => void;
   onNote: (text: string, internal: boolean) => void;
   onAnswer: (text: string) => void;
   onDecide: (d: Decision) => void;
   onReopen: () => void;
   sourceTag: string;
+  /** Field name for one checklist line's sources. */
+  fieldName: (ids: string[]) => string;
+  checks: number[];
+  onToggleCheck: (line: number) => void;
   drift: Drift | null;
   asOf: string;
   roles: Role[];
   history: OwnerChange[];
   onOwner: (side: Side, roleId: string) => void;
+  /** Goes up by one each time x is pressed, or Done is picked on a row: open the done form. */
+  doneRequest?: number;
 }
 
-const SIDE_LABEL: Record<Side, string> = { us: "Our side", customer: "Their side" };
-
-function Section({ label, children }: { label: string; children: ReactNode }) {
+function Section({ label, children, aside }: { label: string; children: ReactNode; aside?: ReactNode }) {
   return (
     <section className="border-t border-line px-5 py-4">
-      <h3 className="mb-2 text-[12px] font-medium uppercase tracking-wide text-faint">{label}</h3>
+      <div className="mb-2 flex items-center gap-2">
+        <h3 className="text-xs font-semibold text-muted">{label}</h3>
+        {aside && <span className="ml-auto">{aside}</span>}
+      </div>
       {children}
     </section>
   );
 }
 
-const field =
-  "w-full rounded-md border border-line bg-bg px-2.5 py-2 text-[15px] outline-none focus:border-accent/60";
-const primary = "rounded-md bg-accent px-3 py-1.5 text-[14px] font-medium text-bg disabled:opacity-40";
-const quiet = "rounded-md px-2.5 py-1.5 text-[14px] text-muted hover:bg-hover";
+const field = "w-full rounded-md border border-line bg-bg px-2.5 py-1.5 text-sm outline-none transition-colors focus:border-accent";
+const primary = "rounded-md bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent transition-opacity disabled:opacity-40";
+const quiet = "rounded-md px-2.5 py-1.5 text-xs text-muted transition-colors hover:bg-hover hover:text-ink";
 
 export function Panel(props: PanelProps) {
   const { item, notes, answer, decision, customerView, onClose, onStatus, onNote } = props;
-  const book = useRoles();
-  const owner = primaryName(book, item);
-  const ownerText = ownerLine(book, item, item.side).primary;
   const [draft, setDraft] = useState("");
   const [internal, setInternal] = useState(true);
   const [confirmingDone, setConfirmingDone] = useState(false);
+  const [holding, setHolding] = useState(false);
+  const [holdText, setHoldText] = useState("");
   const [doneNote, setDoneNote] = useState("");
   const [notEvidenceChecked, setNotEvidenceChecked] = useState(false);
   const [answerText, setAnswerText] = useState("");
@@ -70,6 +70,8 @@ export function Panel(props: PanelProps) {
   useEffect(() => {
     setDraft("");
     setConfirmingDone(false);
+    setHolding(false);
+    setHoldText("");
     setDoneNote("");
     setNotEvidenceChecked(false);
     setAnswerText("");
@@ -77,17 +79,31 @@ export function Panel(props: PanelProps) {
     setBy("");
   }, [item.id]);
 
+  // x on a row, or Done picked from a row's menu: open the done form. The proof note is still required.
+  useEffect(() => {
+    if (props.doneRequest && item.kind === "task" && item.status !== "done") setConfirmingDone(true);
+    // Only when a request comes in, not when the item changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.doneRequest]);
+
   const visibleNotes = customerView ? notes.filter((n) => !n.internal) : notes;
   const needsCheck = item.notEvidence.length > 0;
   const canConfirm = doneNote.trim().length > 0 && (!needsCheck || notEvidenceChecked);
   const resolved = item.kind !== "task" && item.status === "done";
 
   function pickStatus(s: Status) {
-    if (s === "done" && item.status !== "done") {
-      setConfirmingDone(true);
+    setConfirmingDone(false);
+    setHolding(false);
+    if (s === "hold") {
+      setHoldText(item.holdReason ?? "");
+      setHolding(true);
       return;
     }
-    setConfirmingDone(false);
+    if (s === item.status) return;
+    if (s === "done") {
+      if (item.kind === "task") setConfirmingDone(true);
+      return; // Decisions and questions are done by recording them below.
+    }
     onStatus(s);
   }
 
@@ -102,95 +118,201 @@ export function Panel(props: PanelProps) {
     <aside
       role="dialog"
       aria-label={item.title}
-      className="fixed inset-y-0 right-0 z-30 flex w-full max-w-[480px] flex-col border-l border-line bg-panel"
+      className="fixed inset-y-0 right-0 z-30 flex w-full max-w-[var(--panel-width)] flex-col border-l border-line bg-panel shadow-[var(--shadow-menu)]"
     >
-      <header className="flex items-start gap-2.5 px-5 pb-3 pt-5">
-        <span className="mt-1">
-          <StatusIcon status={item.status} size={16} />
-        </span>
-        <h2 className="flex-1 text-[20px] font-semibold leading-snug">{item.title}</h2>
+      <header className="flex items-start gap-3 px-5 pb-2 pt-5">
+        <h2 className="flex-1 text-lg font-semibold">{item.title}</h2>
         <button type="button" onClick={onClose} className={quiet} aria-label="Close (Esc)" title="Close (Esc)">
           ✕
         </button>
       </header>
-
-      <div className="flex flex-wrap items-center gap-2 px-5 pb-4 text-[14px] text-muted">
-        <span className="rounded border border-line px-1.5 text-[13px]">{KIND_LABEL[item.kind]}</span>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 pb-4 text-xs text-muted">
+        <span className="rounded-sm border border-line px-1.5">{KIND_LABEL[item.kind]}</span>
         <span>{item.module}</span>
-        <SideTag side={item.side} />
-        <span className="flex items-center gap-1.5">
-          <Avatar name={owner} /> {ownerText}
-        </span>
-        <span>· {weekLabel(item.week)}</span>
-        {item.visibility === "internal" && <span className="text-warn">· Internal</span>}
+        <span>{weekLabel(item.week)}</span>
+        {item.visibility === "internal" && <span className="text-warn">Internal</span>}
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {item.kind === "task" && (
-          <Section label="Status">
-            <div className="flex flex-wrap gap-1.5">
-              {STATUSES.map((s) => (
+        <Section label="Status">
+          <div role="radiogroup" aria-label="Status" className="flex flex-wrap gap-1.5">
+            {ORDER.map((s) => {
+              const on = item.status === s;
+              return (
                 <button
-                  key={s.value}
+                  key={s}
                   type="button"
-                  onClick={() => pickStatus(s.value)}
-                  className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[14px] ${
-                    item.status === s.value
-                      ? "border-accent/60 bg-hover text-ink"
-                      : "border-line text-muted hover:bg-hover"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => pickStatus(s)}
+                  className={`inline-flex h-[var(--pill-height)] items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors ${
+                    on ? "border-transparent" : "border-line text-muted hover:bg-hover"
                   }`}
+                  style={on ? { color: STATUS[s].color, background: `color-mix(in srgb, ${STATUS[s].color} 14%, transparent)` } : undefined}
                 >
-                  <StatusIcon status={s.value} size={13} /> {s.label}
+                  <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: STATUS[s].color }} />
+                  {STATUS[s].label}
                 </button>
+              );
+            })}
+          </div>
+          {item.status === "hold" && item.holdReason && !holding && (
+            <p className="mt-3 text-sm">
+              <span className="font-medium" style={{ color: STATUS.hold.color }}>
+                On hold:
+              </span>{" "}
+              {item.holdReason}{" "}
+              <button type="button" onClick={() => pickStatus("hold")} className="text-xs text-muted underline-offset-4 hover:underline">
+                Change
+              </button>
+            </p>
+          )}
+          {item.window && <p className="mt-3 text-sm text-muted">Expected window: {item.window}</p>}
+
+          {holding && (
+            <form
+              className="mt-3 flex flex-col gap-2 rounded-lg border border-line bg-raised p-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!holdText.trim()) return;
+                props.onHold(holdText.trim());
+                setHolding(false);
+              }}
+            >
+              <label htmlFor="hold-reason" className="text-xs text-muted">
+                Why is it on hold? A reason is required.
+              </label>
+              <input id="hold-reason" autoFocus value={holdText} onChange={(e) => setHoldText(e.target.value)} className={field} />
+              <div className="flex gap-2">
+                <button type="submit" disabled={!holdText.trim()} className={primary}>
+                  Put on hold
+                </button>
+                <button type="button" onClick={() => setHolding(false)} className={quiet}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+
+          {confirmingDone && (
+            <div className="mt-3 rounded-lg border border-line bg-raised p-3">
+              <label className="mb-1.5 block text-xs text-muted" htmlFor="done-note">
+                What proves this is done? A note is required.
+              </label>
+              <textarea
+                id="done-note"
+                autoFocus
+                value={doneNote}
+                onChange={(e) => setDoneNote(e.target.value)}
+                rows={3}
+                className={field}
+                placeholder="What was built, and what shows it is being used"
+              />
+              {needsCheck && (
+                <div className="mt-3">
+                  <p className="text-xs text-muted">Not evidence for this module:</p>
+                  <ul className="my-1.5 list-disc pl-5 text-sm text-muted">
+                    {item.notEvidence.map((n) => (
+                      <li key={n}>{n}</li>
+                    ))}
+                  </ul>
+                  <label className="flex items-start gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={notEvidenceChecked}
+                      onChange={(e) => setNotEvidenceChecked(e.target.checked)}
+                      className="mt-1.5 accent-[var(--accent)]"
+                    />
+                    The proof is none of these.
+                  </label>
+                </div>
+              )}
+              <div className="mt-3 flex gap-2">
+                <button type="button" disabled={!canConfirm} onClick={confirmDone} className={primary}>
+                  Mark done
+                </button>
+                <button type="button" onClick={() => setConfirmingDone(false)} className={quiet}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </Section>
+
+        {!customerView && (
+          <Section label="Owners">
+            <div className="flex flex-col gap-2">
+              {(["us", "customer"] as const).map((side) => (
+                <div key={side} className="flex items-center gap-3 text-sm">
+                  <span className="w-24 shrink-0 text-xs text-muted">{SIDE_LABEL[side]}</span>
+                  <span className="min-w-0">
+                    <OwnerMenu item={item} side={side} roles={props.roles} onOwner={(r) => props.onOwner(side, r)} />
+                  </span>
+                </div>
               ))}
             </div>
-            {item.blockedBy && item.status === "blocked" && (
-              <p className="mt-3 text-[14px] text-danger">Blocked by: {item.blockedBy}</p>
+            {props.history.length > 0 && (
+              <ul className="mt-3 space-y-0.5 text-xs text-faint">
+                {props.history.map((h) => (
+                  <li key={`${h.at}-${h.side}`}>
+                    Previously: {h.previous} ({SIDE_LABEL[h.side].toLowerCase()}), changed {formatDate(h.at.slice(0, 10), true)}
+                  </li>
+                ))}
+              </ul>
             )}
-            {item.window && <p className="mt-3 text-[14px] text-muted">Expected window: {item.window}</p>}
+          </Section>
+        )}
 
-            {confirmingDone && (
-              <div className="mt-4 rounded-lg border border-line bg-raised p-4">
-                <label className="mb-1.5 block text-[14px] text-muted" htmlFor="done-note">
-                  What proves this is done? A note is required.
-                </label>
-                <textarea
-                  id="done-note"
-                  value={doneNote}
-                  onChange={(e) => setDoneNote(e.target.value)}
-                  rows={3}
-                  className={field}
-                  placeholder="What was built, and what shows it is being used"
-                />
-                {needsCheck && (
-                  <div className="mt-3">
-                    <p className="text-[14px] text-muted">Not evidence for this module:</p>
-                    <ul className="my-1.5 list-disc pl-5 text-[14px] text-muted">
-                      {item.notEvidence.map((n) => (
-                        <li key={n}>{n}</li>
-                      ))}
-                    </ul>
-                    <label className="flex items-start gap-2 text-[14px]">
+        {!customerView && props.drift && item.lead && (
+          <Section label="Lead time and drift" aside={props.drift.flag ? <DriftFlagChip flag={props.drift.flag} /> : undefined}>
+            <p className="text-sm text-muted">
+              {item.lead.min === item.lead.max ? item.lead.min : `${item.lead.min} to ${item.lead.max}`} weeks, from the
+              product config. {props.drift.flag ? "" : "On time."}
+            </p>
+            <ul className="mt-1.5 space-y-0.5 text-sm text-muted">
+              <li>Latest safe start: {formatDate(props.drift.latestSafeStart, true)}</li>
+              <li>
+                If it starts {formatDate(props.asOf, true)}, earliest finish: {formatDate(props.drift.earliestFinish, true)}
+              </li>
+              <li>
+                {props.drift.flag === "risk"
+                  ? `${FLAG_LABEL.risk}: it can no longer finish before the target date.`
+                  : `Turns red from ${formatDate(props.drift.redFrom, true)} if not started.`}
+              </li>
+            </ul>
+          </Section>
+        )}
+
+        {item.checklist && (
+          <Section
+            label="What the answer should cover"
+            aside={
+              <span className="tabular text-xs text-faint">
+                {props.checks.length} of {item.checklist.length}
+              </span>
+            }
+          >
+            <ul className="flex flex-col gap-2">
+              {item.checklist.map((c, n) => {
+                const on = props.checks.includes(n);
+                return (
+                  <li key={c.text}>
+                    <label className="flex items-start gap-2.5 text-sm">
                       <input
                         type="checkbox"
-                        checked={notEvidenceChecked}
-                        onChange={(e) => setNotEvidenceChecked(e.target.checked)}
-                        className="mt-1 accent-[var(--accent)]"
+                        checked={on}
+                        onChange={() => props.onToggleCheck(n)}
+                        className="mt-1.5 accent-[var(--accent)]"
                       />
-                      The proof is none of these.
+                      <span className="min-w-0">
+                        <span className={on ? "text-muted line-through decoration-faint" : ""}>{c.text}</span>
+                        {!customerView && <span className="block text-xs text-faint">From: {props.fieldName(c.from)}</span>}
+                      </span>
                     </label>
-                  </div>
-                )}
-                <div className="mt-3 flex gap-2">
-                  <button type="button" disabled={!canConfirm} onClick={confirmDone} className={primary}>
-                    Mark done
-                  </button>
-                  <button type="button" onClick={() => setConfirmingDone(false)} className={quiet}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
+                  </li>
+                );
+              })}
+            </ul>
           </Section>
         )}
 
@@ -199,31 +321,25 @@ export function Panel(props: PanelProps) {
             {resolved && decision ? (
               <>
                 <p>{decision.decided}</p>
-                <p className="mt-1 text-[14px] text-muted">
+                <p className="mt-1 text-xs text-muted">
                   Decided by {decision.by} on {decision.date}
                 </p>
-                <button type="button" onClick={props.onReopen} className={`${quiet} mt-2 -ml-2.5`}>
+                <button type="button" onClick={props.onReopen} className={`${quiet} -ml-2.5 mt-2`}>
                   Reopen
                 </button>
               </>
             ) : (
               <form
-                className="flex flex-col gap-2.5"
+                className="flex flex-col gap-2"
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (decided.trim() && by.trim() && date) props.onDecide({ decided: decided.trim(), by: by.trim(), date });
                 }}
               >
-                <textarea
-                  value={decided}
-                  onChange={(e) => setDecided(e.target.value)}
-                  rows={2}
-                  placeholder="What was decided"
-                  className={field}
-                />
+                <textarea value={decided} onChange={(e) => setDecided(e.target.value)} rows={2} placeholder="What was decided" className={field} />
                 <div className="flex gap-2">
                   <input value={by} onChange={(e) => setBy(e.target.value)} placeholder="Who decided" className={field} />
-                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`${field} w-44`} />
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`${field} w-48`} />
                 </div>
                 <div>
                   <button type="submit" disabled={!decided.trim() || !by.trim() || !date} className={primary}>
@@ -239,109 +355,44 @@ export function Panel(props: PanelProps) {
           <Section label={resolved ? "Answer" : "Answer the question"}>
             {resolved ? (
               <>
-                <p>{answer ?? "Answered."}</p>
-                <button type="button" onClick={props.onReopen} className={`${quiet} mt-2 -ml-2.5`}>
+                <p className="whitespace-pre-wrap">{answer ?? "Answered."}</p>
+                <button type="button" onClick={props.onReopen} className={`${quiet} -ml-2.5 mt-2`}>
                   Reopen
                 </button>
               </>
             ) : (
               <form
-                className="flex gap-2"
+                className="flex flex-col gap-2"
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (answerText.trim()) props.onAnswer(answerText.trim());
                 }}
               >
-                <input
+                <textarea
                   value={answerText}
                   onChange={(e) => setAnswerText(e.target.value)}
-                  placeholder={item.volume ? "Volume per month, measured or estimate" : "Answer"}
+                  rows={3}
+                  placeholder="What they said. Tick the lines above it covered."
                   className={field}
                 />
-                <button type="submit" disabled={!answerText.trim()} className={primary}>
-                  Save
-                </button>
+                <div>
+                  <button type="submit" disabled={!answerText.trim()} className={primary}>
+                    Save answer
+                  </button>
+                </div>
               </form>
             )}
           </Section>
         )}
 
-        {!customerView && (
-          <Section label="Owners">
-            <div className="flex flex-col gap-2">
-              {(["us", "customer"] as const).map((side) => {
-                const ids = rolesFor(item, side);
-                return (
-                  <label key={side} className="flex flex-wrap items-center gap-2 text-[14px]">
-                    <span className="w-20 shrink-0 text-muted">{SIDE_LABEL[side]}</span>
-                    <select
-                      value={ids[0] ?? ""}
-                      onChange={(e) => props.onOwner(side, e.target.value)}
-                      className="min-w-0 flex-1 rounded-md border border-line bg-bg px-2 py-1.5 text-[14px]"
-                    >
-                      {!ids[0] && <option value="">Not named</option>}
-                      {props.roles
-                        .filter((r) => r.side === side)
-                        .map((r) => (
-                          <option key={r.id} value={r.id}>
-                            {r.label}: {r.name || "not named"}
-                          </option>
-                        ))}
-                    </select>
-                    {ids.length > 1 && (
-                      <span className="text-muted" title={ids.slice(1).map((r) => displayName(book, r)).join(", ")}>
-                        +{ids.length - 1}
-                      </span>
-                    )}
-                  </label>
-                );
-              })}
-            </div>
-            {props.history.length > 0 && (
-              <ul className="mt-3 space-y-0.5 text-[13px] text-faint">
-                {props.history.map((h) => (
-                  <li key={`${h.at}-${h.side}`}>
-                    Previously: {h.previous} ({SIDE_LABEL[h.side].toLowerCase()}), changed {formatDate(h.at.slice(0, 10), true)}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Section>
-        )}
-
-        {!customerView && props.drift && item.lead && (
-          <Section label="Lead time and drift">
-            <p className="flex flex-wrap items-center gap-2">
-              {props.drift.flag ? <DriftChip flag={props.drift.flag} /> : <span className="text-ok">On time</span>}
-              <span className="text-[14px] text-muted">
-                {item.lead.min === item.lead.max ? item.lead.min : `${item.lead.min} to ${item.lead.max}`} weeks, from the
-                product config
-              </span>
-            </p>
-            <ul className="mt-2 space-y-0.5 text-[14px] text-muted">
-              <li>Latest safe start: {formatDate(props.drift.latestSafeStart, true)}</li>
-              <li>
-                If it starts {formatDate(props.asOf, true)}, earliest finish: {formatDate(props.drift.earliestFinish, true)}
-              </li>
-              <li>
-                {props.drift.flag === "risk"
-                  ? `${DRIFT_LABEL.risk}: it can no longer finish before the target date.`
-                  : `Turns red from ${formatDate(props.drift.redFrom, true)} if not started.`}
-              </li>
-            </ul>
-          </Section>
-        )}
-
         <Section label="Why it's here">
-          {!customerView && <p className="text-[13px] text-muted">{props.sourceTag}</p>}
+          {!customerView && <p className="text-xs text-muted">{props.sourceTag}</p>}
           <p className="mt-1.5">{item.why.answer}</p>
-          <p className="mt-1.5 text-[14px] text-faint">
-            {item.why.source ? `Source: ${item.why.source}` : "No source in the handoff"}
-          </p>
+          <p className="mt-1.5 text-xs text-faint">{item.why.source ? `Source: ${item.why.source}` : "No source in the handoff"}</p>
         </Section>
 
         <Section label="Done when">
-          <ul className="list-disc space-y-1.5 pl-5">
+          <ul className="list-disc space-y-1 pl-5">
             {item.doneWhen.map((d) => (
               <li key={d}>{d}</li>
             ))}
@@ -350,7 +401,7 @@ export function Panel(props: PanelProps) {
 
         {item.notEvidence.length > 0 && (
           <Section label="Not evidence">
-            <ul className="list-disc space-y-1.5 pl-5 text-muted">
+            <ul className="list-disc space-y-1 pl-5 text-muted">
               {item.notEvidence.map((d) => (
                 <li key={d}>{d}</li>
               ))}
@@ -359,33 +410,22 @@ export function Panel(props: PanelProps) {
         )}
 
         <Section label="Notes">
-          {visibleNotes.length === 0 && <p className="text-[14px] text-faint">No notes yet.</p>}
+          {visibleNotes.length === 0 && <p className="text-sm text-faint">No notes yet.</p>}
           <ul className="space-y-2">
             {visibleNotes.map((n) => (
               <li key={n.at} className="rounded-md border border-line bg-raised px-3 py-2">
                 <p className="whitespace-pre-wrap">{n.text}</p>
-                <p className="mt-1 text-[12px] text-faint">
+                <p className="mt-1 text-xs text-faint">
                   {new Date(n.at).toLocaleString()}
                   {n.internal && " · internal"}
                 </p>
               </li>
             ))}
           </ul>
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            rows={3}
-            placeholder="How was it built?"
-            className={`${field} mt-3`}
-          />
+          <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} placeholder="Add a note" className={`${field} mt-3`} />
           <div className="mt-2 flex items-center justify-between">
-            <label className="flex items-center gap-2 text-[14px] text-muted">
-              <input
-                type="checkbox"
-                checked={internal}
-                onChange={(e) => setInternal(e.target.checked)}
-                className="accent-[var(--accent)]"
-              />
+            <label className="flex items-center gap-2 text-xs text-muted">
+              <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} className="accent-[var(--accent)]" />
               Internal
             </label>
             <button
@@ -395,7 +435,7 @@ export function Panel(props: PanelProps) {
                 onNote(draft.trim(), internal);
                 setDraft("");
               }}
-              className="rounded-md border border-line px-3 py-1.5 text-[14px] hover:bg-hover disabled:opacity-40"
+              className="rounded-md border border-line px-3 py-1.5 text-xs transition-colors hover:bg-hover disabled:opacity-40"
             >
               Add note
             </button>

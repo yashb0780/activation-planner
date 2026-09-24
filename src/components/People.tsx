@@ -34,21 +34,21 @@ export function PeopleList({ roles, onRename }: { roles: Role[]; onRename: (role
   return (
     <section className="mt-6">
       <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h2 className="text-[20px] font-semibold">People list</h2>
-        <span className="text-[14px] text-muted">
+        <h2 className="text-lg font-semibold">People list</h2>
+        <span className="text-sm text-muted">
           Owners on the plan are roles. Change a name here and every item with that role updates.
         </span>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
         {sides.map(({ side, title }) => (
           <div key={side} className="rounded-xl border border-line bg-panel p-3">
-            <h3 className="mb-2 text-[13px] font-medium uppercase tracking-wide text-faint">{title}</h3>
+            <h3 className="mb-2 text-xs font-medium text-faint">{title}</h3>
             <ul className="flex flex-col gap-1.5">
               {roles
                 .filter((r) => r.side === side)
                 .map((r) => (
                   <li key={`${r.id}:${r.name}`} className="flex items-center gap-2">
-                    <label htmlFor={`role-${r.id}`} className="w-40 shrink-0 text-[14px] text-muted">
+                    <label htmlFor={`role-${r.id}`} className="w-48 shrink-0 text-sm text-muted">
                       {r.label}
                     </label>
                     <input
@@ -59,7 +59,7 @@ export function PeopleList({ roles, onRename }: { roles: Role[]; onRename: (role
                       onKeyDown={(e) => {
                         if (e.key === "Enter") e.currentTarget.blur();
                       }}
-                      className="min-w-0 flex-1 rounded-md border border-line bg-bg px-2 py-1 text-[14px] outline-none focus:border-accent/60"
+                      className="min-w-0 flex-1 rounded-md border border-line bg-bg px-2 py-1 text-sm outline-none focus:border-accent/60"
                     />
                   </li>
                 ))}
@@ -78,15 +78,15 @@ export function People({ people, quadrants, sentiments, onMove, onSentiment }: P
   return (
     <section className="mt-6">
       <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h2 className="text-[20px] font-semibold">People</h2>
-        <span className="text-[14px] text-muted">
+        <h2 className="text-lg font-semibold">People</h2>
+        <span className="text-sm text-muted">
           Internal. Hidden in customer view. Drag a card, or use its picker, to move it.
         </span>
       </div>
 
       <div className="grid grid-cols-[auto_1fr] gap-2">
         <div className="flex items-center justify-center">
-          <span className="text-[13px] uppercase tracking-wide text-faint [writing-mode:vertical-rl] rotate-180">
+          <span className="text-xs text-faint [writing-mode:vertical-rl] rotate-180">
             Influence →
           </span>
         </div>
@@ -112,8 +112,8 @@ export function People({ people, quadrants, sentiments, onMove, onSentiment }: P
                 }`}
               >
                 <div className="mb-2 flex items-baseline gap-2">
-                  <h3 className="text-[17px] font-semibold">{q.label}</h3>
-                  <span className="text-[13px] text-faint">{q.hint}</span>
+                  <h3 className="text-base font-semibold">{q.label}</h3>
+                  <span className="text-xs text-faint">{q.hint}</span>
                 </div>
                 <div className="flex flex-col gap-2">
                   {here.map((p) => (
@@ -133,7 +133,7 @@ export function People({ people, quadrants, sentiments, onMove, onSentiment }: P
           })}
         </div>
         <span />
-        <p className="text-center text-[13px] uppercase tracking-wide text-faint">Involvement →</p>
+        <p className="text-center text-xs text-faint">Involvement →</p>
       </div>
     </section>
   );
@@ -175,12 +175,12 @@ function PersonCard({
             style={{ background: s.color }}
           />
         )}
-        <h4 className={`text-[16px] font-medium ${placeholder ? "text-muted" : ""}`}>{name || labelOf(book, person.roleId)}</h4>
-        <span className="ml-auto text-[12px] text-faint">{moved ? "moved" : "(inferred)"}</span>
+        <h4 className={`text-sm font-medium ${placeholder ? "text-muted" : ""}`}>{name || labelOf(book, person.roleId)}</h4>
+        <span className="ml-auto text-xs text-faint">{moved ? "moved" : "(inferred)"}</span>
       </div>
-      <p className="mt-0.5 text-[14px] text-muted">{person.role}</p>
+      <p className="mt-0.5 text-sm text-muted">{person.role}</p>
       {!placeholder && (
-        <dl className="mt-2 space-y-1 text-[14px]">
+        <dl className="mt-2 space-y-1 text-sm">
           <div>
             <dt className="inline text-faint">What's in it for them: </dt>
             <dd className="inline">{person.wiifm || <span className="text-faint">not stated in the handoff</span>}</dd>
@@ -191,7 +191,7 @@ function PersonCard({
           </div>
         </dl>
       )}
-      <div className="mt-2 flex flex-wrap gap-2 text-[13px]">
+      <div className="mt-2 flex flex-wrap gap-2 text-xs">
         <label className="flex items-center gap-1 text-faint">
           Quadrant
           <select

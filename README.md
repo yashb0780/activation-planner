@@ -60,6 +60,17 @@ section has a **Reviewed** box, and the plan only says **Reviewed** once every
 box is ticked. In the markdown files the reviewer ticks the boxes and changes
 the status line; in the tracker the badge changes by itself.
 
+**Questions read like a conversation, not a form.** Every gap in the handoff
+is grouped under 5 to 7 open questions a CSM would actually ask on a call,
+such as "Who works on each system today, and who has admin access?". Each
+keeps the original detail as a checklist to tick off as the answer comes in,
+so nothing is lost.
+
+**Kickoff setup comes first.** Quick base-level setup done at kickoff (roles
+and permissions, workspace setup, the success plan) sits at the top of week 1.
+Each product config lists its own kickoff items; the success plan is always
+added.
+
 ## The five ideas it runs on
 
 **`UNKNOWN` is a signal, not a blank.** The handoff template tells whoever
@@ -111,8 +122,11 @@ The repo also holds an interactive activation tracker: a small web app built
 from the example board and 30-day plan. It needs Node.js.
 
 - **Plan** opens with the Handoff incomplete panel, then a proposed first
-  value, four milestone gates, and the work as bucket columns you can group by
-  lead time, owner, or module. Cards show their source tag and any drift flag.
+  value, four milestone gates, and the work as dense rows grouped by week
+  (or by lead time, owner, or module) under collapsible headers. Each row has
+  a **status pill** (Not started, In progress, On hold, Done) and an **owner
+  pill**, both clickable. On hold asks for a short reason; Done asks for proof.
+  Drift shows as a separate small flag.
 - **Success plan** is a one-page summary for the customer.
 - **People** holds the People list (edit a name here and every task follows)
   and an internal stakeholder map.
@@ -121,6 +135,13 @@ from the example board and 30-day plan. It needs Node.js.
   plan. Notes, risk commentary, drift flags and source tags stay hidden.
 - The header badge says **Draft** until every section's **Reviewed** box is
   ticked.
+- Keyboard: **j / k** move between rows, **Enter** opens one, **s** opens its
+  status menu, **o** its owner menu, **x** starts marking it done, **v**
+  switches Internal and Customer view, and **⌘K** (Ctrl+K) opens a command
+  menu to jump anywhere.
+
+Every colour, font size, space and radius lives in `src/theme.css`. Change the
+look there without touching the components.
 
 Drift is checked against today's date. To see how the plan looks on another
 day, add `?asof=2026-10-15` to the address.
@@ -170,13 +191,20 @@ src/data/halden.ts         the tracker's items, People list and drift thresholds
 src/fields.ts              handoff field names, for source tags (copied from the template)
 src/drift.ts               the drift rules
 src/owners.ts              owner roles and name lookup
+src/theme.css              the look: every colour, size and spacing value
 public/report.html         an older static version of the example report, not yet updated
 TODO.md                    parked issues
 ```
 
-`.gitignore` excludes `config/private-*`, so a config you would rather not
-commit can sit beside the public one. The planner reads both and the private
-file wins on name collisions.
+`.gitignore` excludes every `private-*` file in `config/`, `examples/` and
+`src/data/`, so real products and private demos never reach the public repo.
+A private config for the same product as a public one is merged in, and wins
+on name collisions. A private config for a different product stands alone.
+
+A private tracker demo is a file `src/data/private-<name>.ts` that exports
+`dataset`, in the same shape as `src/data/halden.ts`. When one exists, the
+tracker shows a switch between examples. The public build has none, so it
+shows no switch.
 
 ## What it will not do
 

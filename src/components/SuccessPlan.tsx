@@ -12,8 +12,8 @@ function Block({ title, note, children }: { title: string; note?: string; childr
   return (
     <section className="border-t border-line pt-4">
       <div className="mb-2 flex flex-wrap items-baseline gap-x-2">
-        <h3 className="text-[17px] font-semibold">{title}</h3>
-        {note && <span className="text-[13px] text-faint">{note}</span>}
+        <h3 className="text-base font-semibold">{title}</h3>
+        {note && <span className="text-xs text-faint">{note}</span>}
       </div>
       {children}
     </section>
@@ -47,22 +47,22 @@ export function SuccessPlan({
     <article className="mx-auto flex w-full max-w-3xl flex-col gap-5 rounded-xl border border-line bg-panel px-5 py-5">
       <header>
         <div className="flex flex-wrap items-center gap-3">
-          <h2 className="text-[24px] font-semibold">Success plan</h2>
+          <h2 className="text-xl font-semibold">Success plan</h2>
           {review}
         </div>
-        <p className="mt-1 text-[14px] text-muted">
+        <p className="mt-1 text-sm text-muted">
           {account.customer} · Draft, to confirm at kickoff. Built from the handoff; conclusions marked (inferred).
         </p>
       </header>
 
       <Block title="Their goal" note={`In their words · ${plan.goalSource}`}>
-        <blockquote className="border-l-2 border-accent/60 pl-3 text-[17px] leading-snug">“{plan.goal}”</blockquote>
-        <p className="mt-2 text-[14px] text-muted">Judged by {displayName(book, plan.judge)}.</p>
+        <blockquote className="border-l-2 border-accent/60 pl-3 text-base leading-snug">“{plan.goal}”</blockquote>
+        <p className="mt-2 text-sm text-muted">Judged by {displayName(book, plan.judge)}.</p>
       </Block>
 
       <Block title="First value" note={firstValueEdited ? "Edited, confirm at kickoff" : "Proposed (inferred)"}>
-        <p className="text-[16px] font-medium">{firstValue.headline}</p>
-        <ul className="mt-1.5 flex flex-col gap-0.5 text-[15px]">
+        <p className="text-sm font-medium">{firstValue.headline}</p>
+        <ul className="mt-1.5 flex flex-col gap-0.5 text-sm">
           {firstValue.points.map((p) => (
             <li key={p.label}>
               <span className="text-faint">{p.label}:</span> {p.text}
@@ -75,10 +75,10 @@ export function SuccessPlan({
         <ul className="flex flex-col gap-3">
           {plan.measures.map((m) => (
             <li key={m.measure} className="grid gap-x-4 gap-y-0.5 sm:grid-cols-[1fr_1fr]">
-              <span className="text-[15px] font-medium">{m.measure}</span>
-              <span className="text-[15px]">
+              <span className="text-sm font-medium">{m.measure}</span>
+              <span className="text-sm">
                 {m.baseline}
-                <span className="block text-[13px] text-faint">{m.basis}</span>
+                <span className="block text-xs text-faint">{m.basis}</span>
               </span>
             </li>
           ))}
@@ -93,23 +93,23 @@ export function SuccessPlan({
             const passed = linked.length > 0 && done === linked.length;
             return (
               <li key={g.id} className="flex flex-wrap items-baseline gap-x-3">
-                <span className="w-24 shrink-0 text-[14px] tabular-nums text-muted">
+                <span className="w-28 shrink-0 text-sm tabular-nums text-muted">
                   {g.by === "after" ? "After day 30" : `by ${formatDate(weekEnd(g.by, account))}`}
                 </span>
-                <span className={`text-[15px] ${passed ? "text-ok" : ""}`}>
+                <span className={`text-sm ${passed ? "text-ok" : ""}`}>
                   {passed && "✓ "}
                   {g.label}
                 </span>
-                <span className="text-[13px] tabular-nums text-faint">
+                <span className="text-xs tabular-nums text-faint">
                   {done} of {linked.length} done
                 </span>
               </li>
             );
           })}
           <li className="flex flex-wrap items-baseline gap-x-3">
-            <span className="w-24 shrink-0 text-[14px] tabular-nums text-muted">{formatDate(account.goLive, true)}</span>
-            <span className="text-[15px]">Target go-live</span>
-            <span className="text-[13px] text-faint">Stated in the handoff, confirm at kickoff</span>
+            <span className="w-28 shrink-0 text-sm tabular-nums text-muted">{formatDate(account.goLive, true)}</span>
+            <span className="text-sm">Target go-live</span>
+            <span className="text-xs text-faint">Stated in the handoff, confirm at kickoff</span>
           </li>
         </ol>
       </Block>
@@ -123,8 +123,8 @@ export function SuccessPlan({
             ] as const
           ).map(([side, title]) => (
             <div key={side}>
-              <h4 className="mb-1 text-[13px] font-medium uppercase tracking-wide text-faint">{title}</h4>
-              <ul className="flex flex-col gap-1 text-[15px]">
+              <h4 className="mb-1 text-xs font-medium text-faint">{title}</h4>
+              <ul className="flex flex-col gap-1 text-sm">
                 {roles
                   .filter((r) => r.side === side)
                   .map((r) => (

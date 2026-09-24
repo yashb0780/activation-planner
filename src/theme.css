@@ -1,0 +1,132 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Theme: every colour, font, size, space, radius and motion value in one place.
+   Change the look here. Components only use the names below, never raw values.
+
+   Dark is the default. [data-theme="light"] overrides the colours only.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root,
+[data-theme="dark"] {
+  /* Neutrals: a plain grey scale, very slightly cool. */
+  --bg: #0f1012;          /* page */
+  --panel: #15161a;       /* surfaces: header, panels, strips */
+  --raised: #1b1d21;      /* chips, inputs, selected row */
+  --hover: #202227;       /* hover */
+  --border: #26282e;      /* 1px lines */
+  --border-strong: #34363d;
+  --text: #e9eaec;
+  --muted: #9b9da4;
+  --faint: #676a72;
+
+  /* Accent: orchid. Focus, the selected row, primary buttons. Nothing else. */
+  --accent: #c58af9;
+  --on-accent: #1b1024;   /* text on an accent background */
+
+  /* Status: four hues that never collide with each other, the drift flags or the accent. */
+  --st-todo: #8b8f98;     /* Not started: grey */
+  --st-progress: #4f9cf5; /* In progress: blue */
+  --st-hold: #3cc3d4;     /* On hold: teal */
+  --st-done: #4db880;     /* Done: green */
+
+  /* Drift flags: separate from status, shown as a small flag. */
+  --flag-drift: #e3a63b;  /* Drifting: amber */
+  --flag-risk: #ec6b62;   /* At risk: red */
+
+  --shadow-menu: 0 12px 32px rgb(0 0 0 / 0.45);
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #fafafb;
+  --panel: #ffffff;
+  --raised: #f3f3f5;
+  --hover: #eeeef1;
+  --border: #e2e3e7;
+  --border-strong: #d2d3d8;
+  --text: #16171a;
+  --muted: #5d6068;
+  --faint: #9a9ca3;
+
+  --accent: #8a3fcb;
+  --on-accent: #ffffff;
+
+  --st-todo: #6f737c;
+  --st-progress: #2567d0;
+  --st-hold: #0b8798;
+  --st-done: #23865a;
+
+  --flag-drift: #b7790f;
+  --flag-risk: #c8433a;
+
+  --shadow-menu: 0 12px 32px rgb(20 20 30 / 0.14);
+  color-scheme: light;
+}
+
+/* Names the components use (Tailwind classes such as text-muted, bg-panel,
+   text-sm, rounded-md, px-3). */
+@theme inline {
+  /* Colours */
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-hover: var(--hover);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-st-todo: var(--st-todo);
+  --color-st-progress: var(--st-progress);
+  --color-st-hold: var(--st-hold);
+  --color-st-done: var(--st-done);
+  --color-flag-drift: var(--flag-drift);
+  --color-flag-risk: var(--flag-risk);
+  /* Short names for warnings and success, used outside the status pill. */
+  --color-warn: var(--flag-drift);
+  --color-danger: var(--flag-risk);
+  --color-ok: var(--st-done);
+
+  /* Font */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Type scale. Body is 16px. Hierarchy comes from weight, not size.
+     To resize everything, change these five sizes (and their line heights). */
+  --text-xs: 14px;
+  --text-xs--line-height: 20px;
+  --text-sm: 16px;
+  --text-sm--line-height: 24px;
+  --text-base: 17px;
+  --text-base--line-height: 24px;
+  --text-lg: 19px;
+  --text-lg--line-height: 26px;
+  --text-xl: 24px;
+  --text-xl--line-height: 30px;
+
+  /* Spacing: every p-, m-, gap- step is a multiple of 4px. */
+  --spacing: 4px;
+
+  /* Corners: small everywhere. */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+
+  /* Motion: quick and quiet. */
+  --default-transition-duration: 120ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Layout sizes. */
+:root {
+  --row-height: 42px;      /* one plan row */
+  --pill-height: 28px;     /* status and owner pills */
+  --col-status: 148px;     /* status column */
+  --col-where: 190px;      /* module column (wide screens) */
+  --col-owner: 200px;      /* owner column */
+  --panel-width: 480px;    /* item detail panel */
+  --page-max: 1360px;
+}

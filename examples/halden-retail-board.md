@@ -51,46 +51,72 @@ below. Confirm where each came from at kickoff.
 
 ### Open questions
 
-Every `UNKNOWN` in the handoff, against the module it blocks and the date it
-puts at risk.
+Every `UNKNOWN`, and every request with no volume, grouped into six open
+questions to ask at kickoff. Each keeps its original questions as a checklist,
+so the answer can be ticked off line by line. Nothing is dropped, only
+regrouped.
 
-| Question | Field | Blocks | Date at risk | Ask | From |
-|---|---|---|---|---|---|
-| Is a security review required before deployment, and who owns sign-off? | `security_review`, `security_signoff` | Discovery — the config names a passed review as its first dependency | Everything downstream of discovery: asset management, change management | *Unassigned* — routed to Dana Whitfield | From: Security review required before deployment · Who owns security sign-off on their side |
-| Who is the security contact? | `security_contact` | Discovery — the config notes the infrastructure owner is almost never the ITSM project owner | Same | *Unassigned* — routed to Dana Whitfield | From: Security contact |
-| Are there restrictions on installing software or outbound connections? | `install_restrictions` | Discovery — scanner host and agent deployment | Same | *Unassigned* — follows from the security contact | From: Restrictions on installing software or outbound connections |
-| Who holds the credentials for each system? | `credential_holders` | Discovery, and the joiners-and-leavers automation, which reaches the HR system | Discovery start date; automation beyond internal routing | Priya Raman, then whoever she names. She holds only the wiki. | From: Who holds the credentials for each system above |
-| Who is the identity / IT contact? | `identity_contact` | Foundation — SSO is required (`sso_required: yes`) | Catalog go-live, which needs SSO and visibility rules | *Unassigned* — routed to Dana Whitfield | From: Identity / IT contact |
-| Is automated user provisioning required, and does their licence tier include it? | `provisioning_required` | Foundation, then catalog and knowledge base visibility rules | Catalog go-live | Priya Raman | From: Automated user provisioning (SCIM) required |
-| Data residency or regional hosting requirements? | `data_residency` | Deployment itself | All dates, if the answer is non-standard | *Unassigned* — routed to Dana Whitfield | From: Data residency or regional hosting requirements |
-| Who will be the day-to-day admin? | `admin` | Foundation — the config asks for budgeted time, not a volunteer | Week one, everything | Priya Raman, who expects to name someone from the service desk | From: Day-to-day admin, if different |
-| Is 2027-01-12 fixed or preferred? | `date_fixed` | The whole sequence | The target date itself | Dana Whitfield and Priya Raman, together | From: Fixed or preferred |
-| Has anyone outside the buying team agreed to this? | `outside_agreement` | Taxonomy, and so the service catalog and workflow automation | Catalog build, weeks 2 to 3 | Tomas Berg, introduced by Priya Raman. He leads store support and has not been on a call. | From: Has anyone outside the buying team agreed to this |
-| Must anything in workflow automation be live by day 30? | `day30_required` (workflow automation) | Workflow automation | Day 30 | Priya Raman | From: Must something here be live by day 30? |
-| What is out of scope for workflow automation and for change management? | `out_of_scope` (both) | Those two modules | Scope of each, from week 1 | Priya Raman | From: Explicitly out of scope for now |
-| Average time to first response — no baseline | `first_response_time` | Workflow automation evidence, which is measured against a pre-automation baseline | Not a date. A measurement window: capture it before configuring, or the evidence has nothing to compare against. | Priya Raman, week one | From: Average time to first response |
-| Store ticket volume — no baseline | `core_volume` (stores) | Same, plus catalog adoption share | Same | Tomas Berg | From: Core volume per month (whatever the product counts) |
-| Changes per month and emergency share — no baseline, no process | `change_volume` | Change management evidence, which is a ratio that must be falling | Phase two | Priya Raman | From: Changes per month, and share that are emergency |
-| How many of the ~200 wiki pages are current, and when was it last reviewed? | `kb_articles`, `docs_location` | Knowledge base seed set | Knowledge base timeline | Priya Raman | From: Existing knowledge articles · Where their documentation lives today |
-| Alternatives they considered | `alternatives` | No module | None. Not yet a finding. | D. Osei | From: Alternatives they considered |
-| Languages or frameworks we have to work with | `frameworks` | No module identified | None. Not yet a finding. | K. Varga | From: Languages or frameworks we have to work with |
+**1. "Walk me through your current setup and the systems involved."**
+Blocks discovery, the longest pole. Date at risk: everything downstream of
+discovery. Ask: Priya Raman.
+- [ ] Any restrictions on installing software or outbound connections? *From: Restrictions on installing software or outbound connections*
+- [ ] Who holds the credentials for each system? Priya holds only the wiki. *From: Who holds the credentials for each system above*
+- [ ] What is actually on the store networks, and roughly how much of it? *From: What they want set up first — asset management with discovery, request 2*
+- [ ] Any languages or frameworks we have to work with? (Not yet a finding.) *From: Languages or frameworks we have to work with*
+- [ ] Where does documentation live, and how many of the ~200 wiki pages are current? *From: Where their documentation lives today · Existing knowledge articles*
+- [ ] Any data residency or regional hosting requirements? *From: Data residency or regional hosting requirements*
 
-### Discovery tasks: requests with no volume
+*From: Restrictions on installing software or outbound connections · Who holds the credentials for each system above · What they want set up first — asset management with discovery, request 2 · Languages or frameworks we have to work with · Where their documentation lives today · Existing knowledge articles · Data residency or regional hosting requirements*
 
-Section 6 requests with no volume are not ranked. Each becomes a week-one task
-to find out the volume, with an owner. None is guessed into a rank.
+**2. "Who works on each system today, and who has admin access?"**
+Blocks discovery and Foundation (SSO, admin). Date at risk: discovery start and
+catalog go-live. Ask: *unassigned* — routed to Dana Whitfield, with Priya
+Raman.
+- [ ] Is a security review required, and who owns sign-off? *From: Security review required before deployment · Who owns security sign-off on their side*
+- [ ] Who is the security contact? *From: Security contact*
+- [ ] Who is the identity / IT contact? *From: Identity / IT contact*
+- [ ] Who will be the day-to-day admin? Priya expects to name someone from the service desk. *From: Day-to-day admin, if different*
+- [ ] Is automated user provisioning required, and does the licence tier include it? *From: Automated user provisioning (SCIM) required*
 
-| Module | Request, in their words | Owner | Why this owner | From |
-|---|---|---|---|---|
-| Service catalog | "Till and printer faults in the stores" | Tomas Berg, introduced by Priya Raman | Store support is his desk | From: What they want set up first — service catalog, request 3 |
-| Knowledge base | "Get the store sheets off the back-room wall and onto a screen" | Tomas Berg, introduced by Priya Raman | Store-side content | From: What they want set up first — knowledge base, request 2 |
-| Discovery | "Find out what is actually on the store networks" | *Unassigned* — routed to Dana Whitfield | No security or infrastructure contact is named | From: What they want set up first — asset management with discovery, request 2 |
-| Change management | "Sign-off before anyone touches a store network during trading hours" | Priya Raman | No change process exists today, so she is the only source | From: What they want set up first — change management, request 1 |
-| Change management | "The December freeze written down somewhere other than my head" | Priya Raman | Her request, from the technical call | From: What they want set up first — change management, request 2 |
+*From: Security review required before deployment · Who owns security sign-off on their side · Security contact · Identity / IT contact · Day-to-day admin, if different · Automated user provisioning (SCIM) required*
 
-Four of the five discovery dependencies in the config are `UNKNOWN` in this
-handoff, and three of them route to a person who has been on one commercial
-call. That is still the headline finding on this account.
+**3. "What has to be true on day 30 for this to feel like a win?"**
+Blocks workflow automation and change management scope, and the automation
+evidence baseline. Date at risk: day 30; the baselines cannot be recovered once
+configuration starts. Ask: Priya Raman and Tomas Berg.
+- [ ] Must anything in workflow automation be live by day 30? *From: Must something here be live by day 30?*
+- [ ] What is out of scope for workflow automation and change management? *From: Explicitly out of scope for now*
+- [ ] What is average time to first response today? *From: Average time to first response*
+- [ ] What is store ticket volume per month? Head office is ~1,400, estimate. *From: Core volume per month (whatever the product counts)*
+
+*From: Must something here be live by day 30? · Explicitly out of scope for now · Average time to first response · Core volume per month (whatever the product counts)*
+
+**4. "What comes in most often that we have not counted yet?"**
+Two section 6 requests with no volume, so neither is ranked. Date at risk: the
+catalog and knowledge base build order. Ask: Tomas Berg, introduced by Priya.
+- [ ] Till and printer faults in the stores: how many a month? *From: What they want set up first — service catalog, request 3*
+- [ ] Store sheets on the back-room wall: how many, and how often do they change? *From: What they want set up first — knowledge base, request 2*
+
+*From: What they want set up first — service catalog, request 3 · What they want set up first — knowledge base, request 2*
+
+**5. "How do changes happen today, and who signs them off?"**
+Change management groundwork. Date at risk: phase two. Ask: Priya Raman.
+- [ ] How many changes a month, and what share are emergency? No change process exists today. *From: Changes per month, and share that are emergency*
+- [ ] Sign-off before anyone touches a store network in trading hours: how often? *From: What they want set up first — change management, request 1*
+- [ ] The December freeze: can we write it down with you, with any maintenance windows? *From: Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · What they want set up first — change management, request 2*
+
+*From: Changes per month, and share that are emergency · What they want set up first — change management, request 1 · What they want set up first — change management, request 2 · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze)*
+
+**6. "Who else needs to agree to this, and what else did you look at?"**
+Blocks the taxonomy, and so the catalog and automation. Date at risk: catalog
+build, weeks 2 to 3. Ask: Tomas Berg; alternatives to D. Osei.
+- [ ] Has anyone outside the buying team agreed to this? Tomas Berg has not been on a call. *From: Has anyone outside the buying team agreed to this*
+- [ ] What alternatives did they consider? (Not yet a finding.) *From: Alternatives they considered*
+
+*From: Has anyone outside the buying team agreed to this · Alternatives they considered*
+
+The open questions route most of their weight to someone who has been on one
+commercial call. That is still the headline finding on this account.
 
 ### Conflicts
 
@@ -177,12 +203,23 @@ can read without asking anyone for it.
 
 ---
 
-## Step 1 — Week one: Foundation, and opening the long gates
+## Step 1 — Week one: Kickoff setup, Foundation, and opening the long gates
 
 - [ ] Reviewed
 
 Per the config, these are mostly waiting rather than work, which is exactly why
 they start first.
+
+### Kickoff setup
+
+Quick setup done at kickoff, first in week 1: the config's Kickoff setup items,
+plus the success plan.
+
+| Kickoff setup item | Where it stands | Status | From |
+|---|---|---|---|
+| Roles and permissions | Two desks at launch: head-office IT (9 agents) and store support (14 agents). Nothing set yet. | **Ready** | From: Teams in scope at launch · product config |
+| Workspace setup | `team_count`: 2 teams at launch, one workspace or two not decided. Sits on the one-process-or-two conflict. | **Blocked** — decided in week 2 by Priya Raman and Tomas Berg | From: Number of teams / workspaces · One shared process, or several that genuinely differ · product config |
+| Success plan: draft, confirm at kickoff, share by end of week 1 | Built from their stated outcome, the first value, the baselines and the milestones. | **Ready** | From: Their stated outcome · How they will know it worked · Number attached, and who reports it upward |
 
 ### Foundation
 
@@ -191,9 +228,7 @@ time. Foundation does not make a long item short.
 
 | Foundation item | Lead time | Where it stands | Expected to finish | Status | From |
 |---|---|---|---|---|---|
-| Roles and permissions | Short | Two desks at launch: head-office IT (9 agents) and store support (14 agents). Nothing set yet. | Week 1 to 2, once one workspace or two is decided | **Ready** | From: Teams in scope at launch · product config |
 | SSO and provisioning | **Unresolved — planned as Short.** Config: short when the identity team is in the room, long when it sits outside the buying team. | SSO required (`sso_required: yes`), and their identity provider has SSO available. Identity / IT contact — `UNKNOWN`. Provisioning — `provisioning_required` and the licence tier both `UNKNOWN`. | Week 1 to 2 if the identity team is reached in week 1; otherwise a long-lead item that finishes later | **Gated by UNKNOWN** — `identity_contact`, `provisioning_required` | From: Single sign-on required · Identity provider · Identity / IT contact · Automated user provisioning (SCIM) required · product config |
-| Workspaces | Short once decided | `team_count`: 2 teams at launch, one workspace or two not decided. Sits on the one-process-or-two conflict. | Week 2, with the process decision | **Blocked** — Priya Raman and Tomas Berg decide together | From: Number of teams / workspaces · One shared process, or several that genuinely differ · product config |
 | Agent groups and business hours | Short | Not started; blocked on the one-process-or-two question. | Week 2 | **Blocked** — same decision | From: One shared process, or several that genuinely differ · product config |
 | Inbound email cutover | Short | The shared mailbox is the current front door and needs a plan for what happens to it. | Week 1 to 2 | **Ready** | From: Tool being replaced, or greenfield · product config |
 | Test instance | Short | **Required** (`separate_envs: yes`), and the December freeze is why the config asks for one. | Week 1 | **Ready** — request it in week one | From: Separate test and production required · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config |

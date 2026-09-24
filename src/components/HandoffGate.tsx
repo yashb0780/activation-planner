@@ -4,29 +4,36 @@ import type { GateGap } from "../types";
 // The handoff gate: required fields (listed only in templates/handoff.md,
 // "Required before planning") that the handoff left missing or partly missing.
 // The plan is still built; this panel says what to fill and who fills it.
+// Neutral surface; the thin amber bar on the left is its only colour.
 
 export function HandoffGate({ gaps }: { gaps: GateGap[] }) {
   const book = useRoles();
   if (gaps.length === 0) {
-    return <p className="text-[14px] text-muted">Handoff gate: all required fields filled.</p>;
+    return <p className="text-xs text-muted">Handoff gate: all required fields filled.</p>;
   }
   return (
-    <section className="rounded-xl border border-warn/60 bg-warn/10 px-5 py-4" aria-labelledby="gate-title">
-      <h2 id="gate-title" className="text-[18px] font-semibold text-warn">
-        Handoff incomplete
-      </h2>
-      <p className="mt-0.5 text-[14px] text-muted">
-        The plan was still built. Fill these in the handoff, then regenerate the plan.
-      </p>
-      <ul className="mt-3 flex flex-col gap-2.5">
+    <section
+      aria-labelledby="gate-title"
+      className="rounded-lg border border-line bg-panel shadow-[inset_3px_0_0_var(--flag-drift)]"
+    >
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-2 pt-3">
+        <h2 id="gate-title" className="text-base font-semibold">
+          Handoff incomplete
+        </h2>
+        <span className="text-xs text-muted">The plan was still built. Fill these in the handoff, then regenerate it.</span>
+      </div>
+      <ul className="border-t border-line">
         {gaps.map((g) => (
-          <li key={g.id} className="grid gap-x-4 gap-y-0.5 sm:grid-cols-[14rem_1fr_12rem]">
+          <li
+            key={g.id}
+            className="grid gap-x-6 gap-y-0.5 border-t border-line px-5 py-2.5 first:border-t-0 lg:grid-cols-[16rem_minmax(0,1fr)_14rem]"
+          >
             <span className="font-medium">{g.field}</span>
-            <span className="text-[15px]">
-              <span className="text-warn">{g.state === "missing" ? "Missing." : "Partly missing."}</span> {g.detail}
+            <span className="text-sm text-muted">
+              <span className="font-medium text-ink">{g.state === "missing" ? "Missing." : "Partly missing."}</span> {g.detail}
             </span>
-            <span className="text-[14px] text-muted">
-              Fills it: {labelOf(book, g.filledBy)} · {displayName(book, g.filledBy)}
+            <span className="text-sm text-muted">
+              Fills it: <span className="text-ink">{labelOf(book, g.filledBy)}</span> · {displayName(book, g.filledBy)}
             </span>
           </li>
         ))}
