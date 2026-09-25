@@ -50,6 +50,21 @@ a **Source**. Refer to fields by their ID when you pull them forward.
 - **Industry** is shown in **Read this first** when given. It is never used to
   plan.
 
+### Using an agent-filled handoff doc
+
+A handoff agent may fill the template from CRM data and call recordings. It
+uses this same template, so nothing above changes. Three things to expect:
+
+- `UNKNOWN` where it has no data. `TBD` and `Not found` mean the same.
+- Sources such as `CRM` or `call, 20 Aug` in the Source column.
+- `agent's read: <reason>` as the source of anything it interpreted. Apply the
+  **Agent's read** rule above, and add the agent's read line to the handoff
+  gate (Step 0).
+
+A person reviews the agent's output before planning. Headings or numbering may
+differ from the template; match by meaning, and ignore sections the template
+does not have.
+
 The config is authoritative on the product. The handoff is authoritative on the
 customer. Where they disagree about what is possible, the config wins and the
 disagreement is a finding.

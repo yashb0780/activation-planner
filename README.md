@@ -116,6 +116,27 @@ handoff, then reports the two paths, the largest `UNKNOWN`, the longest-lead
 item, and any commitment in the handoff that the config's lead times do not
 support.
 
+### Using an agent-filled handoff doc
+
+A handoff agent can fill `templates/handoff.md` from CRM data and call
+recordings. It uses the same template a person does, so the planner reads it
+the same way:
+
+- It writes `UNKNOWN` where it has no data. `TBD` and `Not found` count as
+  `UNKNOWN` too, in any field.
+- It fills the Source column like anyone else: `CRM`, `call, 20 Aug`.
+- Anything it interpreted, rather than read, is sourced `agent's read`, with
+  the reason after a colon: `agent's read: SSO setup was promised for week 1`.
+
+A person reviews and edits the agent's output before the planner runs. The
+planner then labels every use of an `agent's read` answer **Verify**, never
+lets one set a date, milestone or commitment on its own, and adds one line to
+the Handoff incomplete panel: "N answers are the agent's interpretation: verify
+before kickoff." It ignores any section the template does not have.
+
+`examples/acme-*` is an agent-filled example. It is in the tracker's example
+switch as "Acme Corp (agent-filled)".
+
 ### Running the activation tracker locally
 
 The repo also holds an interactive activation tracker: a small web app built
@@ -191,10 +212,11 @@ SKILL.md                   how to read a handoff and generate the two outputs
 templates/handoff.md       blank handoff — the fields the planner reads
 config/itsm.md             example product config (fictional ITSM product)
 config/coreweave.md        unofficial demo product config; unconfirmed points marked VERIFY
-examples/                  two filled handoffs, each with its board and 30-day plan
+examples/                  three filled handoffs, each with its board and 30-day plan (acme-* was filled by a handoff agent)
 src/data/coreweave.ts      the tracker's default example (unofficial CoreWeave demo)
 src/                       the activation tracker app (React + TypeScript)
 src/data/halden.ts         the tracker's items, People list and drift thresholds, built from the example
+src/data/acme.ts           the agent-filled example, for the tracker
 src/fields.ts              handoff field names, for source tags (copied from the template)
 src/drift.ts               the drift rules
 src/owners.ts              owner roles and name lookup

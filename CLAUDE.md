@@ -61,6 +61,7 @@ example when it helps.
     templates/handoff.md   blank handoff; the input interface
     config/itsm.md         example product config (the only product-specific file)
     examples/              fictional customer: filled handoff and generated outputs
+    examples/acme-*        an agent-filled handoff (agent's read, Verify) and its outputs
     src/                   interactive activation tracker (Vite + React + TypeScript + Tailwind)
     src/data/halden.ts     tracker items, built from the example board and plan
     public/report.html     static rendered example report
