@@ -35,6 +35,20 @@ a **Source**. Refer to fields by their ID when you pull them forward.
   `rep's read` or `SE's read` is someone's judgement, not a confirmed fact.
   Describe it that way. A blank source is not a reason to discard an answer,
   but say that it is unsourced when it matters to a decision.
+- **Agent's read.** An answer sourced as `agent's read`, usually with a reason
+  after a colon (`agent's read: SSO setup was promised for week 1`), is a
+  handoff agent's interpretation. Wherever the board or plan uses it, label it
+  `Verify` and give the reason. It never sets a date, a milestone or a
+  commitment on its own; that needs a stated answer from another field. This
+  rule is for `agent's read` only. `rep's read` and `SE's read` keep the rule
+  above.
+- **Match by meaning.** A handoff filled by an agent, or copied between tools,
+  may change heading wording or numbering. Match each section and field to the
+  template by what it asks, not by its exact heading or number. Ignore any
+  section the template does not have. **Handoff notes** is in the template and
+  is read as usual.
+- **Industry** is shown in **Read this first** when given. It is never used to
+  plan.
 
 The config is authoritative on the product. The handoff is authoritative on the
 customer. Where they disagree about what is possible, the config wins and the
@@ -68,7 +82,9 @@ filler to write `UNKNOWN` rather than guess. Treat every `UNKNOWN` as a
 week-one question with a name attached. Never resolve one with a plausible
 default. An empty field that should have been `UNKNOWN` is also `UNKNOWN`, but
 note that the filler left it empty rather than marking it — those are different
-levels of confidence about whether anyone looked.
+levels of confidence about whether anyone looked. `TBD` and `Not found`, in any
+field and any capitalisation, count as `UNKNOWN` too, including in free-text
+fields.
 
 **Only facts from the handoff.** No date, person, system, count, or number that
 the handoff does not contain. If you conclude something rather than read it,
@@ -118,7 +134,7 @@ People list, so a change to one name changes every task that uses the role.
 the only place the list of required fields is kept; read it from there every
 time, never from memory. For each row, read that field in the filled handoff:
 
-- **Missing:** blank, or `UNKNOWN`.
+- **Missing:** blank, or `UNKNOWN` (`TBD` and `Not found` count as `UNKNOWN`).
 - **Partly missing:** the answer contains `UNKNOWN` alongside something else.
 
 Build the plan either way. If any field is missing or partly missing, open both
