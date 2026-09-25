@@ -146,6 +146,12 @@ files, right under the status line, with a **Handoff incomplete** panel:
 followed by that person's name from the handoff. If nothing is missing, write
 one line instead: `Handoff gate: all required fields filled.`
 
+**Agent's read line.** If any answer in the handoff is sourced `agent's read`,
+count them and add one line: `N answers are the agent's interpretation: verify
+before kickoff.` It goes at the foot of the Handoff incomplete panel, or right
+under the one-line result when nothing is missing. If there are none, add
+nothing.
+
 ## Step 1 — Read both files and build the fact base
 
 From the **config**, extract for every module: lead time (with its conditions),
@@ -297,9 +303,21 @@ Open with **Read this first**:
   and the commitments table against the lead times. Give each one a sentence on
   what to do about it and when to raise it.
 
+**Promised in sales.** Every row of the commitments table appears on the board
+at least once, labelled `Promised in sales`, with its stated timing kept as
+written. Put it on the row it concerns; a commitment that no config module
+covers is a conflict of the handoff against the config. Where the stated timing
+is shorter than the config's lead time, do not move it: the conflict names both,
+for example "Promised week 1, lead time 2 to 4 weeks: reset expectations at
+kickoff." Plan tasks that deliver a commitment carry the same label.
+
 Then **First value**, proposed and marked `(inferred)`, to confirm at kickoff.
 Pick the highest-volume request in a module with `day30_required: yes`, and
-tie it to `success_outcome`. Write it short, never as a paragraph:
+tie it to `success_outcome`. If no request qualifies, because no module has
+`day30_required: yes` or none of its requests has a volume, write
+`First value: not proposed yet`, name the fields that would decide it (they are
+already open questions), and skip the parts below. Otherwise write it short,
+never as a paragraph:
 
 - **Headline** — one line: what flows where, in plain words.
 - **Volume** — the request's volume, whose, and estimate or measured.
@@ -357,6 +375,9 @@ the lead time each flag uses. The skill never picks those numbers.
 - **At risk (red):** not started, and the earliest finish is after the target
   date. Red wins over amber.
 - **Started** means work on the module itself has begun, not groundwork.
+- **No target date.** If `target_date` is `UNKNOWN`, still list every module
+  with its lead time and earliest finish, write `needs target date` for the
+  latest safe start, and give no flag.
 
 | Module | Lead time in weeks | Latest safe start | Earliest finish if started on the as-of date | Flag |
 
@@ -426,6 +447,11 @@ Week 1 always has these, whatever the product, in this order:
   with their section 10 baselines (estimates stay labelled), the milestones
   with target dates, and the named owners on both sides. It counts toward the
   kickoff gate.
+
+Week 1 also has a **Baseline capture** task for every section 10 baseline that
+is `UNKNOWN`. It must be done before any module configuration starts (Kickoff
+setup is not module configuration): a baseline captured after we start
+configuring is not a baseline.
 
 Then, for every long-lead module, a **day-30 checkpoint** — a real signal of
 progress, never a completion claim. A good checkpoint is observable, is drawn
@@ -497,6 +523,11 @@ fastest way for a reader to see the difference between the two kinds of claim.
 - Every `Blocked` names who unblocks it. Every `Gated by UNKNOWN` names the
   fields.
 - Every `UNKNOWN` is tied to a module and a date at risk.
+- Every `agent's read` answer used is labelled `Verify` with its reason, and
+  none sets a date, milestone or commitment on its own. The agent's read line
+  is there if any exist.
+- Every commitments table row appears labelled `Promised in sales`, with its
+  stated timing unchanged.
 - No date, name, or number appears that is not in the handoff. Every estimate
   from the baseline table is still labelled an estimate.
 - Step 7 ran, and its downgrades are recorded.
