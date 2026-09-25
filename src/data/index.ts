@@ -1,3 +1,4 @@
+import { dataset as acme } from "./acme";
 import { dataset as coreweave } from "./coreweave";
 import { dataset as halden } from "./halden";
 import type { Dataset } from "../types";
@@ -7,4 +8,4 @@ import type { Dataset } from "../types";
 // `dataset` and joins the switch when present.
 const privates = import.meta.glob<Dataset>("./private-*.ts", { eager: true, import: "dataset" });
 
-export const datasets: Dataset[] = [coreweave, halden, ...Object.values(privates)];
+export const datasets: Dataset[] = [coreweave, halden, acme, ...Object.values(privates)];

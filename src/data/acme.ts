@@ -1,0 +1,1098 @@
+// Illustrative example. Acme Corp is fictional.
+// Built only from examples/acme-handoff.md, examples/acme-board.md and
+// examples/acme-30-day-plan.md. No facts beyond those files. The handoff was
+// filled by a handoff agent and reviewed by a person, so it shows the labels an
+// agent-filled handoff brings: Verify (an "agent's read" answer), Promised in
+// sales, and a promise at risk. Groupings, gates and quadrant placements are
+// judgment calls, labelled inferred in the UI.
+// Owners are roles. Our side defaults to the CSM and their side to the technical
+// owner; an item names other roles only where the plan does.
+
+import type { Account, Dataset, DriftRules, FirstValue, GateGap, Gate, Item, Person, Role, SuccessPlan } from "../types";
+
+// No target date: target_date is UNKNOWN in the handoff, so goLive is absent.
+// Day 1 is the date filled; the contract start date is UNKNOWN.
+export const account: Account = {
+  customer: "Acme Corp",
+  product: "ITSM (example config)",
+  windowStart: "2026-09-22",
+  windowEnd: "2026-10-21",
+  // freeze_periods: UNKNOWN
+  freezes: [],
+};
+
+// ─── People list ──────────────────────────────────────────────────────────
+// Names from section 2, Account basics and Handoff notes. Empty name: UNKNOWN.
+export const roles: Role[] = [
+  { id: "csm", side: "us", label: "CSM", name: "" },
+  { id: "impl_lead", side: "us", label: "Implementation lead", name: "Jordan Ellis" },
+  { id: "se", side: "us", label: "SE", name: "" },
+  { id: "rep", side: "us", label: "Rep", name: "" },
+  { id: "technical_owner", side: "customer", label: "Technical owner", name: "Priya Shah" },
+  { id: "exec_sponsor", side: "customer", label: "Exec sponsor", name: "" },
+  { id: "economic_buyer", side: "customer", label: "Economic buyer", name: "Mark Lee" },
+  { id: "success_judge", side: "customer", label: "Success judge", name: "" },
+  { id: "admin", side: "customer", label: "Day-to-day admin", name: "" },
+  { id: "security_contact", side: "customer", label: "Security contact", name: "" },
+  { id: "identity_contact", side: "customer", label: "Identity / IT contact", name: "" },
+];
+
+// ─── Drift rules ──────────────────────────────────────────────────────────
+// Thresholds copied from the Drift rules section of config/itsm.md.
+export const driftRules: DriftRules = {
+  bufferWeeks: 0,
+  freezePausesWork: true,
+  amberUses: "max",
+  redUses: "min",
+};
+
+// ─── Handoff gate ─────────────────────────────────────────────────────────
+// Result of checking the "Required before planning" table in
+// templates/handoff.md against examples/acme-handoff.md.
+export const gateGaps: GateGap[] = [
+  {
+    field: "Target go-live date",
+    id: "target_date",
+    state: "missing",
+    detail: "UNKNOWN. The driver is known (the Q1 compliance audit), but the audit date is UNKNOWN too.",
+    filledBy: "rep",
+  },
+  { field: "Core volume per month", id: "core_volume", state: "missing", detail: "UNKNOWN.", filledBy: "se" },
+  { field: "Time the core job takes today", id: "core_cycle_time", state: "missing", detail: "UNKNOWN.", filledBy: "se" },
+  { field: "Headcount doing the work", id: "team_headcount", state: "missing", detail: "UNKNOWN.", filledBy: "se" },
+];
+
+// Answers sourced "agent's read" in the handoff: technical owner, SSO required,
+// and the tight timeline note.
+export const agentReads = 3;
+
+// Section 10 rows the config adds, named as the handoff names them. Used for source tags.
+export const configFieldLabels: Record<string, string> = {
+  first_response_time: "Average time to first response",
+  unstructured_share: "Share of requests arriving unstructured (email, chat, tap on the shoulder)",
+  asset_count: "Known asset count",
+  change_volume: "Changes per month, and share that are emergency",
+  kb_articles: "Existing knowledge articles",
+};
+
+// Evidence and "Not evidence" lines, quoted from config/itsm.md.
+const CATALOG_EV = [
+  "More than half of new requests arrive through catalog items rather than free-text email or a tap on the shoulder, sustained across two consecutive weeks",
+  "At least one approval requested, approved and fulfilled end to end in production, by the real approver rather than the admin testing it",
+  "Low reassignment rate on catalog tickets: requests land on the right team first time",
+  "Every live item has a named owner recorded on the item itself",
+];
+const CATALOG_NOT = ["Items built", "Portal branded", "A test request submitted by the admin"];
+
+const DISC_EV = [
+  "Scans running on schedule for at least two consecutive cycles without a manual restart",
+  "Device count found reconciles against the customer's own expected count, with the gap explained rather than ignored",
+  "Unidentified and duplicate records below an agreed threshold",
+  "Relationships between devices, services and software populated, not just rows of hardware",
+];
+const ASSET_EV = [
+  "Assets referenced on incidents and changes by agents doing normal work, without being told to",
+  "A spot audit of 20 random records matches physical or cloud reality above an agreed rate",
+  "Lifecycle events (assign, reclaim, retire) recorded in the product, and the parallel spreadsheet has actually been retired",
+  "Stale record share (not seen by discovery in 30 days) is tracked and trending down",
+];
+const ASSET_NOT = ["A populated asset list", "A dashboard with a device count", "One successful scan"];
+
+const CALL = "call, 20 Aug";
+
+export const items: Item[] = [
+  // ─── Week 1 · Kickoff setup ────────────────────────────────────────────
+  {
+    id: "roles",
+    title: "Set up roles and permissions for the teams in scope",
+    kind: "task",
+    module: "Kickoff setup",
+    lane: "kickoff",
+    week: 1,
+    status: "hold",
+    side: "us",
+    holdReason: "Teams in scope at launch: UNKNOWN.",
+    why: {
+      facts: ["Teams in scope at launch: UNKNOWN", "Roles needed: agent, admin, requester (config)"],
+      source: "",
+    },
+    from: ["teams_launch", "config"],
+    doneWhen: [
+      "Teams in scope listed",
+      "Agent, admin and requester roles set for each team",
+      "One agent per team can log in and see their queue",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "workspaces",
+    title: "Set up the workspace, or several, for the teams in scope",
+    kind: "task",
+    module: "Kickoff setup",
+    lane: "kickoff",
+    week: 1,
+    status: "hold",
+    side: "us",
+    holdReason: "Number of teams or workspaces: UNKNOWN.",
+    why: {
+      facts: ["Number of teams / workspaces: UNKNOWN", "One shared process or several: UNKNOWN"],
+      source: "",
+    },
+    from: ["team_count", "process_shape", "config"],
+    doneWhen: ["Workspace decision recorded", "Each team in scope can log in", "A test request reaches the right team"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "success-plan",
+    title: "Draft success plan, confirm at kickoff, share by end of week 1",
+    kind: "task",
+    module: "Success plan",
+    lane: "kickoff",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Assigned CSM: UNKNOWN, so the owner is unassigned",
+        "Goal: cut ticket response time in half, pass the Q1 compliance audit",
+        "Response time baseline: UNKNOWN, captured this week",
+        "First value: not proposed yet",
+      ],
+      source: CALL,
+    },
+    from: ["success_outcome", "success_number"],
+    doneWhen: [
+      "One-page success plan drafted",
+      "Confirmed with Priya Shah at kickoff",
+      "Shared with her and the exec sponsor by end of week 1",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+
+  // ─── Open questions, grouped as a CSM would ask them on a call ────────
+  {
+    id: "q-people",
+    title: "Who is involved on your side, and who makes the final call?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    why: {
+      facts: [
+        "Only one person named on their side",
+        "Her role as technical owner is the agent's read",
+        "No exec sponsor named",
+      ],
+      source: "CRM",
+    },
+    from: ["technical_owner", "exec_sponsor", "sponsor_engaged", "admin", "owner_capacity", "success_judge", "outside_agreement", "notes"],
+    checklist: [
+      { text: "Are you the technical owner, doing the work day to day? (Verify)", from: ["technical_owner"] },
+      {
+        text: "Who is the exec sponsor? The CRM names Mark Lee as economic buyer; ask whether he also sponsors the rollout, without assuming it.",
+        from: ["exec_sponsor", "notes"],
+      },
+      { text: "Has the exec sponsor been on a call with us?", from: ["sponsor_engaged"] },
+      { text: "Who will be the day-to-day admin?", from: ["admin"] },
+      { text: "How many hours a week does the technical owner have for this?", from: ["owner_capacity"] },
+      { text: "Who judges whether this worked?", from: ["success_judge"] },
+      { text: "Has anyone outside the buying team agreed to this?", from: ["outside_agreement"] },
+      { text: "Priya Shah's email, and have we met her on a call?", from: ["technical_owner"] },
+    ],
+    doneWhen: ["Every checklist line ticked, or given an owner and a date", "Their answer saved on the question"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-dates",
+    title: "When is the audit, and what has to be true before it?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    why: {
+      facts: ["Target go-live date: UNKNOWN", "Driver: the Q1 compliance audit", "Audit date: UNKNOWN"],
+      source: "CRM; call, 20 Aug",
+    },
+    from: ["target_date", "date_driver", "date_fixed", "slip_impact", "freeze_periods", "scope_phase", "success_signal", "failure_definition", "success_number"],
+    checklist: [
+      { text: "What is the target go-live date?", from: ["target_date"] },
+      { text: "When is the Q1 compliance audit?", from: ["date_driver"] },
+      { text: "Is the date fixed or preferred?", from: ["date_fixed"] },
+      { text: "What happens if it slips?", from: ["slip_impact"] },
+      { text: "Any freeze periods, as dates?", from: ["freeze_periods"] },
+      { text: "Is this the whole scope, or phase one?", from: ["scope_phase"] },
+      { text: "How will they know it worked, and what would make it a failure?", from: ["success_signal", "failure_definition"] },
+      { text: "Who reports the response time number upward?", from: ["success_number"] },
+    ],
+    doneWhen: ["Every checklist line ticked, or given an owner and a date", "Their answer saved on the question"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-setup",
+    title: "Walk me through your current setup and the systems involved.",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    why: {
+      facts: ["Legacy ticketing tool: name UNKNOWN", "Data volume to migrate: UNKNOWN", "Every stack and integration field: UNKNOWN"],
+      source: "CRM",
+    },
+    from: ["incumbent", "why_leaving", "alternatives", "integrations", "frameworks", "docs_location", "current_process", "keep_existing", "credential_holders", "install_restrictions"],
+    checklist: [
+      { text: "What is the legacy ticketing tool, and how much data would move?", from: ["incumbent"] },
+      { text: "Why are you leaving it, in your words?", from: ["why_leaving"] },
+      { text: "What else did you consider?", from: ["alternatives"] },
+      { text: "Which systems do we need to integrate with?", from: ["integrations"] },
+      { text: "Any languages or frameworks we have to work with?", from: ["frameworks"] },
+      { text: "Where does documentation live today?", from: ["docs_location"] },
+      { text: "How does the process work today?", from: ["current_process"] },
+      { text: "Anything already built or automated you expect to keep?", from: ["keep_existing"] },
+      { text: "Who holds the credentials for each system?", from: ["credential_holders"] },
+      { text: "Any restrictions on installing software or outbound connections?", from: ["install_restrictions"] },
+    ],
+    doneWhen: ["Every checklist line ticked, or given an owner and a date", "Their answer saved on the question"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-security",
+    title: "Who owns security and identity, and what has to pass before we deploy?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    theirs: ["exec_sponsor", "technical_owner"],
+    team: "other",
+    why: {
+      facts: ["Every security field: UNKNOWN", "SSO required: yes, the agent's read", "No security or identity contact named"],
+      source: "",
+    },
+    from: [
+      "sso_required",
+      "identity_provider",
+      "identity_contact",
+      "provisioning_required",
+      "security_review",
+      "security_review_status",
+      "security_signoff",
+      "security_contact",
+      "security_open_items",
+      "certifications",
+      "data_residency",
+    ],
+    checklist: [
+      { text: "Is single sign-on required? (Verify: agent's read, from the week 1 promise)", from: ["sso_required"] },
+      { text: "Which identity provider?", from: ["identity_provider"] },
+      { text: "Who is the identity / IT contact?", from: ["identity_contact"] },
+      { text: "Is automated user provisioning required?", from: ["provisioning_required"] },
+      {
+        text: "Is a security review required, where does it stand, and who signs off?",
+        from: ["security_review", "security_review_status", "security_signoff"],
+      },
+      { text: "Who is the security contact?", from: ["security_contact"] },
+      { text: "Any open items from signature, and certifications they need from us?", from: ["security_open_items", "certifications"] },
+      { text: "Any data residency or regional hosting requirements?", from: ["data_residency"] },
+    ],
+    doneWhen: ["Every checklist line ticked, or given an owner and a date", "Their answer saved on the question"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-teams",
+    title: "How are your teams organized, and who will use this?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    why: {
+      facts: ["Every teams and structure field: UNKNOWN", "Blocks roles, workspaces and agent groups"],
+      source: "",
+    },
+    from: ["teams_launch", "teams_later", "team_count", "end_users", "geographies", "process_shape", "separate_envs"],
+    checklist: [
+      { text: "Which teams are in scope at launch, and which later?", from: ["teams_launch", "teams_later"] },
+      { text: "How many teams or workspaces?", from: ["team_count"] },
+      { text: "How many end users, and where?", from: ["end_users", "geographies"] },
+      { text: "One shared process, or several?", from: ["process_shape"] },
+      { text: "Separate test and production required?", from: ["separate_envs"] },
+    ],
+    doneWhen: ["Every checklist line ticked, or given an owner and a date", "Their answer saved on the question"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-day30",
+    title: "What has to be true on day 30 for this to feel like a win?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "customer",
+    why: {
+      facts: [
+        "Neither module says whether anything must be live by day 30",
+        "Neither section 6 request has a volume",
+        "Every baseline: UNKNOWN",
+      ],
+      source: "",
+    },
+    from: [
+      "day30_required",
+      "out_of_scope",
+      "request_1@service desk",
+      "request_1@asset management",
+      "first_response_time",
+      "core_volume",
+      "core_cycle_time",
+      "team_headcount",
+      "unstructured_share",
+      "asset_count",
+      "change_volume",
+      "kb_articles",
+    ],
+    checklist: [
+      { text: "Must anything in the service desk be live by day 30, and what is out of scope?", from: ["day30_required", "out_of_scope"] },
+      { text: "Must anything in asset management be live by day 30, and what is out of scope?", from: ["day30_required", "out_of_scope"] },
+      { text: "Service desk: what are the most common requests, and how many a month?", from: ["request_1@service desk"] },
+      { text: "Asset management: what do they want tracked first, and how many a month?", from: ["request_1@asset management"] },
+      {
+        text: "Current ticket response time. They want it cut in half; read here as average time to first response (inferred).",
+        from: ["first_response_time"],
+      },
+      { text: "Tickets per month, time to resolve, and headcount doing the work.", from: ["core_volume", "core_cycle_time", "team_headcount"] },
+      { text: "Share of requests arriving unstructured, and known asset count.", from: ["unstructured_share", "asset_count"] },
+      {
+        text: "Changes per month, and existing knowledge articles. Not yet a finding: neither module was purchased.",
+        from: ["change_volume", "kb_articles"],
+      },
+    ],
+    doneWhen: ["Every checklist line ticked, or given an owner and a date", "Their answer saved on the question"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "q-internal",
+    title: "Internal: who on our side sold this, and what exactly was promised?",
+    kind: "question",
+    module: "Kickoff questions",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "us",
+    ours: ["csm", "rep"],
+    theirs: [],
+    why: {
+      facts: ["Rep, SE and assigned CSM: UNKNOWN", "Who made each commitment, and to whom: UNKNOWN"],
+      source: "",
+    },
+    from: ["rep", "se", "csm", "contract_size", "products", "contract_start", "commitments", "risky_promises"],
+    checklist: [
+      { text: "Who were the rep, the SE and the assigned CSM?", from: ["rep", "se", "csm"] },
+      { text: "Seats, contract size, tiers, and the contract start date.", from: ["contract_size", "products", "contract_start"] },
+      { text: "For each commitment: who made it, to whom, and can we deliver it as stated?", from: ["commitments"] },
+      { text: "Anything else promised that we are not sure we can deliver?", from: ["risky_promises"] },
+    ],
+    doneWhen: ["Every checklist line ticked, or given an owner and a date", "Answers saved on the question"],
+    notEvidence: [],
+    visibility: "internal",
+  },
+
+  // ─── Week 1 · start now ────────────────────────────────────────────────
+  {
+    id: "confirm-owner",
+    title: "Confirm the technical owner",
+    kind: "task",
+    module: "People",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Priya Shah, IT Director: recorded as technical owner",
+        "Champion in the CRM",
+        "Not confirmed as owner",
+      ],
+      source: "agent's read",
+    },
+    verify: "She is the champion in the CRM and the IT lead, not confirmed as owner.",
+    from: ["technical_owner"],
+    doneWhen: [
+      "Priya Shah confirms she is the technical owner, or names who is",
+      "Her hours per week for this written down",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "exec-sponsor",
+    title: "Identify the exec sponsor",
+    kind: "task",
+    module: "People",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Exec sponsor: UNKNOWN",
+        "Economic buyer in the CRM: Mark Lee, CFO",
+        "Whether he also sponsors the rollout has not been asked",
+      ],
+      source: "CRM",
+    },
+    from: ["exec_sponsor", "notes"],
+    doneWhen: ["Exec sponsor named", "Has been on a call with us, or one is booked"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "audit-date",
+    title: "Find the audit date and agree the target go-live date",
+    kind: "task",
+    module: "Target date",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Go-live before the Q1 compliance audit",
+        "They must pass the audit",
+        "Audit date: UNKNOWN, so no target date yet",
+      ],
+      source: "CRM; call, 20 Aug",
+    },
+    verify: "Tight timeline: go-live must land before the Q1 audit with data migration in scope. This does not set a date.",
+    from: ["target_date", "date_driver", "notes"],
+    doneWhen: ["Audit date recorded, with its source", "Target go-live date agreed", "Fixed or preferred recorded"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "baseline",
+    title: "Capture baseline numbers before configuring anything",
+    kind: "task",
+    module: "Baseline",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Every section 10 number: UNKNOWN",
+        "Their goal: cut ticket response time in half",
+        "Read as average time to first response (inferred)",
+        "Cannot be recovered once configuration starts",
+      ],
+      source: CALL,
+    },
+    from: ["first_response_time", "core_volume", "core_cycle_time", "team_headcount", "unstructured_share", "asset_count"],
+    doneWhen: [
+      "Response time recorded, labelled measured or estimate",
+      "Ticket volume, time to resolve and headcount recorded the same way",
+      "All captured before any module is configured",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "security-review",
+    title: "Find out if a security review exists, then open it",
+    kind: "task",
+    module: "Security review",
+    lane: "start",
+    week: 1,
+    status: "hold",
+    theirs: ["exec_sponsor"],
+    side: "customer",
+    team: "other",
+    holdReason: "No security owner or contact named. Routed to the exec sponsor by default, who is not named yet either.",
+    why: {
+      facts: [
+        "Review required: UNKNOWN",
+        "Sign-off owner: UNKNOWN",
+        "Config: assume a review exists even when nobody mentions it",
+      ],
+      source: "",
+    },
+    from: ["security_review", "security_review_status", "security_signoff", "config"],
+    doneWhen: ["Security owner named", "Review opened, or confirmed not needed, in writing"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "discovery-credentials",
+    title: "Request discovery credentials, subnet list and scanner host",
+    kind: "task",
+    module: "Discovery",
+    lane: "start",
+    week: 1,
+    status: "hold",
+    theirs: ["exec_sponsor"],
+    side: "customer",
+    team: "other",
+    holdReason: "Credential holders UNKNOWN. No security or infrastructure contact named.",
+    why: {
+      facts: [
+        "Credential holders: UNKNOWN",
+        "Restrictions on installing software: UNKNOWN",
+        "No infrastructure owner named",
+      ],
+      source: "",
+    },
+    from: ["credential_holders", "install_restrictions"],
+    lead: { min: 8, max: 16 },
+    doneWhen: ["An infrastructure owner named", "Credential requests sent for each platform in scope"],
+    notEvidence: ASSET_NOT,
+    visibility: "shared",
+  },
+
+  // ─── Week 1 · Foundation ───────────────────────────────────────────────
+  {
+    id: "sso",
+    title: "Set up single sign-on",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "hold",
+    theirs: ["identity_contact"],
+    side: "us",
+    holdReason: "Identity / IT contact UNKNOWN.",
+    why: {
+      facts: [
+        "SSO required: yes, the agent's read",
+        "Promised in sales: SSO setup in week 1",
+        "Config lead time: short, 2 to 4 weeks, when the identity team is in the room",
+        "Identity / IT contact: UNKNOWN",
+      ],
+      source: CALL,
+    },
+    promised: "SSO setup in week 1 (call, 20 Aug). Deliverable as stated: UNKNOWN.",
+    promiseRisk: "Promised week 1, lead time 2 to 4 weeks: reset expectations at kickoff.",
+    verify: "SSO setup was promised for week 1.",
+    from: ["commitments", "sso_required", "identity_provider", "identity_contact", "provisioning_required", "config"],
+    doneWhen: ["SSO requirement confirmed", "Identity contact and provider named", "New SSO timing agreed with Priya Shah"],
+    notEvidence: [],
+    visibility: "shared",
+    window: "2 to 4 weeks from reaching the identity team; longer if it sits outside the buying team.",
+  },
+  {
+    id: "agent-groups",
+    title: "Define agent groups and business hours",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "hold",
+    side: "us",
+    holdReason: "Teams in scope UNKNOWN.",
+    why: {
+      facts: ["Teams in scope: UNKNOWN", "Nothing to group until teams are known"],
+      source: "",
+    },
+    from: ["teams_launch", "team_count", "config"],
+    doneWhen: ["An agent group exists for each team", "Business hours set for each group"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "email-cutover",
+    title: "Plan the inbound email cutover",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: ["Tickets get lost in email today", "Legacy tool: name UNKNOWN"],
+      source: CALL,
+    },
+    from: ["why_now", "incumbent", "config"],
+    doneWhen: ["Every inbound address listed", "The plan says what happens to each old address"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "test-instance",
+    title: "Request the test instance",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Config: a test instance when there is an audit requirement",
+        "Audit: the Q1 compliance audit",
+        "Separate test and production: UNKNOWN",
+      ],
+      source: "CRM; call, 20 Aug",
+    },
+    from: ["date_driver", "separate_envs", "config"],
+    doneWhen: ["Test instance requested", "Priya Shah can log in to it"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "admin",
+    title: "Get a day-to-day admin named, with hours budgeted",
+    kind: "task",
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    theirs: ["exec_sponsor"],
+    side: "customer",
+    why: {
+      facts: ["Day-to-day admin: UNKNOWN", "Technical owner's hours: UNKNOWN"],
+      source: "",
+    },
+    from: ["admin", "owner_capacity", "config"],
+    doneWhen: ["An admin is named", "Their weekly hours for this are written down"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+
+  // ─── Conflicts from the board ──────────────────────────────────────────
+  {
+    id: "c-sso",
+    title: "Raise: SSO promised for week 1, lead time says 2 to 4 weeks",
+    kind: "task",
+    conflict: true,
+    module: "Foundation",
+    lane: "foundation",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Promised in sales: SSO setup in week 1",
+        "Config: short, 2 to 4 weeks, when the identity team is in the room",
+        "Identity / IT contact: UNKNOWN",
+        "The promised timing is not moved",
+      ],
+      source: CALL,
+    },
+    promised: "SSO setup in week 1 (call, 20 Aug). Deliverable as stated: UNKNOWN.",
+    promiseRisk: "Promised week 1, lead time 2 to 4 weeks: reset expectations at kickoff.",
+    from: ["commitments", "timing_promises", "identity_contact", "config"],
+    doneWhen: ["Raised with Priya Shah at kickoff", "New timing agreed and written down"],
+    notEvidence: [],
+    visibility: "internal",
+  },
+  {
+    id: "c-migration",
+    title: "Raise: data migration help promised, not in the config",
+    kind: "task",
+    conflict: true,
+    module: "Data migration",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "us",
+    ours: ["csm", "se"],
+    why: {
+      facts: [
+        "Promised in sales: data migration help from our team",
+        "No timing stated",
+        "Config: no migration work and no lead time for it",
+        "Legacy tool and data volume: UNKNOWN",
+      ],
+      source: CALL,
+    },
+    promised: "Data migration help from our team (call, 20 Aug). No timing stated. Deliverable as stated: UNKNOWN.",
+    from: ["commitments", "incumbent", "config"],
+    doneWhen: [
+      "Legacy tool named",
+      "Data volume to move recorded",
+      "What \"help\" covers written down and agreed with the SE",
+    ],
+    notEvidence: [],
+    visibility: "internal",
+  },
+  {
+    id: "c-service-desk",
+    title: "Raise: \"Service Desk\" is not a module in the config",
+    kind: "task",
+    conflict: true,
+    module: "Service catalog",
+    lane: "start",
+    week: 1,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Products purchased: Service Desk, Asset Management",
+        "Planned as the service catalog (inferred)",
+        "Confirm what they think they bought before anything is built",
+      ],
+      source: "CRM",
+    },
+    from: ["products", "config"],
+    doneWhen: ["What they bought confirmed with Priya Shah", "The plan's module list matches it"],
+    notEvidence: [],
+    visibility: "internal",
+  },
+
+  // ─── Week 2 ─────────────────────────────────────────────────────────────
+  {
+    id: "taxonomy",
+    title: "Settle the taxonomy for the catalog starter set",
+    kind: "task",
+    module: "Service catalog",
+    lane: "quick",
+    week: 2,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Starter set: 8 to 12 request types, short lead time (config)",
+        "Requests and volumes come from the week 1 discovery task",
+        "Service Desk planned as the service catalog (inferred)",
+      ],
+      source: "",
+    },
+    from: ["products", "request_1@service desk", "config"],
+    doneWhen: [
+      "Starter set or complete catalog, recorded",
+      "Categories and form fields written down",
+      "Signed off by the technical owner",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+
+  // ─── Week 3 ─────────────────────────────────────────────────────────────
+  {
+    id: "catalog-build",
+    title: "Build the catalog starter set, in volume order",
+    kind: "task",
+    module: "Service catalog",
+    lane: "quick",
+    week: 3,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: ["Built once the taxonomy closes", "Order: highest monthly volume first", "Volumes: UNKNOWN until week 1"],
+      source: "",
+    },
+    from: ["request_1@service desk"],
+    doneWhen: ["Starter items published in the catalog", "Each has a named owner recorded on the item"],
+    evidence: CATALOG_EV,
+    notEvidence: CATALOG_NOT,
+    visibility: "shared",
+  },
+  {
+    id: "asset-model",
+    title: "Agree the asset model",
+    kind: "task",
+    module: "Asset management",
+    lane: "earned",
+    week: 3,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "No visibility into assets today",
+        "Behind the discovery gate, so groundwork only",
+        "What is out of scope: UNKNOWN",
+      ],
+      source: CALL,
+    },
+    from: ["why_now", "out_of_scope", "config"],
+    doneWhen: ["What is tracked, written down", "At what depth, written down", "What is out of scope, written down"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+  {
+    id: "discovery-collect",
+    title: "Collect discovery credentials",
+    kind: "task",
+    module: "Discovery",
+    lane: "start",
+    week: 3,
+    status: "todo",
+    theirs: ["security_contact"],
+    side: "customer",
+    team: "other",
+    why: {
+      facts: ["Only once an infrastructure owner is named", "Credential holders: UNKNOWN"],
+      source: "",
+    },
+    from: ["credential_holders"],
+    doneWhen: ["Credentials received for each platform in scope", "Subnet list supplied", "Scanner host agreed"],
+    notEvidence: [],
+    visibility: "shared",
+  },
+
+  // ─── Week 4 ─────────────────────────────────────────────────────────────
+  {
+    id: "catalog-live",
+    title: "Catalog items live to the teams in scope",
+    kind: "task",
+    module: "Service catalog",
+    lane: "quick",
+    week: 4,
+    status: "todo",
+    side: "us",
+    why: {
+      facts: [
+        "Only if something must be live by day 30",
+        "Must something be live by day 30: UNKNOWN",
+        "Live items are not yet the evidence",
+      ],
+      source: "",
+    },
+    from: ["day30_required"],
+    doneWhen: ["Starter items visible to the teams in scope", "Real requests raised through them"],
+    evidence: CATALOG_EV,
+    notEvidence: CATALOG_NOT,
+    visibility: "shared",
+  },
+  {
+    id: "day30-review",
+    title: "Day 30 review",
+    kind: "task",
+    module: "Review",
+    lane: "start",
+    week: 4,
+    status: "todo",
+    theirs: ["technical_owner", "exec_sponsor"],
+    side: "us",
+    why: {
+      facts: [
+        "Go-live date agreed against the audit date",
+        "Discovery window from the gate's real state",
+      ],
+      source: "",
+    },
+    from: ["target_date", "date_driver"],
+    doneWhen: [
+      "Held with the technical owner and exec sponsor",
+      "Go-live date agreed against the audit date",
+      "Discovery window written down from the gate's real state",
+    ],
+    notEvidence: [],
+    visibility: "shared",
+  },
+
+  // ─── After day 30 ──────────────────────────────────────────────────────
+  {
+    id: "discovery",
+    title: "Discovery: scans running on schedule",
+    kind: "task",
+    module: "Discovery",
+    lane: "start",
+    week: "after",
+    status: "todo",
+    theirs: ["security_contact"],
+    side: "us",
+    why: {
+      facts: [
+        "Long, 8 to 16 weeks, from the gate opening",
+        "Every gate dependency: UNKNOWN",
+        "No target date, so no drift flag",
+      ],
+      source: "",
+    },
+    from: ["products", "security_review", "credential_holders", "config"],
+    doneWhen: ["Scans run on schedule for two cycles", "Device count compared with their expected count"],
+    evidence: DISC_EV,
+    notEvidence: ASSET_NOT,
+    visibility: "shared",
+    window: "8 to 16 weeks from the gate opening. Started on day 1, the earliest finish would be 2026-11-17.",
+  },
+  {
+    id: "asset-management",
+    title: "Asset management in normal use",
+    kind: "task",
+    module: "Asset management",
+    lane: "earned",
+    week: "after",
+    status: "todo",
+    side: "us",
+    why: {
+      facts: ["After discovery, inside the same 8 to 16 weeks", "Known asset count: UNKNOWN"],
+      source: "",
+    },
+    from: ["products", "asset_count", "config"],
+    doneWhen: ["Assets referenced on real tickets", "A spot audit of 20 records done"],
+    evidence: ASSET_EV,
+    notEvidence: ASSET_NOT,
+    visibility: "shared",
+    window: "After discovery, inside the same 8 to 16 weeks.",
+  },
+];
+
+// ─── First value ──────────────────────────────────────────────────────────
+// Not proposed yet: no module has day30_required yes, and no request has a volume.
+export const firstValue: FirstValue = {
+  headline: "Not proposed yet: nothing has to be live by day 30, and no request has a volume",
+  points: [
+    { label: "Volume", text: "UNKNOWN for both section 6 requests" },
+    { label: "Proof", text: "UNKNOWN: who judges success is not named" },
+    { label: "Why first", text: "Decided by open question 6 at kickoff" },
+  ],
+  basis:
+    "First value is the highest-volume request in a module that must be live by day 30. Neither module says whether anything must be live by day 30, and neither section 6 request has a volume, so none qualifies yet.",
+  notProposed: true,
+};
+
+// ─── Milestone gates (inferred) ───────────────────────────────────────────
+// Criteria come from the board. None rests on an agent's read answer alone.
+export const gates: Gate[] = [
+  {
+    id: "kickoff",
+    label: "Kickoff done",
+    criteria: [
+      { text: "Technical owner confirmed", item: "confirm-owner" },
+      { text: "Exec sponsor named", item: "exec-sponsor" },
+      { text: "Audit date recorded", item: "audit-date" },
+      { text: "Success plan confirmed and shared", item: "success-plan" },
+    ],
+    linked: ["confirm-owner", "exec-sponsor", "audit-date", "success-plan"],
+    by: 1,
+  },
+  {
+    id: "baselines",
+    label: "Baselines captured",
+    criteria: [
+      { text: "Response time baseline recorded", item: "baseline" },
+      { text: "Ticket volume recorded", item: "baseline" },
+    ],
+    linked: ["baseline"],
+    by: 2,
+  },
+  {
+    id: "prereqs",
+    label: "Prerequisites cleared",
+    criteria: [
+      { text: "SSO live", item: "sso" },
+      { text: "Admin named, hours budgeted", item: "admin" },
+      { text: "Test instance ready", item: "test-instance" },
+      { text: "Agent groups and hours set", item: "agent-groups" },
+    ],
+    linked: ["sso", "admin", "test-instance", "agent-groups"],
+    by: 4,
+    lane: "foundation",
+  },
+];
+
+// ─── Success plan ─────────────────────────────────────────────────────────
+// Only handoff facts: section 5 for the goal and measures, section 10 for the
+// baselines, which are all UNKNOWN.
+export const successPlan: SuccessPlan = {
+  goal: "Cut ticket response time in half. Pass the Q1 compliance audit.",
+  goalSource: "success_outcome, call, 20 Aug",
+  judge: "success_judge",
+  measures: [
+    {
+      measure: "Ticket response time, cut in half",
+      baseline: "UNKNOWN: baseline needed",
+      basis: "Read as average time to first response (inferred). Capture in week 1, before configuring anything.",
+    },
+    {
+      measure: "Pass the Q1 compliance audit",
+      baseline: "Audit date UNKNOWN",
+      basis: "call, 20 Aug. Their outcome to judge, not a promise from us.",
+    },
+  ],
+};
+
+// ─── People (stakeholder map) ─────────────────────────────────────────────
+// Customer-side people and roles from the handoff. Quadrants are inferred.
+// Sentiment is unknown: the handoff does not state it for anyone.
+export const people: Person[] = [
+  {
+    id: "priya",
+    roleId: "technical_owner",
+    role: "IT Director. Champion in the CRM. Technical owner is the agent's read: verify.",
+    wiifm: "",
+    engagement: "Have we met her: UNKNOWN.",
+    sentiment: "unknown",
+    quadrant: "closely",
+  },
+  {
+    id: "mark",
+    roleId: "economic_buyer",
+    role: "CFO, economic buyer in the CRM. Whether he is also exec sponsor has not been asked.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "satisfied",
+  },
+  {
+    id: "exec-sponsor",
+    roleId: "exec_sponsor",
+    role: "UNKNOWN in the handoff.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "satisfied",
+  },
+  {
+    id: "security-contact",
+    roleId: "security_contact",
+    role: "UNKNOWN in the handoff.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "satisfied",
+  },
+  {
+    id: "identity-contact",
+    roleId: "identity_contact",
+    role: "UNKNOWN in the handoff.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "informed",
+  },
+  {
+    id: "admin",
+    roleId: "admin",
+    role: "UNKNOWN in the handoff.",
+    wiifm: "",
+    engagement: "",
+    sentiment: "unknown",
+    quadrant: "informed",
+  },
+];
+
+export const dataset: Dataset = {
+  id: "acme",
+  label: "Acme Corp (agent-filled)",
+  note: "Illustrative example. Acme Corp is fictional. Its handoff was filled by a handoff agent and reviewed by a person.",
+  account,
+  items,
+  roles,
+  gates,
+  firstValue,
+  successPlan,
+  people,
+  gateGaps,
+  agentReads,
+  driftRules,
+  configFieldLabels,
+};
