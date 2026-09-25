@@ -4,6 +4,9 @@
 config/private-*
 examples/private-*
 src/data/private-*
+# Secrets (API keys, passwords) and local-only settings. Never committed.
+.env*
+.claude/launch.json
 .DS_Store
 node_modules
 dist
