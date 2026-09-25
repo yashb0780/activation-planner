@@ -4,6 +4,7 @@
 
 export const HANDOFF_FIELDS: Record<string, string> = {
   customer_name: "Customer",
+  industry: "Industry (optional)",
   products: "Products and tiers purchased",
   contract_size: "Seats / contract size",
   close_date: "Close date",

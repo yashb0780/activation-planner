@@ -9,7 +9,9 @@
 
 **How to fill this in:** write `UNKNOWN` for anything you do not actually know. Do not guess and do not smooth over a gap. The planner turns every `UNKNOWN` into a week-one task with a name attached, which is useful. It treats a confident wrong answer as fact, which is not.
 
-**Every answer gets a source:** `call, 12 Sep` / `email, 3 Sep` / `CRM` / `rep's read` / `SE's read`. If it came from a recording or transcript, paste the quote.
+**Every answer gets a source:** `call, 12 Sep` / `email, 3 Sep` / `CRM` / `rep's read` / `SE's read` / `agent's read`. If it came from a recording or transcript, paste the quote. When an answer is someone's interpretation rather than something the customer said, put the answer in the answer column and give the reason in the source, after a colon: `rep's read: she runs every call` or `agent's read: SSO setup was promised for week 1`.
+
+**Filled by a handoff agent?** It uses this same template, fills every field, and writes `UNKNOWN` where it has no data, and a person must review and edit it before the planner runs.
 
 **Who owns what:** sections 1 to 5 belong to the rep, sections 6 to 10 to the SE. Fill it together on one call, each person speaking to their half.
 
@@ -37,6 +39,7 @@ The ID column is for the app. Don't edit it.
 | Field | ID | Answer | Source |
 |---|---|---|---|
 | Customer | customer_name | | |
+| Industry (optional) | industry | | |
 | Products and tiers purchased | products | | |
 | Seats / contract size | contract_size | | |
 | Close date | close_date | | |
@@ -64,13 +67,13 @@ The ID column is for the app. Don't edit it.
 
 ## 2. People (rep)
 
-| Role | ID | Name | Title | Email | Have we met them? |
-|---|---|---|---|---|---|
-| Technical owner (does the work) | technical_owner | | | | |
-| Exec sponsor (unblocks and pays) | exec_sponsor | | | | |
-| Day-to-day admin, if different | admin | | | | |
-| Security contact | security_contact | | | | |
-| Identity / IT contact | identity_contact | | | | |
+| Role | ID | Name | Title | Email | Have we met them? | Source |
+|---|---|---|---|---|---|---|
+| Technical owner (does the work) | technical_owner | | | | | |
+| Exec sponsor (unblocks and pays) | exec_sponsor | | | | | |
+| Day-to-day admin, if different | admin | | | | | |
+| Security contact | security_contact | | | | | |
+| Identity / IT contact | identity_contact | | | | | |
 
 | Field | ID | Answer | Source |
 |---|---|---|---|
