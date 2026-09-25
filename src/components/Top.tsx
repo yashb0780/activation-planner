@@ -27,12 +27,15 @@ export function FirstValueLine({
   value,
   edited,
   basis,
+  notProposed,
   onSave,
   review,
 }: {
   review?: ReactNode;
   value: FirstValueEdit;
   edited: boolean;
+  /** No request qualifies yet: labelled "Not proposed yet" until someone edits it. */
+  notProposed?: boolean;
   basis: FirstValue["basis"];
   onSave: (fv: FirstValueEdit) => void;
 }) {
@@ -47,7 +50,7 @@ export function FirstValueLine({
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-base font-semibold">First value</h2>
         <span className="rounded-sm border border-line px-1.5 text-xs text-muted">
-          {edited ? "Edited, confirm at kickoff" : "Proposed, confirm at kickoff (inferred)"}
+          {edited ? "Edited, confirm at kickoff" : notProposed ? "Not proposed yet" : "Proposed, confirm at kickoff (inferred)"}
         </span>
         <span className="ml-auto" />
         {review}

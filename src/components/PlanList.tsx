@@ -3,7 +3,7 @@ import type { DriftFlag } from "../drift";
 import type { Group } from "../grouping";
 import type { Item, Role, Side, Status } from "../types";
 import { EyeOffIcon } from "./icons";
-import { DriftFlagChip, OwnerMenu, StatusMenu } from "./Status";
+import { DriftFlagChip, HandoffChips, OwnerMenu, StatusMenu } from "./Status";
 
 // The plan as dense rows under collapsible group headers. Each row has a status
 // pill and an owner pill; both open a small menu.
@@ -110,6 +110,7 @@ function Row({
           {item.title}
         </button>
         {info.flag && <DriftFlagChip flag={info.flag} />}
+        <HandoffChips item={item} />
         {info.internal && (
           <span className="shrink-0 text-faint" title="Internal: hidden in customer view">
             <EyeOffIcon />

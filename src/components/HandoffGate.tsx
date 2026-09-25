@@ -6,10 +6,20 @@ import type { GateGap } from "../types";
 // The plan is still built; this panel says what to fill and who fills it.
 // Neutral surface; the thin amber bar on the left is its only colour.
 
-export function HandoffGate({ gaps }: { gaps: GateGap[] }) {
+/** "N answers are the agent's interpretation", or nothing when the handoff has none. */
+function agentReadLine(n: number) {
+  return `${n} ${n === 1 ? "answer is" : "answers are"} the agent's interpretation: verify before kickoff.`;
+}
+
+export function HandoffGate({ gaps, agentReads = 0 }: { gaps: GateGap[]; agentReads?: number }) {
   const book = useRoles();
   if (gaps.length === 0) {
-    return <p className="text-xs text-muted">Handoff gate: all required fields filled.</p>;
+    return (
+      <div className="text-xs text-muted">
+        <p>Handoff gate: all required fields filled.</p>
+        {agentReads > 0 && <p className="mt-0.5">{agentReadLine(agentReads)}</p>}
+      </div>
+    );
   }
   return (
     <section
@@ -38,6 +48,7 @@ export function HandoffGate({ gaps }: { gaps: GateGap[] }) {
           </li>
         ))}
       </ul>
+      {agentReads > 0 && <p className="border-t border-line px-5 py-2.5 text-sm text-muted">{agentReadLine(agentReads)}</p>}
     </section>
   );
 }

@@ -3,7 +3,7 @@ import { formatDate } from "../dates";
 import type { Drift } from "../drift";
 import type { OwnerChange } from "../state";
 import type { Decision, Item, Note, Role, Side, Status } from "../types";
-import { DriftFlagChip, FLAG_LABEL, OwnerMenu, pillBg, STATUS } from "./Status";
+import { DriftFlagChip, FLAG_LABEL, HandoffChips, OwnerMenu, pillBg, STATUS } from "./Status";
 import { weekLabel } from "./ui";
 
 const ORDER: Status[] = ["todo", "progress", "hold", "done"];
@@ -166,6 +166,7 @@ export function Panel(props: PanelProps) {
         <span>{item.module}</span>
         <span>{weekLabel(item.week)}</span>
         {item.visibility === "internal" && <span className="text-warn">Internal</span>}
+        {!customerView && <HandoffChips item={item} />}
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -302,17 +303,22 @@ export function Panel(props: PanelProps) {
           <Section label="Lead time and drift" aside={props.drift.flag ? <DriftFlagChip flag={props.drift.flag} /> : undefined}>
             <p className="text-sm text-muted">
               {item.lead.min === item.lead.max ? item.lead.min : `${item.lead.min} to ${item.lead.max}`} weeks, from the
-              product config. {props.drift.flag ? "" : "On time."}
+              product config. {props.drift.flag ? "" : props.drift.latestSafeStart ? "On time." : "No target date, so no flag."}
             </p>
             <ul className="mt-1.5 space-y-0.5 text-sm text-muted">
-              <li>Latest safe start: {formatDate(props.drift.latestSafeStart, true)}</li>
+              <li>
+                Latest safe start:{" "}
+                {props.drift.latestSafeStart ? formatDate(props.drift.latestSafeStart, true) : "needs target date"}
+              </li>
               <li>
                 If it starts {formatDate(props.asOf, true)}, earliest finish: {formatDate(props.drift.earliestFinish, true)}
               </li>
               <li>
                 {props.drift.flag === "risk"
                   ? `${FLAG_LABEL.risk}: it can no longer finish before the target date.`
-                  : `Turns red from ${formatDate(props.drift.redFrom, true)} if not started.`}
+                  : props.drift.redFrom
+                    ? `Turns red from ${formatDate(props.drift.redFrom, true)} if not started.`
+                    : "Turns red: needs target date."}
               </li>
             </ul>
           </Section>
@@ -417,6 +423,28 @@ export function Panel(props: PanelProps) {
                 </div>
               </form>
             )}
+          </Section>
+        )}
+
+        {!customerView && (item.promised || item.verify) && (
+          <Section label="From the handoff">
+            <ul className="flex flex-col gap-1.5 text-sm">
+              {item.promised && (
+                <li>
+                  <span className="text-faint">Promised in sales:</span> {item.promised}
+                </li>
+              )}
+              {item.promiseRisk && (
+                <li>
+                  <span className="text-faint">Promise at risk:</span> {item.promiseRisk}
+                </li>
+              )}
+              {item.verify && (
+                <li>
+                  <span className="text-faint">Verify, agent's read:</span> {item.verify}
+                </li>
+              )}
+            </ul>
           </Section>
         )}
 

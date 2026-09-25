@@ -49,6 +49,38 @@ export function DriftFlagChip({ flag }: { flag: DriftFlag }) {
   );
 }
 
+/** Labels from the handoff: "Promised in sales", "Promise at risk" and "Verify". Outlined
+ *  like the drift chip, so none can be mistaken for a status. Each appears only when the
+ *  item sets its field, so items without them look exactly as before. */
+export function HandoffChips({ item }: { item: Item }) {
+  const chip = "inline-flex shrink-0 items-center gap-1 rounded-sm border border-line-strong px-1.5 text-xs font-medium text-ink";
+  return (
+    <>
+      {item.promiseRisk ? (
+        <span className={chip} title={item.promiseRisk}>
+          <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden>
+            <path d="M8 1.5 L15 14 H1 Z" fill="none" stroke="var(--flag-risk)" strokeWidth="1.6" strokeLinejoin="round" />
+            <path d="M8 6 V9.5" stroke="var(--flag-risk)" strokeWidth="1.6" strokeLinecap="round" />
+            <circle cx="8" cy="11.8" r="0.9" fill="var(--flag-risk)" />
+          </svg>
+          Promise at risk
+        </span>
+      ) : (
+        item.promised && (
+          <span className={chip} title={item.promised}>
+            Promised in sales
+          </span>
+        )
+      )}
+      {item.verify && (
+        <span className={chip} title={`Agent's read: ${item.verify}`}>
+          Verify
+        </span>
+      )}
+    </>
+  );
+}
+
 /** The status pill with its menu. On hold and Done do not change the status here: they open
  *  the side panel, which asks for a reason or for proof first. */
 export function StatusMenu({

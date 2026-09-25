@@ -395,12 +395,13 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
 
           {tab === "plan" && !customerView && (
             <>
-              <HandoffGate gaps={gateGaps} />
+              <HandoffGate gaps={gateGaps} agentReads={data.agentReads} />
               <FirstValueLine
                 key={JSON.stringify(saved.firstValue)}
                 value={saved.firstValue ?? firstValue}
                 edited={saved.firstValue !== null}
                 basis={firstValue.basis}
+                notProposed={firstValue.notProposed}
                 onSave={tracker.setFirstValue}
                 review={review("first-value")}
               />
@@ -448,6 +449,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
               plan={successPlan}
               firstValue={saved.firstValue ?? firstValue}
               firstValueEdited={saved.firstValue !== null}
+              firstValueNotProposed={firstValue.notProposed}
               gates={gates}
               items={items}
               roles={roles}

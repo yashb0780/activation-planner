@@ -14,10 +14,10 @@ export type DriftFlag = "drifting" | "risk";
 
 export interface Drift {
   flag: DriftFlag | null;
-  /** Latest safe start, for the amber end of the lead time. */
-  latestSafeStart: string;
-  /** First date the item turns red if it still has not started. */
-  redFrom: string;
+  /** Latest safe start, for the amber end of the lead time. Null with no target date. */
+  latestSafeStart: string | null;
+  /** First date the item turns red if it still has not started. Null with no target date. */
+  redFrom: string | null;
   /** Earliest finish if work started on the as-of date, for the red end. */
   earliestFinish: string;
 }
@@ -31,9 +31,9 @@ function frozen(iso: string, account: Account, rules: DriftRules) {
 }
 
 /** The latest start date that still leaves `weeks` of working days before the target. */
-function latestStart(weeks: number, account: Account, rules: DriftRules): string {
+function latestStart(weeks: number, goLive: string, account: Account, rules: DriftRules): string {
   let left = (weeks + rules.bufferWeeks) * 7;
-  let d = toDate(account.goLive);
+  let d = toDate(goLive);
   while (left > 0) {
     d = new Date(d.getTime() - DAY);
     if (!frozen(toIso(d), account, rules)) left--;
@@ -54,14 +54,17 @@ function finishFrom(from: string, weeks: number, account: Account, rules: DriftR
 
 export function drift(item: Item, asOf: string, account: Account, rules: DriftRules): Drift | null {
   if (!item.lead) return null;
-  const amberStart = latestStart(item.lead[rules.amberUses], account, rules);
-  const redStart = latestStart(item.lead[rules.redUses], account, rules);
+  const earliestFinish = finishFrom(asOf, item.lead[rules.redUses], account, rules);
+  // No target date: nothing to count back from, so no latest safe start and no flag.
+  if (!account.goLive) return { flag: null, latestSafeStart: null, redFrom: null, earliestFinish };
+  const amberStart = latestStart(item.lead[rules.amberUses], account.goLive, account, rules);
+  const redStart = latestStart(item.lead[rules.redUses], account.goLive, account, rules);
   const started = item.status === "progress" || item.status === "done";
   const flag = started ? null : asOf > redStart ? "risk" : asOf > amberStart ? "drifting" : null;
   return {
     flag,
     latestSafeStart: amberStart,
     redFrom: toIso(new Date(toDate(redStart).getTime() + DAY)),
-    earliestFinish: finishFrom(asOf, item.lead[rules.redUses], account, rules),
+    earliestFinish,
   };
 }

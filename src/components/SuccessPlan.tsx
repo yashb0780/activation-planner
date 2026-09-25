@@ -25,6 +25,7 @@ export function SuccessPlan({
   plan,
   firstValue,
   firstValueEdited,
+  firstValueNotProposed,
   gates,
   items,
   roles,
@@ -34,6 +35,8 @@ export function SuccessPlan({
   plan: Plan;
   firstValue: FirstValueEdit;
   firstValueEdited: boolean;
+  /** No request qualifies yet. */
+  firstValueNotProposed?: boolean;
   gates: Gate[];
   items: Item[];
   roles: Role[];
@@ -60,7 +63,7 @@ export function SuccessPlan({
         <p className="mt-2 text-sm text-muted">Judged by {displayName(book, plan.judge)}.</p>
       </Block>
 
-      <Block title="First value" note={firstValueEdited ? "Edited, confirm at kickoff" : "Proposed (inferred)"}>
+      <Block title="First value" note={firstValueEdited ? "Edited, confirm at kickoff" : firstValueNotProposed ? "Not proposed yet" : "Proposed (inferred)"}>
         <p className="text-sm font-medium">{firstValue.headline}</p>
         <ul className="mt-1.5 flex flex-col gap-0.5 text-sm">
           {firstValue.points.map((p) => (
@@ -107,9 +110,13 @@ export function SuccessPlan({
             );
           })}
           <li className="flex flex-wrap items-baseline gap-x-3">
-            <span className="w-28 shrink-0 text-sm tabular-nums text-muted">{formatDate(account.goLive, true)}</span>
+            <span className="w-28 shrink-0 text-sm tabular-nums text-muted">
+              {account.goLive ? formatDate(account.goLive, true) : "No target date"}
+            </span>
             <span className="text-sm">Target go-live</span>
-            <span className="text-xs text-faint">Stated in the handoff, confirm at kickoff</span>
+            <span className="text-xs text-faint">
+              {account.goLive ? "Stated in the handoff, confirm at kickoff" : "UNKNOWN in the handoff, ask at kickoff"}
+            </span>
           </li>
         </ol>
       </Block>

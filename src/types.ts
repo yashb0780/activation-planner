@@ -60,6 +60,15 @@ export interface Item {
   visibility: Visibility;
   /** Expected landing window, for items after day 30. */
   window?: string;
+  /** A row of the handoff's commitments table this item carries: the promise and its
+   *  stated timing, as recorded. Shown as "Promised in sales". */
+  promised?: string;
+  /** Set when the promised timing is shorter than the config's lead time. The timing is
+   *  not moved; this says so. Shown as "Promise at risk". */
+  promiseRisk?: string;
+  /** Set when the item rests on an answer sourced "agent's read": the agent's reason.
+   *  Shown as "Verify". Never the only basis for a date, milestone or commitment. */
+  verify?: string;
 }
 
 export interface Note {
@@ -84,7 +93,8 @@ export interface Account {
   freezes: { start: string; end: string }[];
   windowStart: string;
   windowEnd: string;
-  goLive: string;
+  /** Target go-live date. Absent when the handoff's target date is UNKNOWN. */
+  goLive?: string;
 }
 
 export interface FirstValue {
@@ -94,6 +104,8 @@ export interface FirstValue {
   points: { label: string; text: string }[];
   /** The longer reasoning, shown behind the Why? toggle. */
   basis: string;
+  /** No request qualifies yet. The headline and points say what would decide it. */
+  notProposed?: boolean;
 }
 
 export interface Criterion {
@@ -199,6 +211,9 @@ export interface Dataset {
   successPlan: SuccessPlan;
   people: Person[];
   gateGaps: GateGap[];
+  /** How many handoff answers are sourced "agent's read". Adds one line to the
+   *  Handoff incomplete panel. Absent or 0: the panel is unchanged. */
+  agentReads?: number;
   driftRules: DriftRules;
   configFieldLabels: Record<string, string>;
 }
