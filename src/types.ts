@@ -24,7 +24,14 @@ export interface Why {
 
 export interface Item {
   id: string;
+  /** Short title, 2 to 6 words, from the config, a rule, or a question topic (see src/titles.ts). */
   title: string;
+  /** The full description, shown in the side panel. For a question, the question as asked. */
+  description: string;
+  /** Set when the title was written by hand because no config line or rule gives one. */
+  handTitle?: boolean;
+  /** Items that must be done before this one can finish, by ID. From the config's "Depends on". */
+  dependsOn?: string[];
   kind: Kind;
   module: Module;
   lane: Lane;
@@ -195,6 +202,12 @@ export interface Dataset {
   id: string;
   /** Short name for the example switch. */
   label: string;
+  /** The product config this demo was planned from, relative to the repo root. Its bold
+   *  short titles are the only titles a task or decision may use without a rule. */
+  configFile: string;
+  /** The generated board, relative to the repo root. When it has an "Item index" section,
+   *  `npm test` checks that the items here match it. Optional. */
+  boardFile?: string;
   /** Place in the example switch, lowest first. The first is the default on load. Absent: last. */
   order?: number;
   /** Footer line, e.g. "Illustrative example. X is fictional." */

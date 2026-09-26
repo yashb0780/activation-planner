@@ -86,7 +86,7 @@ traces flowing on test tickets.
   form came back through procurement.
   *Owners: CSM (us); Technical owner (them) · From: Exec sponsor (unblocks and pays) · Has the exec sponsor ever been on a call with us? · Handoff notes*
   *Done when:* Exec sponsor named · They have been on a call with us, or one is booked
-- **Decision: Reset go-live date or cut scope.** Deployment is already drifting
+- **Decide new go-live or cut scope.** Deployment is already drifting
   on day 1: at the long end of its lead time it finishes after 2026-11-16. The
   date is preferred, not fixed (board conflict 4).
   *Owners: Technical owner (them); CSM (us) · From: Target go-live date · Fixed or preferred · Must something here be live by day 30? · product config*
@@ -170,7 +170,7 @@ groundwork for Evaluation.
 
 **Starting**
 
-- **Choose the deployment option. Promised in sales: "We'll help you choose
+- **Decide the deployment option. Promised in sales: "We'll help you choose
   between Hybrid and Self-hosted."** K. Lindqvist walks Lena and Tomás through
   both, against the storage decision.
   *Owners: SE, CSM (us); Security contact, Technical owner (them) · From: Commitments made during the sales cycle · Products and tiers purchased · product config*
@@ -182,7 +182,7 @@ groundwork for Evaluation.
 - **Set up SSO**, if Owen was reached in week 1.
   *Owners: CSM (us); Identity / IT contact (them) · From: Single sign-on required · Identity / IT contact · product config*
   *Done when:* SSO configured · One support engineer signs in through SSO
-- **Evaluation groundwork: Agree what a good triage is.** Their outcome says
+- **Evaluation groundwork: Agree what a good outcome is.** Their outcome says
   "within 5 minutes" and "fewer misrouted"; turn that into what an evaluator
   scores.
   *Owners: CSM (us); Technical owner (them) · From: Their stated outcome · How they will know it worked · product config*

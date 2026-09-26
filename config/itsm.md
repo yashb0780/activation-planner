@@ -9,31 +9,32 @@ Lead time is calendar time from kickoff to the evidence below being true, assumi
 * Short: 2 to 4 weeks. Configuration we control. Slips because of scheduling, not blockers.
 * Long: 6 to 16 weeks. Gated by something on the customer's side: access, data quality, a security review, or a behaviour change in their team. Start these in week one even when the target date looks far away.
 
+Short title is the bold text at the start of a bullet. Every task built from that bullet uses it, word for word, as its title on the board. Verb first, 2 to 6 words.
 Depends on is a hard prerequisite. Starting a module before its dependencies are in place produces rework, not progress.
 Evidence is what proves the module is doing work, not that it was switched on. The test for any piece of evidence: could this still be true if nobody at the customer had touched the product since go-live? If yes, it is not evidence, it is configuration.
 Kickoff setup
 Quick base-level setup done at kickoff, first in week one. The planner adds the customer success plan to this list for every product.
 
-* Roles and permissions: agent, admin and requester roles set for each team in scope.
-* Workspace setup: one workspace or several, set up for the teams in scope.
+* **Assign roles.** Roles and permissions: agent, admin and requester roles set for each team in scope.
+* **Create workspaces.** Workspace setup: one workspace or several, set up for the teams in scope.
 
 Foundation
 Nothing below starts cleanly without these. Every item starts in week one. Each keeps its own lead time, so a long one starts in week one and may finish later.
 
-* Authentication: SSO configured, and user provisioning (directory sync or SCIM) agreed. Lead time: short when the identity team is in the room; long when it sits outside the buying team.
-* Agent groups and business hours defined, so routing has somewhere to route. Lead time: short.
-* Inbound email or alias cutover plan, including what happens to the old address. Lead time: short.
-* Sandbox or test instance if they have a change freeze or an audit requirement. Lead time: short.
-* A named admin on the customer side with time actually budgeted, not an interested volunteer. Lead time: short to name; the time budget is what slips.
+* **Set up SSO.** Authentication: SSO configured, and user provisioning (directory sync or SCIM) agreed. Lead time: short when the identity team is in the room; long when it sits outside the buying team.
+* **Define agent groups.** Agent groups and business hours defined, so routing has somewhere to route. Lead time: short.
+* **Plan the email cutover.** Inbound email or alias cutover plan, including what happens to the old address. Lead time: short.
+* **Request a test instance.** Sandbox or test instance if they have a change freeze or an audit requirement. Lead time: short.
+* **Name the customer admin.** A named admin on the customer side with time actually budgeted, not an interested volunteer. Lead time: short to name; the time budget is what slips.
 
 Module: Service catalog
 Lead time: Short for a starter set of 8 to 12 request types. Long if they insist on launching with a complete catalog, which is the most common reason a go-live date slips.
 Depends on
 
-* A settled request taxonomy (categories, subcategories, form fields). Changing this after items are built means rebuilding them.
-* Named approvers per item, plus a decision on what happens when an approver is on leave
-* Requester visibility rules: which groups see which items, which needs directory sync working
-* The fulfilment group receiving each item, and confirmation that group has capacity
+* **Settle the taxonomy.** A settled request taxonomy (categories, subcategories, form fields). Changing this after items are built means rebuilding them.
+* **Name approvers per item.** Named approvers per item, plus a decision on what happens when an approver is on leave
+* **Set requester visibility.** Requester visibility rules: which groups see which items, which needs directory sync working
+* **Confirm fulfilment groups.** The fulfilment group receiving each item, and confirmation that group has capacity
 
 Evidence it is real
 
@@ -48,11 +49,11 @@ Lead time: Long, 6 to 10 weeks. The tool is ready on day one. The content, the o
 Lead time in weeks: 6 to 10
 Depends on
 
-* The same taxonomy as the catalog, so articles file where tickets live
-* A seed set: whatever documentation they have today, plus an agreed export path out of it
-* Named article owners per team and a review cadence
-* A publishing decision: open authoring, or a review queue with a reviewer who has time
-* End-user portal access if deflection is the goal, which needs the same visibility rules as the catalog
+* **Share the catalog taxonomy.** The same taxonomy as the catalog, so articles file where tickets live
+* **Gather the seed set.** A seed set: whatever documentation they have today, plus an agreed export path out of it
+* **Name article owners.** Named article owners per team and a review cadence
+* **Decide the publishing model.** A publishing decision: open authoring, or a review queue with a reviewer who has time
+* **Set up portal access.** End-user portal access if deflection is the goal, which needs the same visibility rules as the catalog
 
 Evidence it is real
 
@@ -67,10 +68,10 @@ Lead time: Short per workflow, often days. Long to reach coverage that changes t
 Lead time in weeks: 8 (coverage that changes the team's numbers; no upper end given)
 Depends on
 
-* Catalog and taxonomy settled. Automation written against fields that are still moving gets rewritten.
-* Agent groups, business hours and SLA targets defined
-* Credentials and scopes for anything reaching another system (directory, HR system, endpoint management, chat)
-* A named owner for the rules. Unowned automation gets switched off the first time it misfires, and nobody turns it back on.
+* **Settle the catalog first.** Catalog and taxonomy settled. Automation written against fields that are still moving gets rewritten.
+* **Set SLA targets.** Agent groups, business hours and SLA targets defined
+* **Request integration credentials.** Credentials and scopes for anything reaching another system (directory, HR system, endpoint management, chat)
+* **Name the rules owner.** A named owner for the rules. Unowned automation gets switched off the first time it misfires, and nobody turns it back on.
 
 Evidence it is real
 
@@ -86,11 +87,11 @@ Lead time in weeks: 8 to 16 (discovery; asset management follows inside the same
 Discovery (the gate)
 Depends on
 
-* A passed security review. Assume one exists even when nobody has mentioned it.
-* Service accounts and credentials per platform: Windows, Linux, network gear, hypervisors, cloud accounts
-* Network access: firewall rules, the subnet list, a host for the scanner or collector
-* Approval to deploy agents, plus access to their deployment tooling to push them
-* An owner on the infrastructure team, who is almost never the same person as the ITSM project owner
+* **Open the security review.** A passed security review. Assume one exists even when nobody has mentioned it.
+* **Request discovery credentials.** Service accounts and credentials per platform: Windows, Linux, network gear, hypervisors, cloud accounts
+* **Open network access.** Network access: firewall rules, the subnet list, a host for the scanner or collector
+* **Get agent deployment approval.** Approval to deploy agents, plus access to their deployment tooling to push them
+* **Name the infrastructure owner.** An owner on the infrastructure team, who is almost never the same person as the ITSM project owner
 
 Evidence it is real
 
@@ -102,10 +103,10 @@ Evidence it is real
 Asset management
 Depends on
 
-* Discovery output, or a clean import if they are starting from a spreadsheet
-* An agreed asset model: what is tracked, at what depth, and what is deliberately out of scope
-* Assignment rules linking assets to people or departments, which needs directory or HR data
-* Named process owners for purchase, assignment, reclaim and disposal
+* **Get discovery output.** Discovery output, or a clean import if they are starting from a spreadsheet
+* **Agree the asset model.** An agreed asset model: what is tracked, at what depth, and what is deliberately out of scope
+* **Set assignment rules.** Assignment rules linking assets to people or departments, which needs directory or HR data
+* **Name asset process owners.** Named process owners for purchase, assignment, reclaim and disposal
 
 Evidence it is real
 
@@ -120,12 +121,12 @@ Lead time: Long, 8 to 12 weeks, and longer where no change process exists today.
 Lead time in weeks: 8 to 12
 Depends on
 
-* Asset and CMDB data of usable quality, otherwise impact analysis is theatre
-* Change types agreed: standard (pre-approved), normal, emergency, with real examples of each
-* Approval chains and change-board membership, plus a standing meeting already on calendars
-* Maintenance windows and freeze periods documented
-* Integration with the tooling where work actually happens (deploy pipeline, vendor ticketing) if standard changes are meant to be raised automatically
-* Executive backing. Change management fails on adoption, never on configuration.
+* **Clean up asset data.** Asset and CMDB data of usable quality, otherwise impact analysis is theatre
+* **Agree change types.** Change types agreed: standard (pre-approved), normal, emergency, with real examples of each
+* **Name the change board.** Approval chains and change-board membership, plus a standing meeting already on calendars
+* **Document freeze windows.** Maintenance windows and freeze periods documented
+* **Connect the deploy tooling.** Integration with the tooling where work actually happens (deploy pipeline, vendor ticketing) if standard changes are meant to be raised automatically
+* **Secure executive backing.** Executive backing. Change management fails on adoption, never on configuration.
 
 Evidence it is real
 

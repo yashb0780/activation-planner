@@ -21,7 +21,7 @@ LangSmith, a platform for building, observing, evaluating and deploying AI agent
 
 **Evidence** is what proves the module is doing work, not that it was switched on. The test for any piece of evidence: could this still be true if nobody at the customer had run their agent since go-live? If yes, it is not evidence, it is configuration.
 
-**Short title** is the bold text at the start of a bullet or step. Every task built from that bullet uses it, word for word, as its title on the board. Verb first, 2 to 6 words.
+**Short title** is the bold text at the start of a bullet or step. Every task built from that bullet uses it, word for word, as its title on the board. Tasks start with a verb, decisions with "Decide"; 2 to 6 words, sentence case, no full stop.
 
 **Needs customer approval** names the kind of sign-off the customer gives before the item can finish: `security`, `IT` or `procurement`. The planner adds the customer's usual approval time (from the handoff) to the lead time of these items only.
 
@@ -114,7 +114,7 @@ Lead time in weeks: 2 to 4 (estimate)
 Depends on
 
 * **Trace production traffic.** (Observability) At least one week of it.
-* **Agree what a good triage is.** Their definition of a correct outcome, from the handoff's success section. Without it, no evaluator can score anything.
+* **Agree what a good outcome is.** Their definition of a correct outcome, from the handoff's success section. Without it, no evaluator can score anything.
 * **Name a reviewer.** Someone on their side who checks the dataset's reference outputs.
 
 Steps
@@ -150,7 +150,7 @@ Depends on
 
 Steps
 
-1. **Choose the deployment option.** Cloud, Hybrid or Self-hosted, recorded with the reason.
+1. **Decide the deployment option.** Cloud, Hybrid or Self-hosted, recorded with the reason.
 2. **Prepare their infrastructure.** The cluster, datastores and network access the chosen option needs, per the docs for that option.
 3. **Deploy the agent.** To an Agent Server in their environment, through their own pipeline.
 4. **Record security sign-off.** In writing, from their security contact.

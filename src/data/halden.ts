@@ -120,7 +120,8 @@ export const items: Item[] = [
   // ─── Week 1 · start now ────────────────────────────────────────────────
   {
     id: "catalog-scope",
-    title: "Decide: starter set or complete catalog",
+    title: "Decide scope: Service catalog",
+    description: "Decide: starter set or complete catalog",
     kind: "decision",
     module: "Service catalog",
     lane: "start",
@@ -146,7 +147,8 @@ export const items: Item[] = [
   },
   {
     id: "security-review",
-    title: "Find out if a security review exists, then open it",
+    title: "Open the security review",
+    description: "Find out if a security review exists, then open it",
     kind: "task",
     module: "Security review",
     lane: "start",
@@ -176,7 +178,8 @@ export const items: Item[] = [
   },
   {
     id: "discovery-credentials",
-    title: "Request discovery credentials, subnet list and scanner host",
+    title: "Request discovery credentials",
+    description: "Request discovery credentials, subnet list and scanner host",
     kind: "task",
     module: "Discovery",
     lane: "start",
@@ -206,7 +209,8 @@ export const items: Item[] = [
   },
   {
     id: "workspaces",
-    title: "Set up the workspace, or two, for both desks",
+    title: "Create workspaces",
+    description: "Set up the workspace, or two, for both desks",
     kind: "task",
     module: "Kickoff setup",
     lane: "kickoff",
@@ -233,7 +237,8 @@ export const items: Item[] = [
   },
   {
     id: "roles",
-    title: "Set up roles and permissions for both desks",
+    title: "Assign roles",
+    description: "Set up roles and permissions for both desks",
     kind: "task",
     module: "Kickoff setup",
     lane: "kickoff",
@@ -259,7 +264,8 @@ export const items: Item[] = [
   },
   {
     id: "sso",
-    title: "Set up single sign-on for both desks",
+    title: "Set up SSO",
+    description: "Set up single sign-on for both desks",
     kind: "task",
     module: "Foundation",
     lane: "foundation",
@@ -288,7 +294,8 @@ export const items: Item[] = [
   },
   {
     id: "test-instance",
-    title: "Request the test instance",
+    title: "Request a test instance",
+    description: "Request the test instance",
     kind: "task",
     module: "Foundation",
     lane: "foundation",
@@ -314,7 +321,8 @@ export const items: Item[] = [
   },
   {
     id: "admin",
-    title: "Get a day-to-day admin named, with hours budgeted",
+    title: "Name the customer admin",
+    description: "Get a day-to-day admin named, with hours budgeted",
     kind: "task",
     module: "Foundation",
     lane: "foundation",
@@ -341,7 +349,8 @@ export const items: Item[] = [
   },
   {
     id: "agent-groups",
-    title: "Define agent groups and business hours",
+    title: "Define agent groups",
+    description: "Define agent groups and business hours",
     kind: "task",
     module: "Foundation",
     lane: "foundation",
@@ -368,7 +377,8 @@ export const items: Item[] = [
   },
   {
     id: "mailbox-cutover",
-    title: "Plan the shared mailbox cutover",
+    title: "Plan the email cutover",
+    description: "Plan the shared mailbox cutover",
     kind: "task",
     module: "Foundation",
     lane: "foundation",
@@ -393,7 +403,8 @@ export const items: Item[] = [
   },
   {
     id: "success-plan",
-    title: "Draft success plan, confirm at kickoff, share by end of week 1",
+    title: "Draft the success plan",
+    description: "Draft success plan, confirm at kickoff, share by end of week 1",
     kind: "task",
     module: "Success plan",
     lane: "kickoff",
@@ -422,7 +433,8 @@ export const items: Item[] = [
   // ─── Open questions, grouped as a CSM would ask them on a call ────────
   {
     id: "q-setup",
-    title: "Walk me through your current setup and the systems involved.",
+    title: "Current setup and data",
+    description: "Walk me through your current setup and the systems involved.",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -456,7 +468,8 @@ export const items: Item[] = [
   },
   {
     id: "q-access",
-    title: "Who works on each system today, and who has admin access?",
+    title: "Access and identity",
+    description: "Who works on each system today, and who has admin access?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -472,7 +485,7 @@ export const items: Item[] = [
       ],
       source: "",
     },
-    from: ["security_review", "security_signoff", "security_contact", "identity_contact", "admin", "provisioning_required"],
+    from: ["identity_contact", "security_review", "security_signoff", "security_contact", "admin", "provisioning_required"],
     checklist: [
       { text: "Is a security review required, and who owns sign-off?", from: ["security_review", "security_signoff"] },
       { text: "Who is the security contact?", from: ["security_contact"] },
@@ -489,7 +502,8 @@ export const items: Item[] = [
   },
   {
     id: "q-day30",
-    title: "What has to be true on day 30 for this to feel like a win?",
+    title: "What a win looks like",
+    description: "What has to be true on day 30 for this to feel like a win?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -521,7 +535,8 @@ export const items: Item[] = [
   },
   {
     id: "q-volumes",
-    title: "What comes in most often that we have not counted yet?",
+    title: "What to set up first",
+    description: "What comes in most often that we have not counted yet?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -550,7 +565,8 @@ export const items: Item[] = [
   },
   {
     id: "q-changes",
-    title: "How do changes happen today, and who signs them off?",
+    title: "Change management requests",
+    description: "How do changes happen today, and who signs them off?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -565,7 +581,7 @@ export const items: Item[] = [
       ],
       source: "",
     },
-    from: ["change_volume", "request_1@change management", "request_2@change management", "freeze_periods"],
+    from: ["request_1@change management", "change_volume", "request_2@change management", "freeze_periods"],
     checklist: [
       { text: "How many changes a month, and what share are emergency? No change process exists today.", from: ["change_volume"] },
       { text: "Sign-off before anyone touches a store network in trading hours: how often does that come up?", from: ["request_1@change management"] },
@@ -580,7 +596,8 @@ export const items: Item[] = [
   },
   {
     id: "q-agreement",
-    title: "Who else needs to agree to this, and what else did you look at?",
+    title: "Teams and structure",
+    description: "Who else needs to agree to this, and what else did you look at?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -611,7 +628,9 @@ export const items: Item[] = [
   },
   {
     id: "q-date-fixed",
-    title: "Is 12 January 2027 fixed or preferred?",
+    title: "Decide if the date is fixed",
+    description: "Is 12 January 2027 fixed or preferred?",
+    handTitle: true,
     kind: "decision",
     module: "Timeline",
     lane: "start",
@@ -640,7 +659,8 @@ export const items: Item[] = [
   // ─── Conflicts from the board ──────────────────────────────────────────
   {
     id: "c-asset-day30",
-    title: "Raise: asset list expected by day 30, lead time says 8 to 16 weeks",
+    title: "Raise conflict: Asset management",
+    description: "Raise: asset list expected by day 30, lead time says 8 to 16 weeks",
     kind: "task",
     conflict: true,
     module: "Asset management",
@@ -667,7 +687,8 @@ export const items: Item[] = [
   },
   {
     id: "c-capacity",
-    title: "Raise: technical owner has about 4 hours a week, no admin named",
+    title: "Raise conflict: Name the customer admin",
+    description: "Raise: technical owner has about 4 hours a week, no admin named",
     kind: "task",
     conflict: true,
     module: "Foundation",
@@ -694,7 +715,9 @@ export const items: Item[] = [
   },
   {
     id: "c-macro",
-    title: "Decide: retire the weekly spreadsheet, or keep the macro",
+    title: "Decide spreadsheet or macro",
+    description: "Decide: retire the weekly spreadsheet, or keep the macro",
+    handTitle: true,
     kind: "decision",
     module: "Scope",
     lane: "start",
@@ -720,7 +743,9 @@ export const items: Item[] = [
   },
   {
     id: "c-one-process",
-    title: "Decide: one process or two, and one workspace or two",
+    title: "Decide one process or two",
+    description: "Decide: one process or two, and one workspace or two",
+    handTitle: true,
     kind: "decision",
     module: "Service catalog",
     lane: "start",
@@ -748,7 +773,8 @@ export const items: Item[] = [
   },
   {
     id: "c-finance-register",
-    title: "Raise: the asset count comes from a finance register, not IT",
+    title: "Raise conflict: Agree the asset model",
+    description: "Raise: the asset count comes from a finance register, not IT",
     kind: "task",
     conflict: true,
     module: "Asset management",
@@ -774,7 +800,8 @@ export const items: Item[] = [
   },
   {
     id: "c-legacy-expiry",
-    title: "Raise: legacy store desk tool expires 2027-03-31",
+    title: "Raise conflict: Dates and deadlines",
+    description: "Raise: legacy store desk tool expires 2027-03-31",
     kind: "task",
     conflict: true,
     module: "Timeline",
@@ -802,7 +829,8 @@ export const items: Item[] = [
   // ─── Week 2 ────────────────────────────────────────────────────────────
   {
     id: "taxonomy",
-    title: "Settle the taxonomy with both desk leads",
+    title: "Settle the taxonomy",
+    description: "Settle the taxonomy with both desk leads",
     kind: "task",
     module: "Service catalog",
     lane: "start",
@@ -826,7 +854,9 @@ export const items: Item[] = [
   },
   {
     id: "catalog-password",
-    title: "Build catalog item: password resets and account unlocks",
+    title: "Build the password reset item",
+    description: "Build catalog item: password resets and account unlocks",
+    handTitle: true,
     kind: "task",
     module: "Service catalog",
     lane: "quick",
@@ -853,7 +883,9 @@ export const items: Item[] = [
   },
   {
     id: "catalog-new-starter",
-    title: "Build catalog item: new starter setup",
+    title: "Build the new starter item",
+    description: "Build catalog item: new starter setup",
+    handTitle: true,
     kind: "task",
     module: "Service catalog",
     lane: "quick",
@@ -879,7 +911,9 @@ export const items: Item[] = [
   },
   {
     id: "starter-set-rest",
-    title: "Name the rest of the starter set",
+    title: "Complete the starter set",
+    description: "Name the rest of the starter set",
+    handTitle: true,
     kind: "task",
     module: "Service catalog",
     lane: "quick",
@@ -903,7 +937,8 @@ export const items: Item[] = [
   },
   {
     id: "approvers",
-    title: "Name approvers per catalog item, with a leave cover rule",
+    title: "Name approvers per item",
+    description: "Name approvers per catalog item, with a leave cover rule",
     kind: "task",
     module: "Service catalog",
     lane: "quick",
@@ -928,7 +963,9 @@ export const items: Item[] = [
   },
   {
     id: "kb-start",
-    title: "Start the knowledge base: weekly repeat questions first",
+    title: "Start the knowledge base",
+    description: "Start the knowledge base: weekly repeat questions first",
+    handTitle: true,
     kind: "task",
     module: "Knowledge base",
     lane: "start",
@@ -955,7 +992,8 @@ export const items: Item[] = [
   },
   {
     id: "change-freeze",
-    title: "Write down the December freeze and maintenance windows",
+    title: "Document freeze windows",
+    description: "Write down the December freeze and maintenance windows",
     kind: "task",
     module: "Change management",
     lane: "earned",
@@ -983,7 +1021,9 @@ export const items: Item[] = [
   // ─── Week 3 ────────────────────────────────────────────────────────────
   {
     id: "routing-rule",
-    title: "Routing rule: store tickets to the store desk, head office to us",
+    title: "Build the routing rule",
+    description: "Routing rule: store tickets to the store desk, head office to us",
+    handTitle: true,
     kind: "task",
     module: "Workflow automation",
     lane: "quick",
@@ -1011,7 +1051,9 @@ export const items: Item[] = [
   },
   {
     id: "joiners-leavers",
-    title: "Joiners and leavers from HR open their own tickets",
+    title: "Automate joiners and leavers",
+    description: "Joiners and leavers from HR open their own tickets",
+    handTitle: true,
     kind: "task",
     module: "Workflow automation",
     lane: "earned",
@@ -1039,7 +1081,8 @@ export const items: Item[] = [
   },
   {
     id: "fulfilment-groups",
-    title: "Confirm fulfilment group and capacity per catalog item",
+    title: "Confirm fulfilment groups",
+    description: "Confirm fulfilment group and capacity per catalog item",
     kind: "task",
     module: "Service catalog",
     lane: "quick",
@@ -1065,6 +1108,7 @@ export const items: Item[] = [
   {
     id: "asset-model",
     title: "Agree the asset model",
+    description: "Agree the asset model",
     kind: "task",
     module: "Asset management",
     lane: "earned",
@@ -1091,6 +1135,7 @@ export const items: Item[] = [
   {
     id: "asset-owners",
     title: "Name asset process owners",
+    description: "Name asset process owners",
     kind: "task",
     module: "Asset management",
     lane: "earned",
@@ -1114,7 +1159,8 @@ export const items: Item[] = [
   },
   {
     id: "change-board",
-    title: "Name change-board members and collect real change examples",
+    title: "Name the change board",
+    description: "Name change-board members and collect real change examples",
     kind: "task",
     module: "Change management",
     lane: "earned",
@@ -1140,7 +1186,9 @@ export const items: Item[] = [
   // ─── Week 4 ────────────────────────────────────────────────────────────
   {
     id: "catalog-live",
-    title: "Catalog items live to both desks",
+    title: "Put catalog items live",
+    description: "Catalog items live to both desks",
+    handTitle: true,
     kind: "task",
     module: "Service catalog",
     lane: "quick",
@@ -1166,7 +1214,9 @@ export const items: Item[] = [
   },
   {
     id: "first-approval",
-    title: "First real approval, end to end in production",
+    title: "Run the first real approval",
+    description: "First real approval, end to end in production",
+    handTitle: true,
     kind: "task",
     module: "Service catalog",
     lane: "quick",
@@ -1193,7 +1243,9 @@ export const items: Item[] = [
   },
   {
     id: "store-comms",
-    title: "Tell the stores the front door has changed",
+    title: "Tell stores the front door changed",
+    description: "Tell the stores the front door has changed",
+    handTitle: true,
     kind: "task",
     module: "Service catalog",
     lane: "quick",
@@ -1218,7 +1270,8 @@ export const items: Item[] = [
   },
   {
     id: "day30-review",
-    title: "Day 30 review with Priya and Dana",
+    title: "Hold the day 30 review",
+    description: "Day 30 review with Priya and Dana",
     kind: "task",
     module: "Timeline",
     lane: "start",
@@ -1246,7 +1299,8 @@ export const items: Item[] = [
   // ─── After day 30 ──────────────────────────────────────────────────────
   {
     id: "catalog-adoption",
-    title: "Catalog adoption sustained for two weeks",
+    title: "Reach evidence: Service catalog",
+    description: "Catalog adoption sustained for two weeks",
     kind: "task",
     module: "Service catalog",
     lane: "earned",
@@ -1272,7 +1326,8 @@ export const items: Item[] = [
   },
   {
     id: "kb-write-path",
-    title: "Knowledge base write path holds",
+    title: "Reach evidence: Knowledge base",
+    description: "Knowledge base write path holds",
     kind: "task",
     module: "Knowledge base",
     lane: "earned",
@@ -1299,7 +1354,8 @@ export const items: Item[] = [
   },
   {
     id: "automation-coverage",
-    title: "Automation coverage that moves the numbers",
+    title: "Reach evidence: Workflow automation",
+    description: "Automation coverage that moves the numbers",
     kind: "task",
     module: "Workflow automation",
     lane: "earned",
@@ -1325,7 +1381,8 @@ export const items: Item[] = [
   },
   {
     id: "discovery",
-    title: "Discovery scans running on schedule",
+    title: "Reach evidence: Discovery",
+    description: "Discovery scans running on schedule",
     kind: "task",
     module: "Discovery",
     lane: "earned",
@@ -1355,7 +1412,8 @@ export const items: Item[] = [
   },
   {
     id: "asset-management",
-    title: "Asset management in daily use",
+    title: "Reach evidence: Asset management",
+    description: "Asset management in daily use",
     kind: "task",
     module: "Asset management",
     lane: "earned",
@@ -1383,7 +1441,8 @@ export const items: Item[] = [
   },
   {
     id: "change-management",
-    title: "Change management in use",
+    title: "Reach evidence: Change management",
+    description: "Change management in use",
     kind: "task",
     module: "Change management",
     lane: "earned",
@@ -1573,6 +1632,7 @@ export const people: Person[] = [
 export const dataset: Dataset = {
   id: "halden",
   label: "Halden Retail Group",
+  configFile: "config/itsm.md",
   order: 2,
   note: "Illustrative example. Halden Retail Group is fictional.",
   account,

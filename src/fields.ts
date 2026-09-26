@@ -81,7 +81,7 @@ export function fieldLabel(id: string, module: string, extra: Record<string, str
   // "request_2" is a section 6 request in this item's module; "request_2@knowledge base"
   // names the module, for a grouped question that spans several.
   const req = /^request_(\d+)(?:@(.+))?$/.exec(id);
-  if (req) return `What they want set up first — ${req[2] ?? module.toLowerCase()}, request ${req[1]}`;
+  if (req) return `What they want set up first, ${req[2] ?? module.toLowerCase()}, request ${req[1]}`;
   return extra[id] ?? HANDOFF_FIELDS[id] ?? SPECIAL[id] ?? id;
 }
 

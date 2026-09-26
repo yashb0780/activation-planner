@@ -9,7 +9,7 @@
 // owner; an item names other roles only where the plan does.
 
 import type { Account, Dataset, FirstValue, Gate, Item, Person, Role, SuccessPlan } from "../types";
-import { configFieldLabels, disclaimer, driftRules, EVIDENCE, LEAD, MODULE, NOT_EVIDENCE, product } from "./langchain-product";
+import { configFieldLabels, disclaimer, driftRules, EVIDENCE, LEAD, MODULE, NOT_EVIDENCE, product } from "./langchain-product.ts";
 
 const account: Account = {
   customer: "CoreWeave",
@@ -51,6 +51,7 @@ const items: Item[] = [
   {
     id: "k-org",
     title: "Set up the organization",
+    description: "Create one organization for support engineering, with Tomás Varga as Organization Admin.",
     kind: "task",
     module: MODULE.access,
     lane: "kickoff",
@@ -69,6 +70,7 @@ const items: Item[] = [
   {
     id: "k-workspaces",
     title: "Create workspaces",
+    description: "Create a workspace for support engineering. Keep dev and production apart with resource tags (Environment: dev, prod), not separate workspaces, as the config advises.",
     kind: "task",
     module: MODULE.access,
     lane: "kickoff",
@@ -91,6 +93,7 @@ const items: Item[] = [
   {
     id: "k-roles",
     title: "Assign roles",
+    description: "Give each of the about 25 support engineers the right organization and workspace role.",
     kind: "task",
     module: MODULE.access,
     lane: "kickoff",
@@ -106,6 +109,7 @@ const items: Item[] = [
   {
     id: "k-keys",
     title: "Issue service keys",
+    description: "Issue a service key for the agent, stored where their pipeline reads secrets. Personal tokens are for people only.",
     kind: "task",
     module: MODULE.access,
     lane: "kickoff",
@@ -121,6 +125,7 @@ const items: Item[] = [
   {
     id: "success-plan",
     title: "Draft the success plan",
+    description: "Draft a one-page success plan: their goal in their words, the success measures with their baselines, the proposed first value, milestones with target weeks, and the People list. Confirm it at kickoff and share it by the end of week 1.",
     kind: "task",
     module: "Success plan",
     lane: "kickoff",
@@ -148,7 +153,8 @@ const items: Item[] = [
   // ─── Week 1 · Decision ─────────────────────────────────────────────────
   {
     id: "d-reset",
-    title: "Reset go-live date or cut scope",
+    title: "Decide new go-live or cut scope",
+    description: "Deployment is already drifting on day 1: at the long end of its lead time it finishes after the 2026-11-16 target. The date is preferred, not fixed. Decide with Tomás whether to move the target date or cut what must be live on 2026-11-16.",
     kind: "decision",
     module: MODULE.deployment,
     lane: "start",
@@ -178,7 +184,8 @@ const items: Item[] = [
   // ─── Open questions, grouped as a CSM would ask them on a call ────────
   {
     id: "q-sponsor",
-    title: "Who sponsors this on your side, and who decides it worked?",
+    title: "People and sponsor",
+    description: "Who sponsors this on your side, and who decides it worked?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -202,7 +209,8 @@ const items: Item[] = [
   },
   {
     id: "q-traces",
-    title: "Where may traces and ticket data live, and what does your security review need from us?",
+    title: "Security review and data",
+    description: "Where may traces and ticket data live, and what does your security review need from us?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -215,7 +223,7 @@ const items: Item[] = [
       facts: ["Ticket data must stay inside their environment", "Hybrid or Self-hosted: not decided", "Questionnaire not yet sent to us"],
       source: COMMERCIAL,
     },
-    from: ["products", "data_residency", "security_open_items", "certifications", "config"],
+    from: ["data_residency", "products", "security_open_items", "certifications", "config"],
     checklist: [
       { text: "Hybrid or Self-hosted? Not decided.", from: ["products"] },
       {
@@ -231,7 +239,8 @@ const items: Item[] = [
   },
   {
     id: "q-cluster",
-    title: "Who runs the cluster the agent will live on?",
+    title: "Current setup and data",
+    description: "Who runs the cluster the agent will live on?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -261,7 +270,8 @@ const items: Item[] = [
   },
   {
     id: "q-identity",
-    title: "Who owns your identity provider, and who needs access where?",
+    title: "Access and identity",
+    description: "Who owns your identity provider, and who needs access where?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -290,7 +300,8 @@ const items: Item[] = [
   },
   {
     id: "q-quality",
-    title: "What should the agent's quality be measured against?",
+    title: "Baseline numbers",
+    description: "What should the agent's quality be measured against?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -301,7 +312,7 @@ const items: Item[] = [
       facts: ["Eval request has no volume", "~2,000 past tickets with a known queue (estimate)", "Expected runs per month: UNKNOWN"],
       source: TECHNICAL,
     },
-    from: ["request_1@evaluation", "out_of_scope", "expected_runs", "labeled_examples", "data_residency"],
+    from: ["labeled_examples", "expected_runs", "request_1@evaluation", "out_of_scope", "data_residency"],
     checklist: [
       {
         text: "\"Know before we ship if a prompt change makes routing worse\": how many prompt changes a month? Discovery task.",
@@ -320,7 +331,8 @@ const items: Item[] = [
   },
   {
     id: "q-alerts",
-    title: "When the agent stops triaging at 3am, who should hear about it?",
+    title: "Monitoring and alerts requests",
+    description: "When the agent stops triaging at 3am, who should hear about it?",
     kind: "question",
     module: "Kickoff questions",
     lane: "start",
@@ -346,6 +358,7 @@ const items: Item[] = [
   {
     id: "exec-sponsor",
     title: "Identify exec sponsor",
+    description: "Find out who sponsors this rollout on their side. Nobody above Tomás has been on a call, and the order form came back through procurement.",
     kind: "task",
     module: "People",
     lane: "start",
@@ -363,7 +376,8 @@ const items: Item[] = [
   },
   {
     id: "raise-sso",
-    title: "Raise: SSO promised for week 1, lead time 1 to 4 weeks",
+    title: "Raise conflict: Set up SSO",
+    description: "Raise at kickoff that SSO was promised for week 1, while the config's lead time is 1 to 4 weeks because the identity team sits outside the buying team. Agree a new SSO timing.",
     kind: "task",
     module: MODULE.access,
     lane: "foundation",
@@ -387,7 +401,8 @@ const items: Item[] = [
   },
   {
     id: "raise-day30",
-    title: "Raise: deployment by day 30, Tomás and Lena disagree",
+    title: "Raise conflict: Deploy the agent",
+    description: "Raise at kickoff, with both in the room, that Tomás wants the agent running by day 30 and Lena says nothing touching real tickets runs before her review.",
     kind: "task",
     module: MODULE.deployment,
     lane: "start",
@@ -413,6 +428,7 @@ const items: Item[] = [
   {
     id: "f-admin",
     title: "Name the customer admin",
+    description: "Confirm Tomás Varga as the customer admin, with his weekly hours for this written down. He has about 8 hours a week and also runs the triage rotation.",
     kind: "task",
     module: MODULE.access,
     lane: "foundation",
@@ -428,6 +444,7 @@ const items: Item[] = [
   {
     id: "f-sso-provider",
     title: "Confirm SSO provider",
+    description: "Get an introduction to Owen Achebe, who owns their identity provider and has not heard about the project. Confirm which provider they use and whether SCIM is required.",
     kind: "task",
     module: MODULE.access,
     lane: "foundation",
@@ -445,6 +462,7 @@ const items: Item[] = [
   {
     id: "f-sso",
     title: "Set up SSO",
+    description: "Set up SAML SSO for the support engineering team with Owen's identity team, and test it with one real support engineer.",
     kind: "task",
     module: MODULE.access,
     lane: "foundation",
@@ -473,6 +491,7 @@ const items: Item[] = [
   {
     id: "f-traces",
     title: "Decide where traces live",
+    description: "Decide, with Lena and Tomás, where traces may be stored: LangSmith Cloud with inputs and outputs masked, BYOC, or self-hosted LangSmith. No real ticket is traced until this is recorded.",
     kind: "decision",
     module: MODULE.observability,
     lane: "foundation",
@@ -497,6 +516,7 @@ const items: Item[] = [
   {
     id: "f-review",
     title: "Open the security review",
+    description: "Open their security review of the deployment option and the trace storage decision. Ask Lena for the vendor questionnaire and the security reports she needs.",
     kind: "task",
     module: MODULE.deployment,
     lane: "foundation",
@@ -520,6 +540,7 @@ const items: Item[] = [
   {
     id: "baseline",
     title: "Capture baselines",
+    description: "Record the one missing baseline, agent runs per month expected in production, labelled estimate or measured, before any module is configured.",
     kind: "task",
     module: "Baseline",
     lane: "start",
@@ -535,6 +556,7 @@ const items: Item[] = [
   {
     id: "o-testdata",
     title: "Pick test data",
+    description: "Choose a set of test tickets that hold no customer data, for tracing in the dev project.",
     kind: "task",
     module: MODULE.observability,
     lane: "quick",
@@ -550,6 +572,7 @@ const items: Item[] = [
   {
     id: "o-tracing",
     title: "Turn on tracing",
+    description: "Turn on tracing for the agent in a cloud dev project tagged Environment: dev, on test tickets only. First value: Tomás can see which step chose a ticket's queue.",
     kind: "task",
     module: MODULE.observability,
     lane: "quick",
@@ -569,7 +592,8 @@ const items: Item[] = [
   // ─── Week 2 ────────────────────────────────────────────────────────────
   {
     id: "d-option",
-    title: "Choose the deployment option",
+    title: "Decide the deployment option",
+    description: "Decide between Hybrid and Self-hosted with Lena and Tomás, against the trace storage decision. K. Lindqvist walks them through both, as promised in sales.",
     kind: "decision",
     module: MODULE.deployment,
     lane: "start",
@@ -591,6 +615,7 @@ const items: Item[] = [
   {
     id: "platform-owner",
     title: "Name the platform owner",
+    description: "Get a named owner on the platform team that runs the Kubernetes cluster. Nobody there is named, and they have not agreed to host the agent.",
     kind: "task",
     module: MODULE.deployment,
     lane: "start",
@@ -613,7 +638,8 @@ const items: Item[] = [
   },
   {
     id: "e-good",
-    title: "Agree what a good triage is",
+    title: "Agree what a good outcome is",
+    description: "Turn their outcome (triaged within 5 minutes, fewer misrouted) into a written definition of a correct outcome that an evaluator can score.",
     kind: "task",
     module: MODULE.evaluation,
     lane: "earned",
@@ -632,6 +658,7 @@ const items: Item[] = [
   {
     id: "e-reviewer",
     title: "Name a reviewer",
+    description: "Name someone on their side who checks the eval dataset's reference outputs, with their weekly time for it.",
     kind: "task",
     module: MODULE.evaluation,
     lane: "earned",
@@ -649,6 +676,7 @@ const items: Item[] = [
   {
     id: "d-infra",
     title: "Prepare their infrastructure",
+    description: "Prepare the cluster, datastores and network access the chosen option needs, including the IT-approved firewall change for outbound connections.",
     kind: "task",
     module: MODULE.deployment,
     lane: "start",
@@ -675,6 +703,7 @@ const items: Item[] = [
   {
     id: "o-mask",
     title: "Mask sensitive fields",
+    description: "If traces will go to LangSmith Cloud, hide or redact inputs and outputs before they are sent, and have Lena check a test trace.",
     kind: "task",
     module: MODULE.observability,
     lane: "quick",
@@ -691,6 +720,7 @@ const items: Item[] = [
   {
     id: "m-owner",
     title: "Name the alert owner",
+    description: "Name who on their side receives alerts, and write down their on-call route through their paging tool.",
     kind: "task",
     module: MODULE.monitoring,
     lane: "earned",
@@ -708,6 +738,7 @@ const items: Item[] = [
   {
     id: "review",
     title: "Hold the day 30 review",
+    description: "Hold the day 30 review with Tomás and the exec sponsor: check go-live against the Deployment window, and write down where the security review stands.",
     kind: "task",
     module: "Review",
     lane: "start",
@@ -730,6 +761,7 @@ const items: Item[] = [
   {
     id: "d-deploy",
     title: "Deploy the agent",
+    description: "Deploy the agent to an Agent Server in their environment, through their own pipeline, so it triages real tickets.",
     kind: "task",
     module: MODULE.deployment,
     lane: "start",
@@ -748,6 +780,7 @@ const items: Item[] = [
   {
     id: "d-signoff",
     title: "Record security sign-off",
+    description: "Get security sign-off recorded in writing by Lena Hartmann. Nothing touching real tickets runs before it.",
     kind: "task",
     module: MODULE.deployment,
     lane: "start",
@@ -765,6 +798,7 @@ const items: Item[] = [
   {
     id: "o-prod",
     title: "Trace production traffic",
+    description: "Trace the agent's real ticket traffic, stored wherever the trace storage decision says.",
     kind: "task",
     module: MODULE.observability,
     lane: "quick",
@@ -782,6 +816,7 @@ const items: Item[] = [
   {
     id: "e-dataset",
     title: "Build the eval dataset",
+    description: "Build the eval dataset from real traces, with reference outputs checked by their named reviewer.",
     kind: "task",
     module: MODULE.evaluation,
     lane: "earned",
@@ -798,13 +833,14 @@ const items: Item[] = [
   {
     id: "e-evaluators",
     title: "Choose evaluators",
+    description: "Choose the evaluators (code rules, LLM-as-judge, or human review) that score the agreed definition of a good outcome.",
     kind: "task",
     module: MODULE.evaluation,
     lane: "earned",
     week: "after",
     status: "todo",
     side: "customer",
-    why: { facts: ["Code rules, LLM-as-judge, or human review", "Per the agreed definition of a good triage"], source: "" },
+    why: { facts: ["Code rules, LLM-as-judge, or human review", "Per the agreed definition of a good outcome"], source: "" },
     from: ["config"],
     doneWhen: ["Evaluators chosen and written down", "Each one scores the agreed definition"],
     notEvidence: [],
@@ -814,6 +850,7 @@ const items: Item[] = [
   {
     id: "e-baseline",
     title: "Run a baseline experiment",
+    description: "Run the current agent version on the dataset. This is the baseline every later version is compared to.",
     kind: "task",
     module: MODULE.evaluation,
     lane: "earned",
@@ -831,6 +868,7 @@ const items: Item[] = [
   {
     id: "e-online",
     title: "Turn on online evaluators",
+    description: "Turn on online evaluators that score production traffic as it arrives.",
     kind: "task",
     module: MODULE.evaluation,
     lane: "earned",
@@ -847,6 +885,7 @@ const items: Item[] = [
   {
     id: "m-dashboard",
     title: "Build a project dashboard",
+    description: "Build a dashboard on the production project's trace data, reviewed by the alert owner.",
     kind: "task",
     module: MODULE.monitoring,
     lane: "earned",
@@ -863,6 +902,7 @@ const items: Item[] = [
   {
     id: "m-thresholds",
     title: "Set alert thresholds",
+    description: "Set alert thresholds from a week of real numbers, not defaults.",
     kind: "task",
     module: MODULE.monitoring,
     lane: "earned",
@@ -880,6 +920,7 @@ const items: Item[] = [
   {
     id: "m-route",
     title: "Route alerts to on-call",
+    description: "Route alerts to their on-call through their paging tool, to the named alert owner.",
     kind: "task",
     module: MODULE.monitoring,
     lane: "earned",
@@ -1018,6 +1059,8 @@ const people: Person[] = [
 export const dataset: Dataset = {
   id: "langchain-coreweave",
   label: "CoreWeave",
+  configFile: "config/langchain.md",
+  boardFile: "examples/langchain-coreweave-board.md",
   order: 1,
   note: "Hypothetical engagement. Every person, number and date is fictional.",
   productFirst: true,

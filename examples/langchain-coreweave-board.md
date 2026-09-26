@@ -141,7 +141,7 @@ week of real traffic. Ask: Tomás Varga.
 4. **Deployment is already drifting on day 1.** At the long end of its lead time,
    the latest safe start was 2026-09-02, before the contract started. See the
    drift check. The target date is preferred, not fixed. Week 1 decision:
-   **Reset go-live date or cut scope**, owned by Tomás Varga (Step 1).
+   **Decide new go-live or cut scope**, owned by Tomás Varga (Step 1).
    *From: Fixed or preferred · Target go-live date · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config*
 
 ### First value (proposed, confirm at kickoff) (inferred)
@@ -167,7 +167,7 @@ week of real traffic. Ask: Tomás Varga.
 1. **Kickoff done**, by end of week 1 (2026-09-20)
    - Exec sponsor named (item: Identify exec sponsor)
    - SSO timing reset with Tomás (item: Confirm SSO provider)
-   - Go-live date or scope decided (item: Reset go-live date or cut scope)
+   - Go-live date or scope decided (item: Decide new go-live or cut scope)
    - Success plan confirmed and shared (item: success plan)
 2. **First traces**, by end of week 2 (2026-09-27)
    - Tracing on in a dev project (item: Turn on tracing)
@@ -190,7 +190,7 @@ first.
 
 | Decision | Why it is here | Owners | Status | From |
 |---|---|---|---|---|
-| Reset go-live date or cut scope | Deployment is Drifting on day 1 (conflict 4). At the long end of its lead time it finishes after 2026-11-16, and the review it waits on has not started. The date is preferred, not fixed. Options: move the target date, or cut what must be live on 2026-11-16. | Technical owner (them); CSM (us) | **Ready:** decide at kickoff, with the answer to open question 3 | From: Target go-live date · Fixed or preferred · Must something here be live by day 30? · product config |
+| Decide new go-live or cut scope | Deployment is Drifting on day 1 (conflict 4). At the long end of its lead time it finishes after 2026-11-16, and the review it waits on has not started. The date is preferred, not fixed. Options: move the target date, or cut what must be live on 2026-11-16. | Technical owner (them); CSM (us) | **Ready:** decide at kickoff, with the answer to open question 3 | From: Target go-live date · Fixed or preferred · Must something here be live by day 30? · product config |
 
 ### Kickoff setup
 
@@ -259,7 +259,7 @@ cloud deployment):
 
 The second commitment, help choosing between Hybrid and Self-hosted (K.
 Lindqvist to Lena Hartmann, deliverable: `yes`), sits on the config step
-**Choose the deployment option**.
+**Decide the deployment option**.
 
 ## Step 4, after one week of real traffic: Evaluation, and Monitoring and alerts
 
@@ -271,7 +271,7 @@ Deployment. Each gets groundwork as its first step.
 
 | Module | Lead time | Depends on, and where each stands | Evidence it is real | Status | From |
 |---|---|---|---|---|---|
-| Evaluation | Earned, 2 to 4 weeks (estimate) after a week of real traffic | Trace production traffic: not possible until Deployment and the storage decision. Agree what a good triage is: their outcome says "triaged within 5 minutes, fewer misrouted", not yet written as a scoring rule. Name a reviewer: not named. | *"An experiment compared two versions of their agent, and the result changed a decision (a version shipped, or did not)"*; *"The dataset holds examples from real tickets, reviewed by a person on their side"*; *"Evaluation runs as a step before they release a new version, run by them"* | **Blocked** behind production traffic. First step inside 30 days: groundwork, agree what a good triage is and name a reviewer. | From: Their stated outcome · How they will know it worked · Past tickets with a known correct queue · product config |
+| Evaluation | Earned, 2 to 4 weeks (estimate) after a week of real traffic | Trace production traffic: not possible until Deployment and the storage decision. Agree what a good outcome is: their outcome says "triaged within 5 minutes, fewer misrouted", not yet written as a scoring rule. Name a reviewer: not named. | *"An experiment compared two versions of their agent, and the result changed a decision (a version shipped, or did not)"*; *"The dataset holds examples from real tickets, reviewed by a person on their side"*; *"Evaluation runs as a step before they release a new version, run by them"* | **Blocked** behind production traffic. First step inside 30 days: groundwork, agree what a good outcome is and name a reviewer. | From: Their stated outcome · How they will know it worked · Past tickets with a known correct queue · product config |
 | Monitoring and alerts | Earned, 1 to 2 weeks (estimate) from the first week of production traffic | Trace production traffic: as above. Name the alert owner: not named. Their on-call paging tool stays. | *"Their on-call received an alert from the production project and acted on it"*; *"Thresholds were set from real traffic and reviewed once since"*; *"The dashboard is reviewed in a standing meeting by a named owner"* | **Blocked** behind production traffic. First step inside 30 days: groundwork, name the alert owner. | From: Anything already built or automated they expect to keep · product config |
 
 **Requests, by volume:**
@@ -340,7 +340,7 @@ sponsor, Owen, the platform owner, and where traces live.
 
 Every item on this board, one row each, in plan order: the tasks, decisions and
 open questions above, plus the config steps the plan schedules after day 30.
-Names are the config's short titles; open questions keep their wording. The
+Names are short titles: the config's, a rule's, or, for an open question, its topic from the fixed list. The
 app's item list must match this table exactly. "Week" is the plan week the item
 is due in; "after" means after day 30.
 
@@ -351,16 +351,16 @@ is due in; "after" means after day 30.
 | Assign roles | task | 1 | Workspace and access |
 | Issue service keys | task | 1 | Workspace and access |
 | Draft the success plan | task | 1 | Success plan |
-| Reset go-live date or cut scope | decision | 1 | Deployment |
-| Who sponsors this on your side, and who decides it worked? | question | 1 | Kickoff questions |
-| Where may traces and ticket data live, and what does your security review need from us? | question | 1 | Kickoff questions |
-| Who runs the cluster the agent will live on? | question | 1 | Kickoff questions |
-| Who owns your identity provider, and who needs access where? | question | 1 | Kickoff questions |
-| What should the agent's quality be measured against? | question | 1 | Kickoff questions |
-| When the agent stops triaging at 3am, who should hear about it? | question | 1 | Kickoff questions |
+| Decide new go-live or cut scope | decision | 1 | Deployment |
+| People and sponsor | question | 1 | Kickoff questions |
+| Security review and data | question | 1 | Kickoff questions |
+| Current setup and data | question | 1 | Kickoff questions |
+| Access and identity | question | 1 | Kickoff questions |
+| Baseline numbers | question | 1 | Kickoff questions |
+| Monitoring and alerts requests | question | 1 | Kickoff questions |
 | Identify exec sponsor | task | 1 | People |
-| Raise: SSO promised for week 1, lead time 1 to 4 weeks | task | 1 | Workspace and access |
-| Raise: deployment by day 30, Tomás and Lena disagree | task | 1 | Deployment |
+| Raise conflict: Set up SSO | task | 1 | Workspace and access |
+| Raise conflict: Deploy the agent | task | 1 | Deployment |
 | Name the customer admin | task | 1 | Workspace and access |
 | Confirm SSO provider | task | 1 | Workspace and access |
 | Set up SSO | task | 1 | Workspace and access |
@@ -369,9 +369,9 @@ is due in; "after" means after day 30.
 | Capture baselines | task | 1 | Baseline |
 | Pick test data | task | 1 | Observability |
 | Turn on tracing | task | 1 | Observability |
-| Choose the deployment option | decision | 2 | Deployment |
+| Decide the deployment option | decision | 2 | Deployment |
 | Name the platform owner | task | 2 | Deployment |
-| Agree what a good triage is | task | 2 | Evaluation |
+| Agree what a good outcome is | task | 2 | Evaluation |
 | Name a reviewer | task | 2 | Evaluation |
 | Prepare their infrastructure | task | 3 | Deployment |
 | Mask sensitive fields | task | 3 | Observability |

@@ -81,7 +81,7 @@ order.
 
 **Both files open the same way**, before anything else:
 
-1. **A status line: `Status: Draft — 0 of N sections reviewed`.** Every
+1. **A status line: `Status: Draft, 0 of N sections reviewed`.** Every
    generated file is a draft. Under every `##` section heading, put one line:
    `- [ ] Reviewed`. The person reviewing ticks each box as they finish a
    section, and changes the status line to `Status: Reviewed` only when every
@@ -121,7 +121,7 @@ Do not introduce product names, vendors, or tooling the handoff does not.
 the plan ends with a source tag: `From: <field name>`, using the field's name
 exactly as `templates/handoff.md` writes it in the Field, Role or Metric
 column — for example `From: Security review required before deployment`. For
-a section 6 request, write `From: What they want set up first — <module>,
+a section 6 request, write `From: What they want set up first, <module>,
 request <rank>`. For a baseline row the config adds, use the config's name for
 it. If the item comes from a config default and no handoff field, write
 `From: product config`. If both, list the handoff fields first and end with
@@ -138,8 +138,43 @@ Every task names an owner role on each side:
   instead.
 - **More than one:** list them in order. The first is the primary.
 
-Write `Owners: us — <role>; them — <role>`. The name is looked up from the
+Write `Owners: <role> (us); <role> (them)`. The name is looked up from the
 People list, so a change to one name changes every task that uses the role.
+
+**Every item has a short title and a description.** The title is what a row
+shows; the description is the full sentence, shown when the row is opened. A
+title never carries detail the description should hold. The rules, the fixed
+lists, and a check that enforces them live in `src/titles.ts`; this section is
+the same rules in words. Change both together.
+
+- **Style.** 2 to 6 words, sentence case, no full stop, no em dash. Tasks start
+  with a verb ("Set up SSO"). Decisions start with "Decide" ("Decide where traces
+  live"). Questions are a short topic ("Current setup and data").
+- **Tasks and decisions** take their title from the config: the bold words at
+  the start of the bullet or step they come from, word for word. The config
+  says which words ("Short title" under How to read the fields).
+- **Titles made by rule**, for any product:
+  - `Draft the success plan`, `Identify exec sponsor` (exec sponsor `UNKNOWN`),
+    `Capture baselines` (a section 10 baseline `UNKNOWN`), `Hold the day 30 review`,
+    `Decide new go-live or cut scope` (a long-lead item already drifting on day
+    1), `Ask about approval timelines` (approval timelines not in the handoff).
+  - With a colon, where only the part before it is fixed, and the part after it
+    is another item's title, a module name, a question topic, or `request N`:
+    `Name owner: <title>`, `Raise conflict: <what it is about>`,
+    `Decide scope: <module>` (a short/long lead time the handoff does not
+    resolve, Step 2), `Reach evidence: <module>` (a module reaching its
+    evidence after day 30, when the config has no step for it).
+- **Questions** take the topic of the first handoff field they cover, so list a
+  question's main field first. Topics: People and sponsor · Dates and deadlines
+  · Why they bought · Sales commitments · What a win looks like · What to set
+  up first · Security review and data · Access and identity · Current setup and
+  data · Teams and structure · Baseline numbers · Handoff notes. The field-to-topic
+  list is in `src/titles.ts`. When the first field is a section 6 request and
+  every request the question covers is in one module, the title is
+  `<Module> requests`. The question as a CSM would ask it is the description.
+- **Nothing else.** If no config line, rule or topic gives a title, write one by
+  hand in the same style and say so: the app marks it hand-written and counts it.
+- **No two items share a title.**
 
 ---
 
@@ -405,6 +440,15 @@ already avoided, or not yet visible. This is the cheapest useful thing in the
 whole document — it is a list of known failure modes checked against a specific
 customer.
 
+After it, end the board with an **Item index**: one row per item on the board
+and in the plan, in plan order, including the config steps the plan schedules
+after day 30.
+
+| Item | Kind | Week | Module |
+
+Item is the short title; Kind is task, decision or question; Week is 1 to 4, or
+`after` for after day 30. The app's item list is checked against this table.
+
 ## Step 6 — Write the 30-day plan
 
 Day 1 is the contract start date if the handoff has one, otherwise the date
@@ -428,7 +472,7 @@ customer** (named people, specific asks), **checkpoint**, **risks live this
 week**.
 
 Every task under **starting** carries its owners and its source tag on its own
-line: `Owners: us — CSM; them — Technical owner · From: Target go-live date`.
+line: `Owners: CSM (us); Technical owner (them) · From: Target go-live date`.
 
 Every task also gets a **Done when** line: **2 to 3 short checks anyone could
 verify by looking**. Specific, not vague, and not complicated. Each check is a
@@ -557,6 +601,9 @@ fastest way for a reader to see the difference between the two kinds of claim.
   as-of date.
 - Every task has a "Done when" of 2 to 3 short checks someone could verify by
   looking. None of them softens a config evidence line.
+- Every item has a short title that follows the short-title rules, and a
+  description. No two items share a title. Any hand-written title is said so.
+- The board ends with an Item index that lists every item exactly once.
 
 Then report back in a few lines: the two file paths, the single largest
 `UNKNOWN`, the longest-lead item, and any commitment in the handoff that the
