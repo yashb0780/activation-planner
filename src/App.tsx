@@ -10,9 +10,9 @@ import { CustomerWeek } from "./components/CustomerWeek";
 import { PlanList, type MenuRequest, type RowActions, type RowInfo } from "./components/PlanList";
 import { CommandMenu, type Command } from "./components/CommandMenu";
 import { weekLabel } from "./components/ui";
-import { currentWeek, formatDate, todayIso } from "./dates";
+import { currentWeek, dueLabel, formatDate, todayIso } from "./dates";
 import { drift, type Drift } from "./drift";
-import { fieldLabel, sourceTag } from "./fields";
+import { fieldLabel } from "./fields";
 import { buildGroups, LENS_LABEL, LENSES, type Lens } from "./grouping";
 import { RolesContext } from "./owners";
 
@@ -114,11 +114,10 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
   const info = useCallback(
     (i: Item): RowInfo => ({
       flag: customerView ? null : drifts.get(i.id)?.flag,
-      where: lens === "week" ? i.module : `${weekLabel(i.week)} · ${i.module}`,
-      sourceTag: customerView ? undefined : sourceTag(i.from, i.module, configFieldLabels),
-      internal: !customerView && i.visibility === "internal",
+      module: i.module,
+      due: dueLabel(i.week, account),
     }),
-    [customerView, drifts, lens, configFieldLabels],
+    [customerView, drifts, account],
   );
 
   /** Open an item's panel on its done form (tasks) or its record/answer form (decisions, questions). */

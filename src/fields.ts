@@ -1,5 +1,5 @@
-// Field names from templates/handoff.md, keyed by field ID. Used for source tags
-// ("From: ..."). If you rename or add a field in the template, update it here in
+// Field names from templates/handoff.md, keyed by field ID. Used to name the handoff
+// fields an item came from, in the side panel. If you rename or add a field in the template, update it here in
 // the same change. Product-specific rows (from a config) are passed in separately.
 
 export const HANDOFF_FIELDS: Record<string, string> = {
@@ -83,11 +83,4 @@ export function fieldLabel(id: string, module: string, extra: Record<string, str
   const req = /^request_(\d+)(?:@(.+))?$/.exec(id);
   if (req) return `What they want set up first, ${req[2] ?? module.toLowerCase()}, request ${req[1]}`;
   return extra[id] ?? HANDOFF_FIELDS[id] ?? SPECIAL[id] ?? id;
-}
-
-/** "From: ..." text for an item. Handoff fields first, "product config" last. */
-export function sourceTag(from: string[], module: string, extra: Record<string, string> = {}): string {
-  const label = (id: string) => fieldLabel(id, module, extra);
-  const ordered = [...from.filter((f) => f !== "config"), ...from.filter((f) => f === "config")];
-  return `From: ${ordered.map(label).join(" · ")}`;
 }

@@ -2,18 +2,17 @@ import { useEffect, useRef } from "react";
 import type { DriftFlag } from "../drift";
 import type { Group } from "../grouping";
 import type { Item, Role, Side, Status } from "../types";
-import { EyeOffIcon } from "./icons";
-import { DriftFlagChip, HandoffChips, OwnerMenu, StatusMenu } from "./Status";
+import { OwnerMenu, RowFlag, StatusMenu } from "./Status";
 
-// The plan as dense rows under collapsible group headers. Each row has a status
-// pill and an owner pill; both open a small menu.
+// The plan as dense rows under collapsible group headers, one line per item:
+// status, short title, module, owner, due date. Status and owner open a small
+// menu; the title opens the side panel, which holds everything else.
 
 export interface RowInfo {
   flag?: DriftFlag | null;
-  /** Second column: module, or week and module when not grouped by week. */
-  where: string;
-  sourceTag?: string;
-  internal: boolean;
+  module: string;
+  /** "3 Oct", or "After day 30". */
+  due: string;
 }
 
 export interface RowActions {
@@ -46,7 +45,7 @@ interface Props {
 }
 
 const COLS =
-  "grid-cols-[var(--col-status)_minmax(0,1fr)_var(--col-owner)] lg:grid-cols-[var(--col-status)_minmax(0,1fr)_var(--col-where)_var(--col-owner)]";
+  "grid-cols-[var(--col-status)_minmax(0,1fr)_var(--col-owner)] md:grid-cols-[var(--col-status)_minmax(0,1fr)_var(--col-owner)_var(--col-due)] lg:grid-cols-[var(--col-status)_minmax(0,1fr)_var(--col-where)_var(--col-owner)_var(--col-due)]";
 
 function Row({
   item,
@@ -109,21 +108,10 @@ function Row({
         >
           {item.title}
         </button>
-        {info.flag && <DriftFlagChip flag={info.flag} />}
-        <HandoffChips item={item} />
-        {info.internal && (
-          <span className="shrink-0 text-faint" title="Internal: hidden in customer view">
-            <EyeOffIcon />
-          </span>
-        )}
-        {info.sourceTag && (
-          <span className="hidden min-w-28 flex-1 truncate text-xs text-faint xl:inline" title={info.sourceTag}>
-            {info.sourceTag}
-          </span>
-        )}
+        <RowFlag item={item} drift={info.flag} />
       </span>
-      <span className="hidden truncate text-xs text-muted lg:block" title={info.where}>
-        {info.where}
+      <span className="hidden truncate text-xs text-muted lg:block" title={info.module}>
+        {info.module}
       </span>
       <span className="min-w-0">
         <OwnerMenu
@@ -135,6 +123,7 @@ function Row({
           openSignal={mine?.kind === "owner" ? mine.n : undefined}
         />
       </span>
+      <span className="tabular hidden text-right text-xs text-muted md:block">{info.due}</span>
     </div>
   );
 }

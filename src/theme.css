@@ -138,6 +138,7 @@
   --col-status: 148px;     /* status column */
   --col-where: 190px;      /* module column (wide screens) */
   --col-owner: 200px;      /* owner column */
+  --col-due: 84px;         /* due date column */
   --panel-width: 480px;    /* item detail panel */
   --page-max: 1360px;
 }

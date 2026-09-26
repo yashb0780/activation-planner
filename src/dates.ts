@@ -35,3 +35,8 @@ export function todayIso(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
+
+/** When an item is due: the last day of its plan week, or "After day 30". */
+export function dueLabel(week: Week, account: Account): string {
+  return week === "after" ? "After day 30" : formatDate(weekEnd(week, account));
+}

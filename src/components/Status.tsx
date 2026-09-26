@@ -81,6 +81,30 @@ export function HandoffChips({ item }: { item: Item }) {
   );
 }
 
+/** One small warning icon on a plan row, only when something needs a look: at risk,
+ *  drifting, promise at risk, or an answer to verify. Hover or focus says which; the side
+ *  panel has the detail. Red for at risk and promise at risk, amber otherwise. */
+export function RowFlag({ item, drift }: { item: Item; drift?: DriftFlag | null }) {
+  const labels = [
+    drift ? FLAG_LABEL[drift] : null,
+    item.promiseRisk ? "Promise at risk" : null,
+    item.verify ? "Verify: agent's read" : null,
+  ].filter(Boolean) as string[];
+  if (labels.length === 0) return null;
+  const red = drift === "risk" || Boolean(item.promiseRisk);
+  const color = red ? "var(--flag-risk)" : "var(--flag-drift)";
+  const text = labels.join(" · ");
+  return (
+    <span className="inline-flex shrink-0" title={text} role="img" aria-label={text}>
+      <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden>
+        <path d="M8 1.5 L15 14 H1 Z" fill="none" stroke={color} strokeWidth="1.6" strokeLinejoin="round" />
+        <path d="M8 6 V9.5" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+        <circle cx="8" cy="11.8" r="0.9" fill={color} />
+      </svg>
+    </span>
+  );
+}
+
 /** The status pill with its menu. On hold and Done do not change the status here: they open
  *  the side panel, which asks for a reason or for proof first. */
 export function StatusMenu({
