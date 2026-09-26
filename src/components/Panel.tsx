@@ -1,14 +1,37 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { formatDate } from "../dates";
 import type { Drift } from "../drift";
+import { displayName, labelOf, rolesFor, useRoles } from "../owners";
 import type { OwnerChange } from "../state";
 import type { Decision, Item, Note, Role, Side, Status } from "../types";
-import { DriftFlagChip, FLAG_LABEL, HandoffChips, OwnerMenu, pillBg, STATUS } from "./Status";
-import { weekLabel } from "./ui";
+import { EyeOffIcon } from "./icons";
+import { DriftFlagChip, FLAG_LABEL, OwnerMenu, pillBg, STATUS, StatusDot } from "./Status";
 
 const ORDER: Status[] = ["todo", "progress", "hold", "done"];
 const KIND_LABEL = { task: "Task", decision: "Decision", question: "Question" } as const;
 const SIDE_LABEL: Record<Side, string> = { us: "Our side", customer: "Their side" };
+
+// The side panel for one item. It opens in both views.
+// Customer view is read-only, and never shows: source tags (the handoff fields and the
+// call or document an item came from), Promised in sales, Promise at risk, Verify and
+// agent's read lines, drift detail, hold reasons, or internal notes.
+
+/** An owner line for one side, read-only: "Owen Achebe · Identity / IT contact". */
+function OwnerText({ item, side }: { item: Item; side: Side }) {
+  const book = useRoles();
+  const ids = rolesFor(item, side);
+  if (ids.length === 0) return <span className="text-muted">Not named</span>;
+  return (
+    <span className="flex flex-col gap-0.5">
+      {ids.map((id) => (
+        <span key={id}>
+          {displayName(book, id)}
+          <span className="text-xs text-faint"> · {labelOf(book, id)}</span>
+        </span>
+      ))}
+    </span>
+  );
+}
 
 interface PanelProps {
   item: Item;
@@ -25,6 +48,12 @@ interface PanelProps {
   onReopen: () => void;
   /** The handoff fields (or "product config") this item came from, one name each. */
   sources: string[];
+  /** "20 Sept", or "After day 30". */
+  due: string;
+  /** Items this one depends on, as the current view shows them. */
+  dependencies: Item[];
+  /** Open another item's panel, from the dependency list. */
+  onOpenItem: (id: string) => void;
   /** Field name for one checklist line's sources. */
   fieldName: (ids: string[]) => string;
   checks: number[];
@@ -161,15 +190,26 @@ export function Panel(props: PanelProps) {
           ✕
         </button>
       </header>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 pb-4 text-xs text-muted">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 pb-3 text-xs text-muted">
         <span className="rounded-sm border border-line px-1.5">{KIND_LABEL[item.kind]}</span>
         <span>{item.module}</span>
-        <span>{weekLabel(item.week)}</span>
-        {item.visibility === "internal" && <span className="text-warn">Internal</span>}
-        {!customerView && <HandoffChips item={item} />}
+        <span className="tabular">Due {props.due}</span>
+        {!customerView && item.visibility === "internal" && (
+          <span className="inline-flex items-center gap-1 text-warn" title="Hidden in customer view">
+            <EyeOffIcon /> Internal only
+          </span>
+        )}
+        {!customerView && props.drift?.flag && <DriftFlagChip flag={props.drift.flag} />}
       </div>
+      <p className="px-5 pb-4 text-sm leading-relaxed">{item.description}</p>
 
       <div className="flex-1 overflow-y-auto">
+        {customerView ? (
+          <Section label="Status">
+            <StatusDot status={item.status} />
+            {item.window && <p className="mt-3 text-sm text-muted">Expected window: {item.window}</p>}
+          </Section>
+        ) : (
         <Section label="Status">
           <div role="radiogroup" aria-label="Status" className="flex flex-wrap gap-1.5">
             {ORDER.map((s) => {
@@ -274,8 +314,20 @@ export function Panel(props: PanelProps) {
             </div>
           )}
         </Section>
+        )}
 
-        {!customerView && (
+        {customerView ? (
+          <Section label="Owners">
+            <div className="flex flex-col gap-2">
+              {(["us", "customer"] as const).map((side) => (
+                <div key={side} className="flex items-start gap-3 text-sm">
+                  <span className="w-24 shrink-0 pt-0.5 text-xs text-muted">{SIDE_LABEL[side]}</span>
+                  <OwnerText item={item} side={side} />
+                </div>
+              ))}
+            </div>
+          </Section>
+        ) : (
           <Section label="Owners">
             <div className="flex flex-col gap-2">
               {(["us", "customer"] as const).map((side) => (
@@ -299,16 +351,25 @@ export function Panel(props: PanelProps) {
           </Section>
         )}
 
-        {!customerView && props.drift && item.lead && (
-          <Section label="Lead time and drift" aside={props.drift.flag ? <DriftFlagChip flag={props.drift.flag} /> : undefined}>
-            <p className="text-sm text-muted">
-              {item.lead.min === item.lead.max ? item.lead.min : `${item.lead.min} to ${item.lead.max}`} weeks, from the
-              product config. {props.drift.flag ? "" : props.drift.latestSafeStart ? "On time." : "No target date, so no flag."}
-            </p>
-            <ul className="mt-1.5 space-y-0.5 text-sm text-muted">
+        <Section label="Timing" aside={!customerView && props.drift?.flag ? <DriftFlagChip flag={props.drift.flag} /> : undefined}>
+          <dl className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm">
+            <dt className="text-xs leading-5 text-muted">Due</dt>
+            <dd className="tabular">{props.due}</dd>
+            <dt className="text-xs leading-5 text-muted">Lead time</dt>
+            <dd>
+              {item.lead
+                ? `${item.lead.min === item.lead.max ? item.lead.min : `${item.lead.min} to ${item.lead.max}`} weeks, from the product config`
+                : "None set in the product config"}
+            </dd>
+            <dt className="text-xs leading-5 text-muted">Module</dt>
+            <dd>{item.module}</dd>
+          </dl>
+          {!customerView && props.drift && item.lead && (
+            <ul className="mt-3 space-y-0.5 text-sm text-muted">
               <li>
                 Latest safe start:{" "}
                 {props.drift.latestSafeStart ? formatDate(props.drift.latestSafeStart, true) : "needs target date"}
+                {!props.drift.flag && props.drift.latestSafeStart ? ". On time." : ""}
               </li>
               <li>
                 If it starts {formatDate(props.asOf, true)}, earliest finish: {formatDate(props.drift.earliestFinish, true)}
@@ -321,8 +382,29 @@ export function Panel(props: PanelProps) {
                     : "Turns red: needs target date."}
               </li>
             </ul>
-          </Section>
-        )}
+          )}
+        </Section>
+
+        <Section label="Depends on">
+          {props.dependencies.length === 0 ? (
+            <p className="text-sm text-faint">Nothing recorded.</p>
+          ) : (
+            <ul className="flex flex-col gap-1.5">
+              {props.dependencies.map((d) => (
+                <li key={d.id} className="flex items-center gap-3 text-sm">
+                  <button
+                    type="button"
+                    onClick={() => props.onOpenItem(d.id)}
+                    className="min-w-0 flex-1 truncate text-left underline-offset-4 hover:underline"
+                  >
+                    {d.title}
+                  </button>
+                  <StatusDot status={d.status} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </Section>
 
         {item.checklist && (
           <Section
@@ -342,6 +424,7 @@ export function Panel(props: PanelProps) {
                       <input
                         type="checkbox"
                         checked={on}
+                        disabled={customerView}
                         onChange={() => props.onToggleCheck(n)}
                         className="mt-1.5 accent-[var(--accent)]"
                       />
@@ -357,7 +440,7 @@ export function Panel(props: PanelProps) {
           </Section>
         )}
 
-        {item.kind === "decision" && (
+        {item.kind === "decision" && (!customerView || (resolved && decision)) && (
           <Section label={resolved ? "Decision recorded" : "Record the decision"}>
             {resolved && decision ? (
               <>
@@ -365,9 +448,11 @@ export function Panel(props: PanelProps) {
                 <p className="mt-1 text-xs text-muted">
                   Decided by {decision.by} on {decision.date}
                 </p>
-                <button type="button" onClick={props.onReopen} className={`${quiet} -ml-2.5 mt-2`}>
-                  Reopen
-                </button>
+                {!customerView && (
+                  <button type="button" onClick={props.onReopen} className={`${quiet} -ml-2.5 mt-2`}>
+                    Reopen
+                  </button>
+                )}
               </>
             ) : (
               <form
@@ -392,14 +477,16 @@ export function Panel(props: PanelProps) {
           </Section>
         )}
 
-        {item.kind === "question" && (
+        {item.kind === "question" && (!customerView || (resolved && answer)) && (
           <Section label={resolved ? "Answer" : "Answer the question"}>
             {resolved ? (
               <>
                 <p className="whitespace-pre-wrap">{answer ?? "Answered."}</p>
-                <button type="button" onClick={props.onReopen} className={`${quiet} -ml-2.5 mt-2`}>
-                  Reopen
-                </button>
+                {!customerView && (
+                  <button type="button" onClick={props.onReopen} className={`${quiet} -ml-2.5 mt-2`}>
+                    Reopen
+                  </button>
+                )}
               </>
             ) : (
               <form
@@ -427,7 +514,7 @@ export function Panel(props: PanelProps) {
         )}
 
         {!customerView && (item.promised || item.verify) && (
-          <Section label="From the handoff">
+          <Section label="Promises and checks">
             <ul className="flex flex-col gap-1.5 text-sm">
               {item.promised && (
                 <li>
@@ -448,10 +535,10 @@ export function Panel(props: PanelProps) {
           </Section>
         )}
 
-        <Section label="Why it's here">
+        <Section label="Why this exists">
           {!customerView && (
             <div className="mb-4">
-              <PillHeading>Source</PillHeading>
+              <PillHeading>From the handoff</PillHeading>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {props.sources.map((src) => (
                   <span key={src} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink">
@@ -467,7 +554,11 @@ export function Panel(props: PanelProps) {
               <li key={f}>{f}</li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-faint">{item.why.source ? `From: ${item.why.source}` : "No call or document recorded in the handoff"}</p>
+          {!customerView && (
+            <p className="mt-3 text-xs text-faint">
+              {item.why.source ? `Source: ${item.why.source}` : "No call or document recorded in the handoff"}
+            </p>
+          )}
         </Section>
 
         <Section label="Done when">
@@ -501,6 +592,7 @@ export function Panel(props: PanelProps) {
           </Section>
         )}
 
+        {(!customerView || visibleNotes.length > 0) && (
         <Section label="Notes">
           {visibleNotes.length === 0 && <p className="text-sm text-faint">No notes yet.</p>}
           <ul className="space-y-2">
@@ -509,11 +601,13 @@ export function Panel(props: PanelProps) {
                 <p className="whitespace-pre-wrap">{n.text}</p>
                 <p className="mt-1 text-xs text-faint">
                   {new Date(n.at).toLocaleString()}
-                  {n.internal && " · internal"}
+                  {!customerView && n.internal && " · internal"}
                 </p>
               </li>
             ))}
           </ul>
+          {!customerView && (
+          <>
           <textarea
             ref={noteBox}
             value={draft}
@@ -539,7 +633,10 @@ export function Panel(props: PanelProps) {
               Add note
             </button>
           </div>
+          </>
+          )}
         </Section>
+        )}
       </div>
     </aside>
   );

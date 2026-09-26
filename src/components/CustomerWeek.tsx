@@ -5,6 +5,7 @@ import { StatusDot } from "./Status";
 
 // Customer view: this week's items, the owner on each side, and status.
 // Nothing else: no notes, no risk commentary, no drift flags, no source tags.
+// Clicking an item opens the read-only side panel.
 
 function Owner({ item, side }: { item: Item; side: Side }) {
   const book = useRoles();
@@ -20,7 +21,19 @@ function Owner({ item, side }: { item: Item; side: Side }) {
 
 const COLS = "md:grid-cols-[minmax(0,1fr)_12rem_12rem_9rem]";
 
-export function CustomerWeek({ items, week, account }: { items: Item[]; week: 1 | 2 | 3 | 4; account: Account }) {
+export function CustomerWeek({
+  items,
+  week,
+  account,
+  openId,
+  onOpen,
+}: {
+  items: Item[];
+  week: 1 | 2 | 3 | 4;
+  account: Account;
+  openId: string | null;
+  onOpen: (id: string) => void;
+}) {
   const rows = [...items].sort((a, b) => Number(a.status === "done") - Number(b.status === "done"));
   return (
     <section className="flex flex-col gap-3">
@@ -42,9 +55,19 @@ export function CustomerWeek({ items, week, account }: { items: Item[]; week: 1 
           {rows.map((i) => (
             <li
               key={i.id}
-              className={`grid min-h-[var(--row-height)] items-center gap-x-4 gap-y-1 border-t border-line px-4 py-2 first:border-t-0 ${COLS}`}
+              className={`grid min-h-[var(--row-height)] items-center gap-x-4 gap-y-1 border-t border-line px-4 py-2 first:border-t-0 ${COLS} ${
+                i.id === openId ? "bg-raised shadow-[inset_2px_0_0_var(--accent)]" : ""
+              }`}
             >
-              <span className={i.status === "done" ? "text-muted line-through decoration-faint" : ""}>{i.title}</span>
+              <button
+                type="button"
+                onClick={() => onOpen(i.id)}
+                className={`text-left underline-offset-4 hover:underline hover:decoration-line-strong ${
+                  i.status === "done" ? "text-muted line-through decoration-faint" : ""
+                }`}
+              >
+                {i.title}
+              </button>
               <span className="text-sm">
                 <span className="text-faint md:hidden">Us: </span>
                 <Owner item={i} side="us" />

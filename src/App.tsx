@@ -62,11 +62,10 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
     writePref("activation-tracker:theme", theme);
   }, [theme]);
 
+  // Switching view closes the panel, and Customer view has no People tab.
   useEffect(() => {
-    if (customerView) {
-      setTab((t) => (t === "people" ? "plan" : t));
-      setOpenId(null);
-    }
+    setOpenId(null);
+    if (customerView) setTab((t) => (t === "people" ? "plan" : t));
   }, [customerView]);
 
   const setLens = (l: Lens) => {
@@ -390,7 +389,13 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
 
         <main className="mx-auto flex max-w-[var(--page-max)] flex-col gap-4 px-4 pb-16 pt-4">
           {tab === "plan" && customerView && (
-            <CustomerWeek items={visible.filter((i) => i.week === thisWeek)} week={thisWeek} account={account} />
+            <CustomerWeek
+              items={visible.filter((i) => i.week === thisWeek)}
+              week={thisWeek}
+              account={account}
+              openId={openId}
+              onOpen={open}
+            />
           )}
 
           {tab === "plan" && !customerView && (
@@ -502,6 +507,9 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
               ...openItem.from.filter((f) => f !== "config"),
               ...openItem.from.filter((f) => f === "config"),
             ].map((f) => fieldLabel(f, openItem.module, configFieldLabels))}
+            due={dueLabel(openItem.week, account)}
+            dependencies={(openItem.dependsOn ?? []).flatMap((id) => visible.filter((i) => i.id === id))}
+            onOpenItem={open}
             drift={drifts.get(openItem.id) ?? null}
             asOf={asOf}
             roles={roles}

@@ -98,3 +98,12 @@ for (const d of datasets.filter((x) => x.boardFile)) {
     assert.deepEqual(items, rows);
   });
 }
+
+// Every dependency points to an item in the same demo, and never to itself.
+for (const d of datasets) {
+  test(`${d.label}: every dependency points to a real item`, () => {
+    const ids = new Set(d.items.map((i) => i.id));
+    const bad = d.items.flatMap((i) => (i.dependsOn ?? []).filter((x) => !ids.has(x) || x === i.id).map((x) => `${i.id} -> ${x}`));
+    assert.deepEqual(bad, []);
+  });
+}
