@@ -4,7 +4,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
-import { configTitles, PREFIX, QUESTION_TOPICS, questionTitle, RULE, titleProblems } from "../src/titles.ts";
+import { configTitles, PREFIX, QUESTION_TOPICS, questionTitleFor, RULE, titleProblems } from "../src/titles.ts";
 import type { Dataset } from "../src/types.ts";
 
 const root = new URL("../", import.meta.url);
@@ -62,9 +62,11 @@ for (const d of datasets) {
 
   test(`${d.label}: question titles come from the fixed topic list`, () => {
     const wrong = d.items
-      .filter((i) => i.kind === "question" && i.title !== questionTitle(i.from, baselineFields))
-      .map((i) => `${i.id}: "${i.title}", expected "${questionTitle(i.from, baselineFields)}"`);
+      .filter((i) => i.kind === "question" && i.title !== questionTitleFor(i, baselineFields))
+      .map((i) => `${i.id}: "${i.title}", expected "${questionTitleFor(i, baselineFields)}"`);
     assert.deepEqual(wrong, []);
+    const offList = d.items.filter((i) => i.topic && !QUESTION_TOPICS.includes(i.topic)).map((i) => `${i.id}: ${i.topic}`);
+    assert.deepEqual(offList, [], "A question's topic must be on the fixed list");
   });
 
   test(`${d.label}: task and decision titles come from the config or a rule, unless marked hand-written`, () => {

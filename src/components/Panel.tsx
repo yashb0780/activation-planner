@@ -14,7 +14,8 @@ const SIDE_LABEL: Record<Side, string> = { us: "Our side", customer: "Their side
 // The side panel for one item. It opens in both views.
 // Customer view is read-only, and never shows: source tags (the handoff fields and the
 // call or document an item came from), Promised in sales, Promise at risk, Verify and
-// agent's read lines, drift detail, hold reasons, or internal notes.
+// agent's read lines, drift detail, hold reasons, internal notes, or "What we know",
+// which comes from the internal handoff.
 
 /** An owner line for one side, read-only: "Owen Achebe · Identity / IT contact". */
 function OwnerText({ item, side }: { item: Item; side: Side }) {
@@ -535,31 +536,29 @@ export function Panel(props: PanelProps) {
           </Section>
         )}
 
+        {!customerView && (
         <Section label="Why this exists">
-          {!customerView && (
-            <div className="mb-4">
-              <PillHeading>From the handoff</PillHeading>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {props.sources.map((src) => (
-                  <span key={src} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink">
-                    {src}
-                  </span>
-                ))}
-              </div>
+          <div className="mb-4">
+            <PillHeading>From the handoff</PillHeading>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {props.sources.map((src) => (
+                <span key={src} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink">
+                  {src}
+                </span>
+              ))}
             </div>
-          )}
+          </div>
           <PillHeading>What we know</PillHeading>
           <ul className="mt-2 list-disc space-y-1 pl-5 marker:text-faint">
             {item.why.facts.map((f) => (
               <li key={f}>{f}</li>
             ))}
           </ul>
-          {!customerView && (
-            <p className="mt-3 text-xs text-faint">
-              {item.why.source ? `Source: ${item.why.source}` : "No call or document recorded in the handoff"}
-            </p>
-          )}
+          <p className="mt-3 text-xs text-faint">
+            {item.why.source ? `Source: ${item.why.source}` : "No call or document recorded in the handoff"}
+          </p>
         </Section>
+        )}
 
         <Section label="Done when">
           <ul className="flex flex-col gap-1.5">

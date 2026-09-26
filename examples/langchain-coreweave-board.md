@@ -354,10 +354,10 @@ is due in; "after" means after day 30.
 | Decide new go-live or cut scope | decision | 1 | Deployment |
 | People and sponsor | question | 1 | Kickoff questions |
 | Security review and data | question | 1 | Kickoff questions |
-| Current setup and data | question | 1 | Kickoff questions |
+| Platform owner | question | 1 | Kickoff questions |
 | Access and identity | question | 1 | Kickoff questions |
 | Baseline numbers | question | 1 | Kickoff questions |
-| Monitoring and alerts requests | question | 1 | Kickoff questions |
+| Alert owners | question | 1 | Kickoff questions |
 | Identify exec sponsor | task | 1 | People |
 | Raise conflict: Set up SSO | task | 1 | Workspace and access |
 | Raise conflict: Deploy the agent | task | 1 | Deployment |

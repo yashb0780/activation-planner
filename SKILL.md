@@ -168,10 +168,14 @@ the same rules in words. Change both together.
   question's main field first. Topics: People and sponsor · Dates and deadlines
   · Why they bought · Sales commitments · What a win looks like · What to set
   up first · Security review and data · Access and identity · Current setup and
-  data · Teams and structure · Baseline numbers · Handoff notes. The field-to-topic
+  data · Teams and structure · Baseline numbers · Handoff notes · Platform owner
+  · Alert owners. The field-to-topic
   list is in `src/titles.ts`. When the first field is a section 6 request and
   every request the question covers is in one module, the title is
-  `<Module> requests`. The question as a CSM would ask it is the description.
+  `<Module> requests`. When that rule reads badly for a question, it may name a
+  better topic from the same list instead, such as Platform owner or Alert
+  owners, which no field points to. The question as a CSM would ask it is the
+  description.
 - **Nothing else.** If no config line, rule or topic gives a title, write one by
   hand in the same style and say so: the app marks it hand-written and counts it.
 - **No two items share a title.**

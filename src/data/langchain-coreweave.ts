@@ -241,7 +241,8 @@ const items: Item[] = [
   },
   {
     id: "q-cluster",
-    title: "Current setup and data",
+    title: "Platform owner",
+    topic: "Platform owner",
     description: "Who runs the cluster the agent will live on?",
     kind: "question",
     module: "Kickoff questions",
@@ -333,7 +334,8 @@ const items: Item[] = [
   },
   {
     id: "q-alerts",
-    title: "Monitoring and alerts requests",
+    title: "Alert owners",
+    topic: "Alert owners",
     description: "When the agent stops triaging at 3am, who should hear about it?",
     kind: "question",
     module: "Kickoff questions",

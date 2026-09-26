@@ -4,7 +4,8 @@ import type { Item } from "./types";
 // never written freely:
 //   1. The product config: the bold words at the start of a bullet or step.
 //   2. This file: titles the planner makes by rule for any product (RULE, PREFIX).
-//   3. This file: question topics, picked from the handoff fields a question covers.
+//   3. This file: question topics, picked from the handoff fields a question covers, or
+//      named on the question (`topic`) when that reads better. Either way, from TOPICS.
 // A title written by hand is marked `handTitle` on the item, so it can be counted.
 // The same rules are written out in SKILL.md. Change both together.
 
@@ -62,6 +63,10 @@ const TOPICS: [string, string[]][] = [
   ],
   ["Baseline numbers", ["core_volume", "core_cycle_time", "team_headcount"]],
   ["Handoff notes", ["notes"]],
+  // Topics no field points to. A question picks one with `topic` when the first-field
+  // rule reads badly for it.
+  ["Platform owner", []],
+  ["Alert owners", []],
 ];
 
 export const QUESTION_TOPICS = TOPICS.map(([t]) => t);
@@ -77,6 +82,12 @@ function topicOf(field: string, baselineFields: string[]): string | undefined {
 }
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** A question's short title: the topic it picks from the fixed list, if it picks one;
+ *  otherwise the topic of its first field (see questionTitle). */
+export function questionTitleFor(item: Pick<Item, "from" | "topic">, baselineFields: string[] = []): string {
+  return item.topic && QUESTION_TOPICS.includes(item.topic) ? item.topic : questionTitle(item.from, baselineFields);
+}
 
 /** A question's short title: the topic of the first field it covers that has one. When that
  *  field is a section 6 request and every request the question covers is in one module, the

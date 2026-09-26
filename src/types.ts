@@ -30,6 +30,9 @@ export interface Item {
   description: string;
   /** Set when the title was written by hand because no config line or rule gives one. */
   handTitle?: boolean;
+  /** A question only: a topic from the fixed list in src/titles.ts, used as its title when
+   *  the first-field rule reads badly. */
+  topic?: string;
   /** Items that must be done before this one can finish, by ID. From the config's "Depends on". */
   dependsOn?: string[];
   kind: Kind;
