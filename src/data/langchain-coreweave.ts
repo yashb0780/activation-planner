@@ -156,7 +156,7 @@ const items: Item[] = [
   {
     id: "d-reset",
     title: "Decide new go-live or cut scope",
-    description: "Deployment is already drifting on day 1: at the long end of its lead time it finishes after the 2026-11-16 target. The date is preferred, not fixed. Decide with Tomás whether to move the target date or cut what must be live on 2026-11-16.",
+    description: "At the long end of its lead time, Deployment finishes after the 2026-11-16 target. The date is preferred, not fixed. Decide with Tomás whether to move the target date or cut what must be live on 2026-11-16.",
     kind: "decision",
     module: MODULE.deployment,
     lane: "start",
@@ -166,7 +166,7 @@ const items: Item[] = [
     theirs: ["technical_owner"],
     why: {
       facts: [
-        "Deployment is drifting on day 1: latest safe start was 2026-09-02",
+        "Deployment lead time: 4 to 10 weeks (estimate)",
         "At the long end of its lead time it finishes after 2026-11-16",
         "The target date is preferred, not fixed",
         "Options: move the target date, or cut what must be live on 2026-11-16",
@@ -597,7 +597,7 @@ const items: Item[] = [
   {
     id: "d-option",
     title: "Decide the deployment option",
-    description: "Decide between Hybrid and Self-hosted with Lena and Tomás, against the trace storage decision. K. Lindqvist walks them through both, as promised in sales.",
+    description: "Decide between Hybrid and Self-hosted with Lena and Tomás, against the trace storage decision. K. Lindqvist walks them through both.",
     kind: "decision",
     module: MODULE.deployment,
     lane: "start",
