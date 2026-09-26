@@ -15,6 +15,7 @@ import { drift, type Drift } from "./drift";
 import { fieldLabel } from "./fields";
 import { buildGroups, LENS_LABEL, LENSES, type Lens } from "./grouping";
 import { RolesContext } from "./owners";
+import { applyRules } from "./rules";
 
 type Tab = "plan" | "success" | "people";
 
@@ -41,7 +42,7 @@ const ghost = "rounded-md border border-line px-2.5 py-1 text-muted transition-c
 
 export default function App({ data, switcher }: { data: Dataset; switcher?: ReactNode }) {
   const { account, configFieldLabels, driftRules, firstValue, gateGaps, gates, people, successPlan } = data;
-  const tracker = useTracker(`activation-tracker:${data.id}:v2`, data.items, data.roles);
+  const tracker = useTracker(`activation-tracker:${data.id}:v2`, data.items, data.roles, applyRules);
   const { items, saved, roles, book } = tracker;
   const [asOf] = useState(() => readAsOf(data.asOf));
   const [tab, setTab] = useState<Tab>("plan");

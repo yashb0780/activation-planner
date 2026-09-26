@@ -141,6 +141,14 @@ Every task names an owner role on each side:
 Write `Owners: <role> (us); <role> (them)`. The name is looked up from the
 People list, so a change to one name changes every task that uses the role.
 
+**Unassigned owners.** A task done by their side whose owner role has nobody
+named is **Unassigned**: write it that way, never "them". For each such role,
+add a week 1 task `Name owner: <title of the first task waiting on it>`, with
+every task waiting on that role in its description. A task with no role at all
+gets its own. A missing exec sponsor adds `Identify exec sponsor` instead, and
+covers every task routed to the exec sponsor. The app applies the same rules
+live (`src/rules.ts`), so naming someone on the People list clears them.
+
 **Every item has a short title and a description.** The title is what a row
 shows; the description is the full sentence, shown when the row is opened. A
 title never carries detail the description should hold. The rules, the fixed

@@ -5,7 +5,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { configTitles, PREFIX, QUESTION_TOPICS, questionTitleFor, RULE, titleProblems } from "../src/titles.ts";
-import type { Dataset } from "../src/types.ts";
+import { applyRules } from "../src/rules.ts";
+import type { Dataset, Item } from "../src/types.ts";
 
 const root = new URL("../", import.meta.url);
 const dataDir = new URL("src/data/", root);
@@ -15,6 +16,9 @@ for (const file of readdirSync(dataDir).filter((f) => f.endsWith(".ts") && f !==
   const mod = (await import(new URL(file, dataDir).href)) as { dataset?: Dataset };
   if (mod.dataset) datasets.push(mod.dataset);
 }
+
+/** The plan as the app shows it on load: the demo's items plus the items rules add. */
+const full = (d: Dataset): Item[] => applyRules(d.items, new Map(d.roles.map((r) => [r.id, r])));
 
 const RULES = new Set<string>(Object.values(RULE));
 const PREFIXES = new Set<string>(Object.values(PREFIX));
@@ -26,8 +30,9 @@ test("there is at least one demo", () => {
 for (const d of datasets) {
   const fromConfig = configTitles(readFileSync(new URL(d.configFile, root), "utf8"));
   const baselineFields = Object.keys(d.configFieldLabels);
-  const titles = new Set(d.items.map((i) => i.title));
-  const modules = new Set(d.items.map((i) => i.module));
+  const items = full(d);
+  const titles = new Set(items.map((i) => i.title));
+  const modules = new Set(items.map((i) => i.module));
 
   /** Where a task or decision title comes from, or null when nothing gives it. */
   function source(title: string): "config" | "rule" | null {
@@ -42,18 +47,18 @@ for (const d of datasets) {
   }
 
   test(`${d.label}: every title follows the style rules`, () => {
-    const bad = d.items.map((i) => ({ id: i.id, title: i.title, problems: titleProblems(i) })).filter((x) => x.problems.length);
+    const bad = items.map((i) => ({ id: i.id, title: i.title, problems: titleProblems(i) })).filter((x) => x.problems.length);
     assert.deepEqual(bad, []);
   });
 
   test(`${d.label}: every item has a description`, () => {
-    assert.deepEqual(d.items.filter((i) => !i.description?.trim()).map((i) => i.id), []);
+    assert.deepEqual(items.filter((i) => !i.description?.trim()).map((i) => i.id), []);
   });
 
   test(`${d.label}: no two items share a title`, () => {
     const seen = new Map<string, string>();
     const dupes: string[] = [];
-    for (const i of d.items) {
+    for (const i of items) {
       if (seen.has(i.title)) dupes.push(`${i.title} (${seen.get(i.title)}, ${i.id})`);
       seen.set(i.title, i.id);
     }
@@ -70,18 +75,18 @@ for (const d of datasets) {
   });
 
   test(`${d.label}: task and decision titles come from the config or a rule, unless marked hand-written`, () => {
-    const others = d.items.filter((i) => i.kind !== "question");
+    const others = items.filter((i) => i.kind !== "question");
     const unexplained = others.filter((i) => !i.handTitle && !source(i.title)).map((i) => `${i.id}: ${i.title}`);
     const wronglyMarked = others.filter((i) => i.handTitle && source(i.title)).map((i) => `${i.id}: ${i.title}`);
     assert.deepEqual(unexplained, [], "Titles with no source: add them to the config, use a rule, or mark handTitle");
     assert.deepEqual(wronglyMarked, [], "Marked hand-written, but the config or a rule gives this title");
     const hand = others.filter((i) => i.handTitle);
-    console.log(`${d.label}: ${hand.length} hand-written title${hand.length === 1 ? "" : "s"} of ${d.items.length} items`);
+    console.log(`${d.label}: ${hand.length} hand-written title${hand.length === 1 ? "" : "s"} of ${items.length} items`);
   });
 }
 
 // The board's item index and the app's item list must match: same items, kinds, weeks and
-// modules, in the same order.
+// modules. Rule-made items come last in the app, so order is not compared.
 for (const d of datasets.filter((x) => x.boardFile)) {
   test(`${d.label}: items match the board's item index`, () => {
     const board = readFileSync(new URL(d.boardFile!, root), "utf8");
@@ -91,21 +96,26 @@ for (const d of datasets.filter((x) => x.boardFile)) {
       .split("\n")
       .filter((l) => l.startsWith("| ") && !l.startsWith("| Item "))
       .map((l) => l.slice(1, -1).split("|").map((c) => c.trim()).join(" / "));
-    const items = d.items.map((i) => [i.title, i.kind, String(i.week), i.module].join(" / "));
+    const items = full(d).map((i) => [i.title, i.kind, String(i.week), i.module].join(" / "));
     const count = (xs: string[], kind: string) => xs.filter((x) => x.split(" / ")[1] === kind).length;
     console.log(
       `${d.label}: board ${count(rows, "task")} tasks, ${count(rows, "decision")} decisions, ${count(rows, "question")} questions; ` +
         `app ${count(items, "task")} tasks, ${count(items, "decision")} decisions, ${count(items, "question")} questions`,
     );
-    assert.deepEqual(items, rows);
+    assert.deepEqual([...items].sort(), [...rows].sort());
   });
 }
 
-// Every dependency points to an item in the same demo, and never to itself.
+// Every dependency and every milestone points to an item in the same demo.
 for (const d of datasets) {
+  test(`${d.label}: every milestone points to a real item`, () => {
+    const ids = new Set(full(d).map((i) => i.id));
+    const bad = d.gates.flatMap((g) => [...g.linked, ...g.criteria.map((c) => c.item)].filter((x) => !ids.has(x)).map((x) => `${g.id} -> ${x}`));
+    assert.deepEqual(bad, []);
+  });
   test(`${d.label}: every dependency points to a real item`, () => {
-    const ids = new Set(d.items.map((i) => i.id));
-    const bad = d.items.flatMap((i) => (i.dependsOn ?? []).filter((x) => !ids.has(x) || x === i.id).map((x) => `${i.id} -> ${x}`));
+    const ids = new Set(full(d).map((i) => i.id));
+    const bad = full(d).flatMap((i) => (i.dependsOn ?? []).filter((x) => !ids.has(x) || x === i.id).map((x) => `${i.id} -> ${x}`));
     assert.deepEqual(bad, []);
   });
 }

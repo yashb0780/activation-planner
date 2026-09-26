@@ -91,6 +91,11 @@ traces flowing on test tickets.
   date is preferred, not fixed (board conflict 4).
   *Owners: Technical owner (them); CSM (us) · From: Target go-live date · Fixed or preferred · Must something here be live by day 30? · product config*
   *Done when:* Decision recorded: a new target date, or what is cut from 2026-11-16 · Tomás signs it off · Shared with the exec sponsor, once named
+- **Name owner: Prepare their infrastructure.** Nobody on the platform team
+  that runs the cluster is named, and they have not agreed to host the agent.
+  The same person owns Deploy the agent.
+  *Owners: CSM (us); Technical owner (them) · From: Who holds the credentials for each system above · Has anyone outside the buying team agreed to this*
+  *Done when:* A platform owner is named · They have been on a call with us
 - **Foundation**: every item from the config, each at its own lead time.
   Foundation starts in week 1; it does not make a long item finish in week 1.
   - **Name the customer admin.** Tomás is named. Confirm his hours: about 8 a
@@ -175,10 +180,6 @@ groundwork for Evaluation.
   both, against the storage decision.
   *Owners: SE, CSM (us); Security contact, Technical owner (them) · From: Commitments made during the sales cycle · Products and tiers purchased · product config*
   *Done when:* Option recorded with the reason · Lena agrees it fits her review
-- **Name the platform owner.** Nobody on the platform team is named, and they
-  have not agreed to host the agent. Routed to the exec sponsor by default.
-  *Owners: CSM (us); Exec sponsor (them) · From: Who holds the credentials for each system above · Has anyone outside the buying team agreed to this · product config*
-  *Done when:* A platform owner is named · They have been on a call with us
 - **Set up SSO**, if Owen was reached in week 1.
   *Owners: CSM (us); Identity / IT contact (them) · From: Single sign-on required · Identity / IT contact · product config*
   *Done when:* SSO configured · One support engineer signs in through SSO

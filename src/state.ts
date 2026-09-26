@@ -85,7 +85,9 @@ export function writePref(key: string, value: string) {
 
 const now = () => new Date().toISOString();
 
-export function useTracker(key: string, base: Item[], baseRoles: Role[]) {
+/** `derive` adds the items rules make (see src/rules.ts). They are worked out again on every
+ *  change, from the items and the People list, and keep any status saved for them. */
+export function useTracker(key: string, base: Item[], baseRoles: Role[], derive?: (items: Item[], book: RoleBook) => Item[]) {
   const [saved, setSaved] = useState<Saved>(() => load(key));
 
   useEffect(() => {
@@ -108,11 +110,16 @@ export function useTracker(key: string, base: Item[], baseRoles: Role[]) {
     theirs: overrides[i.id]?.customer ?? i.theirs,
   });
 
-  const items: Item[] = base.map((i) => ({
+  const withSaved = (i: Item): Item => ({
     ...withOwners(i, saved.ownerOverrides),
     status: saved.status[i.id] ?? i.status,
     holdReason: saved.holdReasons[i.id] ?? i.holdReason,
-  }));
+  });
+  const merged = base.map(withSaved);
+  const baseIds = new Set(base.map((i) => i.id));
+  const items: Item[] = derive
+    ? derive(merged, book).map((i) => (baseIds.has(i.id) ? i : withSaved(i)))
+    : merged;
 
   const setStatus = useCallback((id: string, status: Status) => {
     setSaved((s) => ({ ...s, status: { ...s.status, [id]: status } }));

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { formatDate } from "../dates";
 import type { Drift } from "../drift";
-import { displayName, labelOf, rolesFor, useRoles } from "../owners";
+import { displayName, labelOf, nameOf, rolesFor, useRoles } from "../owners";
 import type { OwnerChange } from "../state";
 import type { Decision, Item, Note, Role, Side, Status } from "../types";
 import { EyeOffIcon } from "./icons";
@@ -21,15 +21,18 @@ const SIDE_LABEL: Record<Side, string> = { us: "Our side", customer: "Their side
 function OwnerText({ item, side }: { item: Item; side: Side }) {
   const book = useRoles();
   const ids = rolesFor(item, side);
-  if (ids.length === 0) return <span className="text-muted">Not named</span>;
+  if (ids.length === 0) return <span className={side === "customer" ? "text-warn" : "text-muted"}>{side === "customer" ? "Unassigned" : "Not named"}</span>;
   return (
     <span className="flex flex-col gap-0.5">
-      {ids.map((id) => (
-        <span key={id}>
-          {displayName(book, id)}
-          <span className="text-xs text-faint"> · {labelOf(book, id)}</span>
-        </span>
-      ))}
+      {ids.map((id) => {
+        const unassigned = side === "customer" && !nameOf(book, id);
+        return (
+          <span key={id} className={unassigned ? "text-warn" : ""}>
+            {unassigned ? "Unassigned" : displayName(book, id)}
+            <span className="text-xs text-faint"> · {labelOf(book, id)}</span>
+          </span>
+        );
+      })}
     </span>
   );
 }

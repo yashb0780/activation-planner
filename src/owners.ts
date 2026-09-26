@@ -36,3 +36,10 @@ export function primaryName(book: RoleBook, item: Item): string {
   const first = rolesFor(item, item.side)[0];
   return first ? nameOf(book, first) : "";
 }
+
+/** A customer-side item whose main customer owner has nobody named: shown as "Unassigned". */
+export function isUnassigned(item: Item, book: RoleBook): boolean {
+  if (item.side !== "customer") return false;
+  const first = rolesFor(item, "customer")[0];
+  return !first || !nameOf(book, first);
+}

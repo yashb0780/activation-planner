@@ -11,6 +11,8 @@ function Owner({ item, side }: { item: Item; side: Side }) {
   const book = useRoles();
   const { primary, more } = ownerLine(book, item, side);
   const unnamed = primary === "Not named" || primary.endsWith("(not named)");
+  // Their side with nobody named reads "Unassigned", in amber.
+  if (unnamed && side === "customer") return <span className="text-warn">Unassigned</span>;
   return (
     <span className={unnamed ? "text-muted" : ""}>
       {primary}

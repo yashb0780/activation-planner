@@ -175,7 +175,7 @@ week of real traffic. Ask: Tomás Varga.
 3. **Foundation cleared**, by day 30 (2026-10-13)
    - Security review opened (item: Open the security review)
    - SSO tested by a real user (item: Set up SSO)
-   - Platform owner named (item: Name the platform owner)
+   - Platform owner named (item: Name owner: Prepare their infrastructure)
 
 ---
 
@@ -370,7 +370,7 @@ is due in; "after" means after day 30.
 | Pick test data | task | 1 | Observability |
 | Turn on tracing | task | 1 | Observability |
 | Decide the deployment option | decision | 2 | Deployment |
-| Name the platform owner | task | 2 | Deployment |
+| Name owner: Prepare their infrastructure | task | 1 | Deployment |
 | Agree what a good outcome is | task | 2 | Evaluation |
 | Name a reviewer | task | 2 | Evaluation |
 | Prepare their infrastructure | task | 3 | Deployment |

@@ -1,5 +1,5 @@
 import type { DriftFlag } from "../drift";
-import { displayName, rolesFor, useRoles } from "../owners";
+import { displayName, labelOf, nameOf, rolesFor, useRoles } from "../owners";
 import type { Item, Role, Side, Status } from "../types";
 import { Dropdown, ListBox } from "./ui";
 
@@ -180,17 +180,26 @@ export function OwnerMenu({
 }) {
   const book = useRoles();
   const ids = rolesFor(item, side);
-  const primary = ids[0] ? displayName(book, ids[0]) : "Not named";
+  // Their side with nobody named reads "Unassigned", in amber, never "Them".
+  const unassigned = side === "customer" && (!ids[0] || !nameOf(book, ids[0]));
+  const primary = unassigned ? "Unassigned" : ids[0] ? displayName(book, ids[0]) : "Not named";
   const more = ids.length - 1;
+  const tip = unassigned
+    ? `Unassigned: ${ids[0] ? labelOf(book, ids[0]) : "their owner"} has nobody named`
+    : ids.length > 1
+      ? ids.map((r) => displayName(book, r)).join(", ")
+      : undefined;
   return (
     <Dropdown
       label={`${side === "us" ? "Our" : "Their"} owner: ${primary}. Change owner`}
-      title={ids.length > 1 ? ids.map((r) => displayName(book, r)).join(", ") : undefined}
-      className="max-w-full border border-line text-ink hover:border-line-strong hover:bg-hover"
+      title={tip}
+      className={`max-w-full border hover:bg-hover ${
+        unassigned ? "border-warn/50 text-warn hover:border-warn" : "border-line text-ink hover:border-line-strong"
+      }`}
       openSignal={openSignal}
       content={
         <span className="truncate">
-          {prefix && <span className="font-normal text-faint">{prefix} </span>}
+          {prefix && !unassigned && <span className="font-normal text-faint">{prefix} </span>}
           {primary}
           {more > 0 && <span className="font-normal text-muted"> +{more}</span>}
         </span>
