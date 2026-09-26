@@ -2,7 +2,7 @@
  *  foundation: the config's Foundation tier. Starts in week 1, keeps its own lead time. */
 export type Lane = "kickoff" | "foundation" | "start" | "quick" | "earned";
 export type Week = 1 | 2 | 3 | 4 | "after";
-/** Not started, In progress, On hold (needs a reason), Done (needs a proof note). */
+/** Not started, In progress, Blocked (needs a reason), Done (needs a proof note). */
 export type Status = "todo" | "progress" | "hold" | "done";
 export type Side = "us" | "customer";
 export type Visibility = "internal" | "shared";
@@ -52,7 +52,7 @@ export interface Item {
   team?: "other";
   /** A conflict from the board. Hidden in customer view. */
   conflict?: boolean;
-  /** Why it is on hold. From the handoff when the plan starts it on hold. */
+  /** Why it is blocked. From the handoff when the plan starts it as blocked. */
   holdReason?: string;
   /** For a grouped question: the detail it covers, one line per original question.
    *  Ticked off as the answer comes in. Each line names the handoff fields it came from. */

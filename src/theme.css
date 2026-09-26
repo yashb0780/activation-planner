@@ -28,7 +28,7 @@
   --st-todo-ink: #b3b6bd;
   --st-progress: #f0883e;     /* In progress */
   --st-progress-ink: #f5a36c;
-  --st-hold: #eab308;         /* On hold: true yellow */
+  --st-hold: #eab308;         /* Blocked: true yellow */
   --st-hold-ink: #facc15;
   --st-done: #4db880;         /* Done */
   --st-done-ink: #62c990;

@@ -3,14 +3,14 @@ import { displayName, labelOf, nameOf, rolesFor, useRoles } from "../owners";
 import type { Item, Role, Side, Status } from "../types";
 import { Dropdown, ListBox } from "./ui";
 
-// Status: Not started, In progress, On hold, Done. Each has its own colour from
+// Status: Not started, In progress, Blocked, Done. Each has its own colour from
 // the theme. Drift is not a status: it is a separate small flag.
 
 /** color: the dot and the pill tint. ink: the pill's text. */
 export const STATUS: Record<Status, { label: string; color: string; ink: string }> = {
   todo: { label: "Not started", color: "var(--st-todo)", ink: "var(--st-todo-ink)" },
   progress: { label: "In progress", color: "var(--st-progress)", ink: "var(--st-progress-ink)" },
-  hold: { label: "On hold", color: "var(--st-hold)", ink: "var(--st-hold-ink)" },
+  hold: { label: "Blocked", color: "var(--st-hold)", ink: "var(--st-hold-ink)" },
   done: { label: "Done", color: "var(--st-done)", ink: "var(--st-done-ink)" },
 };
 /** Background of a status pill. */
@@ -105,7 +105,7 @@ export function RowFlag({ item, drift }: { item: Item; drift?: DriftFlag | null 
   );
 }
 
-/** The status pill with its menu. On hold and Done do not change the status here: they open
+/** The status pill with its menu. Blocked and Done do not change the status here: they open
  *  the side panel, which asks for a reason or for proof first. */
 export function StatusMenu({
   item,
@@ -124,7 +124,7 @@ export function StatusMenu({
   return (
     <Dropdown
       label={`Status: ${s.label}. Change status`}
-      title={item.status === "hold" && item.holdReason ? `On hold: ${item.holdReason}` : undefined}
+      title={item.status === "hold" && item.holdReason ? `Blocked: ${item.holdReason}` : undefined}
       style={{ color: s.ink, background: pillBg(item.status) }}
       className="hover:brightness-110"
       openSignal={openSignal}

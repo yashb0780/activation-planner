@@ -207,7 +207,7 @@ export function NeedsAttention({
 }) {
   const book = useRoles();
   if (!items.length) return null;
-  const label = (i: Item) => (atRisk.has(i.id) ? "At risk" : i.conflict ? "Conflict" : "On hold");
+  const label = (i: Item) => (atRisk.has(i.id) ? "At risk" : i.conflict ? "Conflict" : "Blocked");
   const color = (i: Item) =>
     atRisk.has(i.id) ? "var(--flag-risk)" : i.conflict ? "var(--muted)" : "var(--st-hold-ink)";
   return (

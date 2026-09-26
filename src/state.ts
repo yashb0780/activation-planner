@@ -21,7 +21,7 @@ export interface Saved {
   ownerHistory: Record<string, OwnerChange[]>;
   /** Review ticks, by section ID. */
   reviewed: Record<string, boolean>;
-  /** Why an item is on hold, when set here rather than in the plan. */
+  /** Why an item is blocked, when set here rather than in the plan. */
   holdReasons: Record<string, string>;
   /** Ticked checklist lines on grouped questions: item ID → line indexes. */
   checks: Record<string, number[]>;
@@ -57,7 +57,7 @@ function load(key: string): Saved {
     // Older versions saved First value as one paragraph. Drop it rather than show a broken card.
     const fv = saved.firstValue as unknown;
     if (fv !== null && (typeof fv !== "object" || !Array.isArray((fv as FirstValueEdit).points))) saved.firstValue = null;
-    // Older versions called On hold "blocked".
+    // Older versions saved Blocked as "blocked"; it is stored as "hold" now.
     for (const [id, st] of Object.entries(saved.status)) if ((st as string) === "blocked") saved.status[id] = "hold";
     return saved;
   } catch {
@@ -125,7 +125,7 @@ export function useTracker(key: string, base: Item[], baseRoles: Role[], derive?
     setSaved((s) => ({ ...s, status: { ...s.status, [id]: status } }));
   }, []);
 
-  /** Put an item on hold. A reason is required. */
+  /** Mark an item blocked. A reason is required. */
   const setHold = useCallback((id: string, reason: string) => {
     setSaved((s) => ({
       ...s,

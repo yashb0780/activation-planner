@@ -45,11 +45,12 @@ Read `CLAUDE.md` first; everything below adds to it.
 |---|---|---|
 | A1 to A4 | LangChain config, CoreWeave handoff, board, 30-day plan, app switched to the new demo, Veltmoor retired | merged to main |
 | B1 to B3 | Short titles plus descriptions, slim rows, side panel in both views | merged to main (6f2cf73) |
-| C | Named customer owners: "Unassigned" in amber, "Name owner: <title>", "Identify exec sponsor" | branch |
-| D | Customer approval time (`approval_lead_time`), combined lead times, computed "Promise at risk", "Ask about approval timelines" | branch |
-| E | Health strip (Open blockers, Customer tasks with no owner, Overdue), On hold renamed Blocked, click to filter | branch |
+| C | Named customer owners: "Unassigned" in amber, one "Name owner: <title>" per unnamed role, "Identify exec sponsor" (`src/rules.ts`) | branch, not merged |
+| D | Customer approval time (`approval_lead_time`, weeks), combined lead times (`src/lead.ts`), computed "Promise at risk", "Ask about approval timelines" | branch, not merged |
+| E | Health strip (`src/health.ts`): Open blockers, Customer tasks with no owner, Overdue; On hold renamed Blocked; click a count to filter | branch, not merged |
 
-The status of C, D and E is in the git log on `activation-v2`.
+Main is at the commit after B3 plus the two fixes (6f2cf73). C, D and E wait on
+`activation-v2` until the owner says to merge.
 
 ## Step F: Accounts view
 

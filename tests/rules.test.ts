@@ -5,6 +5,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
 import { effectiveLead } from "../src/lead.ts";
+import { health, HEALTH_KEYS } from "../src/health.ts";
 import { applyRules } from "../src/rules.ts";
 import { RULE } from "../src/titles.ts";
 import type { Dataset } from "../src/types.ts";
@@ -79,5 +80,23 @@ test("rules work when a handoff gives no sources at all (hand-filled)", () => {
     const bare = d.items.map((i) => ({ ...i, why: { ...i.why, source: "" }, verify: undefined }));
     const plan = applyRules(bare, bookOf(d), d.account);
     assert.ok(plan.length >= bare.length, d.label);
+  }
+});
+
+test("the health strip is not all zeros on a demo's own date", () => {
+  for (const d of datasets.filter((x) => x.asOf)) {
+    const book = bookOf(d);
+    const h = health(applyRules(d.items, book, d.account), book, d.asOf!, d.account);
+    for (const k of HEALTH_KEYS) assert.ok(h[k].length > 0, `${d.label}: ${k} is 0`);
+    console.log(`${d.label} on ${d.asOf}: ${HEALTH_KEYS.map((k) => `${k} ${h[k].length}`).join(", ")}`);
+  }
+});
+
+test("health counts never include done items, and overdue never includes after-day-30 items", () => {
+  for (const d of datasets) {
+    const book = bookOf(d);
+    const h = health(applyRules(d.items, book, d.account), book, "2099-01-01", d.account);
+    for (const k of HEALTH_KEYS) assert.equal(h[k].some((i) => i.status === "done"), false, `${d.label}: ${k}`);
+    assert.equal(h.overdue.some((i) => i.week === "after"), false, d.label);
   }
 });

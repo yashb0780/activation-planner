@@ -17,6 +17,8 @@ import { buildGroups, LENS_LABEL, LENSES, type Lens } from "./grouping";
 import { RolesContext, type RoleBook } from "./owners";
 import { applyRules } from "./rules";
 import { describeLead } from "./lead";
+import { health, HEALTH_LABEL, type HealthKey } from "./health";
+import { HealthStrip } from "./components/HealthStrip";
 
 type Tab = "plan" | "success" | "people";
 
@@ -53,11 +55,12 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [openId, setOpenId] = useState<string | null>(null);
   const [keyboardNav, setKeyboardNav] = useState(false);
-  // A request to open the panel on its done form or its On hold reason box, for one item.
+  // A request to open the panel on its done form or its Blocked reason box, for one item.
   const [panelRequest, setPanelRequest] = useState<{ id: string; kind: "done" | "hold" | "note"; n: number } | undefined>();
   const [menuRequest, setMenuRequest] = useState<MenuRequest | undefined>();
   const [commandsOpen, setCommandsOpen] = useState(false);
   const [customerView, setCustomerView] = useState(false);
+  const [healthFilter, setHealthFilter] = useState<HealthKey | null>(null);
   const [theme, setTheme] = useState(() => readPref("activation-tracker:theme", "dark", ["dark", "light"] as const));
 
   useEffect(() => {
@@ -101,9 +104,17 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
     );
   const thisWeek = currentWeek(asOf, account);
 
+  // The health strip's counts, from the whole board. A picked count filters the list.
+  const counts = useMemo(() => health(items, book, asOf, account), [items, book, asOf, account]);
+  const listed = useMemo(() => {
+    if (!healthFilter) return visible;
+    const ids = new Set(counts[healthFilter].map((i) => i.id));
+    return visible.filter((i) => ids.has(i.id));
+  }, [visible, healthFilter, counts]);
+
   const groups = useMemo(
-    () => (customerView ? [] : buildGroups(visible, items, lens, account, gates)),
-    [customerView, visible, items, lens, account, gates],
+    () => (customerView ? [] : buildGroups(listed, items, lens, account, gates)),
+    [customerView, listed, items, lens, account, gates],
   );
 
   // Rows on screen, in the order j/k moves through them.
@@ -147,7 +158,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
         tracker.setStatus(id, st);
         if (st === "progress") requestPanel(id, "note");
       },
-      // On hold asks for a reason in the side panel first. Closing the panel changes nothing.
+      // Blocked asks for a reason in the side panel first. Closing the panel changes nothing.
       onRequestHold: (id: string) => requestPanel(id, "hold"),
       onRequestDone: requestDone,
       onOwner: tracker.setOwner,
@@ -403,6 +414,14 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
 
           {tab === "plan" && !customerView && (
             <>
+              <HealthStrip
+                health={counts}
+                active={healthFilter}
+                onPick={(k) => {
+                  setHealthFilter(k);
+                  if (k) setCollapsed({});
+                }}
+              />
               <HandoffGate gaps={gateGaps} agentReads={data.agentReads} />
               <FirstValueLine
                 key={JSON.stringify(saved.firstValue)}
@@ -431,6 +450,15 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
                     </span>
                   </label>
                 </div>
+                {healthFilter && (
+                  <p className="flex flex-wrap items-center gap-x-3 text-sm text-muted">
+                    Showing {listed.length} {listed.length === 1 ? "item" : "items"}: {HEALTH_LABEL[healthFilter].toLowerCase()}.
+                    <button type="button" onClick={() => setHealthFilter(null)} className="text-ink underline underline-offset-4">
+                      Clear
+                    </button>
+                  </p>
+                )}
+                {healthFilter && listed.length === 0 && <p className="text-sm text-faint">None right now.</p>}
                 <PlanList
                   groups={groups}
                   collapsed={collapsed}

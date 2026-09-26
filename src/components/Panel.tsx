@@ -71,7 +71,7 @@ interface PanelProps {
   onOwner: (side: Side, roleId: string) => void;
   /** Goes up by one each time x is pressed, or Done is picked on a row: open the done form. */
   doneRequest?: number;
-  /** Goes up by one each time On hold is picked on a row: open the reason box. */
+  /** Goes up by one each time Blocked is picked on a row: open the reason box. */
   holdRequest?: number;
   /** Goes up by one each time In progress is picked on a row: focus the optional note box. */
   noteRequest?: number;
@@ -138,7 +138,7 @@ export function Panel(props: PanelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.doneRequest]);
 
-  // On hold picked on a row: open the reason box. Nothing changes until a reason is saved.
+  // Blocked picked on a row: open the reason box. Nothing changes until a reason is saved.
   useEffect(() => {
     if (!props.holdRequest) return;
     setConfirmingDone(false);
@@ -241,7 +241,7 @@ export function Panel(props: PanelProps) {
           {item.status === "hold" && item.holdReason && !holding && (
             <p className="mt-3 text-sm">
               <span className="font-medium" style={{ color: STATUS.hold.ink }}>
-                On hold:
+                Blocked:
               </span>{" "}
               {item.holdReason}{" "}
               <button type="button" onClick={() => pickStatus("hold")} className="text-xs text-muted underline-offset-4 hover:underline">
@@ -262,12 +262,12 @@ export function Panel(props: PanelProps) {
               }}
             >
               <label htmlFor="hold-reason" className="text-xs text-muted">
-                Why is it on hold? A reason is required.
+                Why is it blocked? A reason is required.
               </label>
               <input id="hold-reason" autoFocus value={holdText} onChange={(e) => setHoldText(e.target.value)} className={field} />
               <div className="flex gap-2">
                 <button type="submit" disabled={!holdText.trim()} className={primary}>
-                  Put on hold
+                  Mark blocked
                 </button>
                 <button type="button" onClick={() => setHolding(false)} className={quiet}>
                   Cancel

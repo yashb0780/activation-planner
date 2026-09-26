@@ -146,8 +146,8 @@ from the example board and 30-day plan. It needs Node.js.
   proposed first value, four milestone gates, and the work as dense rows
   grouped by week (or by lead time, owner, or module) under collapsible
   headers. Each row has a **status pill** (Not started grey, In progress
-  orange, On hold yellow, Done green) and an **owner pill**, both clickable.
-  On hold opens the side panel and only takes effect once a reason is saved;
+  orange, Blocked yellow, Done green) and an **owner pill**, both clickable.
+  Blocked opens the side panel and only takes effect once a reason is saved;
   Done asks for proof. Drift shows as a separate outlined warning chip
   ("Drifting" or "At risk"), never as a coloured pill.
 - Opening an item shows **Why it's here** (the handoff fields it came from,
