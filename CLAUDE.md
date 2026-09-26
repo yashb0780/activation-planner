@@ -37,7 +37,7 @@ conclusions as `(inferred)`.
 ## Rules
 
 **Public repo.** Customer names are always fictional, in every committed file
-(see `examples/halden-*` and `examples/coreweave-*`). No real account data, and
+(see `examples/halden-*` and `examples/acme-*`). No real account data, and
 no employer names. A real company name is allowed only for the **product being
 demoed**, as plain text (no logo, brand colours or visual identity), and only
 with the disclaimer "Unofficial demo. Not affiliated with {company}." wherever

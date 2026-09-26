@@ -1573,6 +1573,7 @@ export const people: Person[] = [
 export const dataset: Dataset = {
   id: "halden",
   label: "Halden Retail Group",
+  order: 2,
   note: "Illustrative example. Halden Retail Group is fictional.",
   account,
   items,

@@ -211,9 +211,9 @@ README.md                  this file
 SKILL.md                   how to read a handoff and generate the two outputs
 templates/handoff.md       blank handoff — the fields the planner reads
 config/itsm.md             example product config (fictional ITSM product)
-config/coreweave.md        unofficial demo product config; unconfirmed points marked VERIFY
+config/                    one more product config: the default demo's (see "Examples, real names and private files")
 examples/                  three filled handoffs, each with its board and 30-day plan (acme-* was filled by a handoff agent)
-src/data/coreweave.ts      the tracker's default example (unofficial CoreWeave demo)
+src/data/                  the tracker's examples, one file each; the default demo has a product file and an account file
 src/                       the activation tracker app (React + TypeScript)
 src/data/halden.ts         the tracker's items, People list and drift thresholds, built from the example
 src/data/acme.ts           the agent-filled example, for the tracker
@@ -227,17 +227,18 @@ TODO.md                    parked issues
 
 ### Examples, real names and private files
 
-The tracker opens on an **unofficial CoreWeave demo**: a fictional customer,
-Veltmoor Labs, activating onto CoreWeave (`config/coreweave.md`,
-`examples/coreweave-*`, `src/data/coreweave.ts`). It is not affiliated with
-CoreWeave. The product is named as plain text only, and every timeline is an
-estimate: unconfirmed points are marked VERIFY in the config and shown as
-"estimate" in the app. The fictional ITSM example, Halden Retail Group, is in
-the example switch.
+The tracker opens on the default demo:
+
+Unofficial demo of a hypothetical engagement, not affiliated with LangChain or CoreWeave: LangChain (the product) activating CoreWeave (the customer), in `config/langchain.md`, `examples/langchain-coreweave-*` and `src/data/langchain-*.ts`.
+
+Every person, number and date in it is fictional, the product is named as plain
+text only, and every lead time is an estimate. The fictional ITSM examples,
+Halden Retail Group and Acme Corp, are in the example switch.
 
 The rule for real names: a real company may be named only as the **product
 being demoed**, with the unofficial-demo disclaimer, and never with its logo,
-colours or visual identity. **Customers are always fictional.**
+colours or visual identity. **Customers are always fictional**, with one
+exception for the default demo, set out in `CLAUDE.md`.
 
 `.gitignore` still excludes every `private-*` file in `config/`, `examples/`
 and `src/data/`, for anything that should stay off the public repo. A private

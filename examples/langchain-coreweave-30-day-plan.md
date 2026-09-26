@@ -115,7 +115,7 @@ traces flowing on test tickets.
     vendor questionnaire.
     *Owners: CSM (us); Security contact (them) · From: Security review required before deployment · Review status · Open items at signature (questionnaire, pen test report, DPA, insurance) · product config*
     *Done when:* Questionnaire received from Lena · The security reports she needs are listed
-- **Baseline capture.** One section 10 number is `UNKNOWN`: agent runs per month
+- **Capture baselines.** One section 10 number is `UNKNOWN`: agent runs per month
   expected in production. Capture it before any module is configured.
   *Owners: CSM (us); Technical owner (them) · From: Agent runs per month expected in production*
   *Done when:* Expected runs per month recorded, labelled estimate or measured
@@ -258,7 +258,7 @@ room.
 
 **Starting**
 
-- **Day 30 review.**
+- **Hold the day 30 review.**
   *Owners: CSM (us); Technical owner, Exec sponsor (them) · From: Target go-live date · What is driving it (audit, contract expiry, office opening, fiscal year, board promise)*
   *Done when:* Held with Tomás and the exec sponsor · Go-live date checked against the Deployment window · Security review status written down with a date
 

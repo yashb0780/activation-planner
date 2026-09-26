@@ -195,6 +195,8 @@ export interface Dataset {
   id: string;
   /** Short name for the example switch. */
   label: string;
+  /** Place in the example switch, lowest first. The first is the default on load. Absent: last. */
+  order?: number;
   /** Footer line, e.g. "Illustrative example. X is fictional." */
   note: string;
   /** Show the product as the header title, with the customer underneath. For a product demo. */
@@ -203,6 +205,9 @@ export interface Dataset {
   fictionalCustomer?: boolean;
   /** A quiet line under the header, e.g. an unofficial-demo disclaimer. */
   disclaimer?: string;
+  /** A fixed demo date, YYYY-MM-DD. Drift, overdue and "this week" are checked against it
+   *  instead of today, so the demo looks the same whenever it is opened. ?asof= still wins. */
+  asOf?: string;
   account: Account;
   items: Item[];
   roles: Role[];

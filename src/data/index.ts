@@ -1,11 +1,12 @@
-import { dataset as acme } from "./acme";
-import { dataset as coreweave } from "./coreweave";
-import { dataset as halden } from "./halden";
 import type { Dataset } from "../types";
 
-// The examples the tracker can show. The first is the default on load.
-// Private demos live in src/data/private-*.ts, which git ignores; each exports
-// `dataset` and joins the switch when present.
-const privates = import.meta.glob<Dataset>("./private-*.ts", { eager: true, import: "dataset" });
+// The examples the tracker can show: every file in this folder that exports
+// `dataset`, found automatically, so this file never names one. Files that
+// export no dataset (a shared product file) are skipped. Private demos live in
+// src/data/private-*.ts, which git ignores, and join the same way when present.
+// Order: by each dataset's `order`, lowest first; the first is the default on load.
+const files = import.meta.glob<{ dataset?: Dataset }>(["./*.ts", "!./index.ts"], { eager: true });
 
-export const datasets: Dataset[] = [coreweave, halden, acme, ...Object.values(privates)];
+export const datasets: Dataset[] = Object.values(files)
+  .flatMap((f) => (f.dataset ? [f.dataset] : []))
+  .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));

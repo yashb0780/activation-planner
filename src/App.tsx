@@ -26,10 +26,11 @@ const REVIEW_SECTIONS = [
   { id: "success-plan", label: "Success plan" },
 ] as const;
 
-/** The date drift and "this week" are checked against. ?asof=YYYY-MM-DD overrides today, for reviewing. */
-function readAsOf(): string {
+/** The date drift and "this week" are checked against. ?asof=YYYY-MM-DD wins, for reviewing;
+ *  then the dataset's fixed demo date, if it has one; then today. */
+function readAsOf(pinned?: string): string {
   const v = new URLSearchParams(window.location.search).get("asof");
-  return v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : todayIso();
+  return v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : (pinned ?? todayIso());
 }
 
 const seg = (active: boolean) =>
@@ -42,7 +43,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
   const { account, configFieldLabels, driftRules, firstValue, gateGaps, gates, people, successPlan } = data;
   const tracker = useTracker(`activation-tracker:${data.id}:v2`, data.items, data.roles);
   const { items, saved, roles, book } = tracker;
-  const [asOf] = useState(readAsOf);
+  const [asOf] = useState(() => readAsOf(data.asOf));
   const [tab, setTab] = useState<Tab>("plan");
   const [lens, setLensState] = useState<Lens>(() => readPref("activation-tracker:group-by:v2", "week", LENSES));
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -473,7 +474,10 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
             {!customerView && <span>j / k move · Enter open · s status · o owner · x done · v view · ⌘K commands</span>}
             {customerView && <span>v switches back to Internal</span>}
             <span>Saved in this browser only</span>
-            {!customerView && <span>Drift checked as of {formatDate(asOf, true)}</span>}
+            <span>
+              As of {formatDate(asOf, true)}
+              {data.asOf && asOf === data.asOf ? " (demo date)" : ""}
+            </span>
             <span>{data.note}</span>
           </footer>
         </main>

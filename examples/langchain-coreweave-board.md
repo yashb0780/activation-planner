@@ -2,7 +2,7 @@
 
 # Activation board: CoreWeave
 
-**Status: Draft, 0 of 8 sections reviewed.** Tick each section's box as you
+**Status: Draft, 0 of 9 sections reviewed.** Tick each section's box as you
 review it. Change this line to `Status: Reviewed` only when every box is ticked.
 
 Handoff gate: all required fields filled. One of them, time to triage a ticket
@@ -333,3 +333,57 @@ The config gives three. *From: product config*
 Two of six are already happening, one is avoidable if acted on this week, and
 three are not yet visible. The week-one agenda is people and decisions: the exec
 sponsor, Owen, the platform owner, and where traces live.
+
+## Item index
+
+- [ ] Reviewed
+
+Every item on this board, one row each, in plan order: the tasks, decisions and
+open questions above, plus the config steps the plan schedules after day 30.
+Names are the config's short titles; open questions keep their wording. The
+app's item list must match this table exactly. "Week" is the plan week the item
+is due in; "after" means after day 30.
+
+| Item | Kind | Week | Module |
+|---|---|---|---|
+| Set up the organization | task | 1 | Workspace and access |
+| Create workspaces | task | 1 | Workspace and access |
+| Assign roles | task | 1 | Workspace and access |
+| Issue service keys | task | 1 | Workspace and access |
+| Draft the success plan | task | 1 | Success plan |
+| Reset go-live date or cut scope | decision | 1 | Deployment |
+| Who sponsors this on your side, and who decides it worked? | question | 1 | Kickoff questions |
+| Where may traces and ticket data live, and what does your security review need from us? | question | 1 | Kickoff questions |
+| Who runs the cluster the agent will live on? | question | 1 | Kickoff questions |
+| Who owns your identity provider, and who needs access where? | question | 1 | Kickoff questions |
+| What should the agent's quality be measured against? | question | 1 | Kickoff questions |
+| When the agent stops triaging at 3am, who should hear about it? | question | 1 | Kickoff questions |
+| Identify exec sponsor | task | 1 | People |
+| Raise: SSO promised for week 1, lead time 1 to 4 weeks | task | 1 | Workspace and access |
+| Raise: deployment by day 30, Tomás and Lena disagree | task | 1 | Deployment |
+| Name the customer admin | task | 1 | Workspace and access |
+| Confirm SSO provider | task | 1 | Workspace and access |
+| Set up SSO | task | 1 | Workspace and access |
+| Decide where traces live | decision | 1 | Observability |
+| Open the security review | task | 1 | Deployment |
+| Capture baselines | task | 1 | Baseline |
+| Pick test data | task | 1 | Observability |
+| Turn on tracing | task | 1 | Observability |
+| Choose the deployment option | decision | 2 | Deployment |
+| Name the platform owner | task | 2 | Deployment |
+| Agree what a good triage is | task | 2 | Evaluation |
+| Name a reviewer | task | 2 | Evaluation |
+| Prepare their infrastructure | task | 3 | Deployment |
+| Mask sensitive fields | task | 3 | Observability |
+| Name the alert owner | task | 3 | Monitoring and alerts |
+| Hold the day 30 review | task | 4 | Review |
+| Deploy the agent | task | after | Deployment |
+| Record security sign-off | task | after | Deployment |
+| Trace production traffic | task | after | Observability |
+| Build the eval dataset | task | after | Evaluation |
+| Choose evaluators | task | after | Evaluation |
+| Run a baseline experiment | task | after | Evaluation |
+| Turn on online evaluators | task | after | Evaluation |
+| Build a project dashboard | task | after | Monitoring and alerts |
+| Set alert thresholds | task | after | Monitoring and alerts |
+| Route alerts to on-call | task | after | Monitoring and alerts |
