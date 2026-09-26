@@ -193,6 +193,7 @@ The ID column is for the app. Don't edit it.
 | Review status | security_review_status | not started | CSM |
 | Who owns security sign-off on their side | security_signoff | Lena Hartmann | Call recording, commercial call, 2026-09-03 |
 | Open items at signature (questionnaire, pen test report, DPA, insurance) | security_open_items | Their vendor questionnaire, not yet sent to us. DPA with their legal team. | CSM |
+| About how many weeks do their security or IT approvals take? (min to max) | approval_lead_time | 3 to 4 | Lena, call recording, commercial call, 2026-09-03 |
 | Certifications they need from us | certifications | Lena asked for our security reports. Which ones was not said. | |
 | Data residency or regional hosting requirements | data_residency | Customer ticket data must stay inside their environment. | Lena, call recording, commercial call, 2026-09-03 |
 | Restrictions on installing software or outbound connections | install_restrictions | Outbound connections from their production cluster need a firewall change request approved by IT. | Call recording, technical call, 2026-09-01 |

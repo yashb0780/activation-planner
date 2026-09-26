@@ -43,6 +43,7 @@ export const HANDOFF_FIELDS: Record<string, string> = {
   security_review_status: "Review status",
   security_signoff: "Who owns security sign-off on their side",
   security_open_items: "Open items at signature (questionnaire, pen test report, DPA, insurance)",
+  approval_lead_time: "About how many weeks do their security or IT approvals take? (min to max)",
   certifications: "Certifications they need from us",
   data_residency: "Data residency or regional hosting requirements",
   install_restrictions: "Restrictions on installing software or outbound connections",

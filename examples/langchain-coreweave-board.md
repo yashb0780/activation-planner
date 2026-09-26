@@ -122,10 +122,11 @@ week of real traffic. Ask: Tomás Varga.
    `UNKNOWN`). The config's SSO lead time is long when the identity team sits
    outside the buying team, and it does: Owen Achebe has not been on a call and
    has not heard about the project from us. Workspace and access is therefore
-   planned at its long reading, 1 to 4 weeks. **Promised week 1, lead time 1 to
-   4 weeks: reset expectations at kickoff.** The timing stays as promised on the
-   board; it is not moved.
-   *From: Commitments made during the sales cycle · Anything promised on timing specifically · Anything promised we are not sure we can deliver · Identity / IT contact · product config*
+   planned at its long reading, 1 to 4 weeks, and SSO waits for their IT
+   approval, which takes 3 to 4 weeks (Lena, commercial call). **Promised week
+   1, lead time 4 to 8 weeks: reset expectations at kickoff.** The timing stays
+   as promised on the board; it is not moved.
+   *From: Commitments made during the sales cycle · Anything promised on timing specifically · Anything promised we are not sure we can deliver · Identity / IT contact · About how many weeks do their security or IT approvals take? (min to max) · product config*
 2. **"No ticket data leaves our environment" against Hybrid.** The config says
    Hybrid keeps the agent in their infrastructure, but its traces go wherever
    the tracing endpoint points, which can be LangSmith Cloud. Choosing Hybrid
@@ -135,11 +136,12 @@ week of real traffic. Ask: Tomás Varga.
 3. **Deployment by day 30: the handoff disagrees with itself.** Tomás wants the
    agent running in their environment by day 30; Lena says nothing touching real
    tickets runs before her review, which has not started. The config's lead time
-   for Deployment is 4 to 10 weeks. Raise it at kickoff with both of them in the
+   for Deployment is 4 to 10 weeks, plus 3 to 4 for their security and IT
+   approval. Raise it at kickoff with both of them in the
    room.
    *From: Must something here be live by day 30? · Review status · Handoff notes · product config*
 4. **Deployment is already drifting on day 1.** At the long end of its lead time,
-   the latest safe start was 2026-09-02, before the contract started. See the
+   the latest safe start was 2026-08-05, before the contract started. See the
    drift check. The target date is preferred, not fixed. Week 1 decision:
    **Decide new go-live or cut scope**, owned by Tomás Varga (Step 1).
    *From: Fixed or preferred · Target go-live date · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config*
@@ -208,7 +210,7 @@ first.
 |---|---|---|---|---|---|
 | Name the customer admin | Short to name; the time budget is what slips | Tomás Varga is named admin. He has about 8 hours a week and also runs the triage rotation. | Week 1 | **Ready:** confirm his hours in writing | From: Day-to-day admin, if different · Hours per week the technical owner has for this · product config |
 | Confirm SSO provider | Short when the identity owner is in the room | Owen Achebe owns the identity provider, and has not been on a call. Which provider: not said. | Week 1 | **Ready:** Tomás introduces Owen | From: Identity / IT contact · Identity provider · product config |
-| Set up SSO. **Promised in sales:** week 1 | Long here: the identity team sits outside the buying team. Workspace and access: 1 to 4 weeks (estimate). | SSO required: `yes`. Provider not said. SCIM `UNKNOWN`. Promised week 1, lead time 1 to 4 weeks: reset expectations at kickoff (conflict 1). | Weeks 2 to 4 at the earliest, once Owen is reached | **Gated by UNKNOWN:** `identity_provider`, `provisioning_required` | From: Single sign-on required · Identity provider · Automated user provisioning (SCIM) required · Commitments made during the sales cycle · product config |
+| Set up SSO. **Promised in sales:** week 1 | 4 to 8 weeks: 1 to 4 (estimate; long here, the identity team sits outside the buying team), plus 3 to 4 for their IT approval. | SSO required: `yes`. Provider not said. SCIM `UNKNOWN`. Promised week 1, lead time 4 to 8 weeks: reset expectations at kickoff (conflict 1). | Weeks 4 to 8, counted from reaching Owen | **Gated by UNKNOWN:** `identity_provider`, `provisioning_required` | From: Single sign-on required · Identity provider · Automated user provisioning (SCIM) required · Commitments made during the sales cycle · product config |
 | Decide where traces live | Short to decide (estimate) | Ticket data must stay inside their environment. The deployment option is not decided. Nothing recorded. | Week 1 to 2 | **Ready:** Lena Hartmann and Tomás decide | From: Data residency or regional hosting requirements · Products and tiers purchased · product config |
 | Open the security review | 1 to 2 weeks on our side (estimate), plus their review | Required: `yes`. Status: not started. Sign-off: Lena Hartmann. Their questionnaire has not been sent to us. DPA with their legal team. | Our part in weeks 1 to 2; their review after that | **Ready:** ask Lena for the questionnaire | From: Security review required before deployment · Review status · Who owns security sign-off on their side · Open items at signature (questionnaire, pen test report, DPA, insurance) · product config |
 
@@ -216,7 +218,7 @@ first.
 
 | Module | Lead time | Depends on, and where each stands | Evidence it is real | Status | From |
 |---|---|---|---|---|---|
-| Workspace and access | Long here, 1 to 4 weeks (estimate): SSO depends on an identity team outside the buying team | Confirm SSO provider: not started, Owen not yet reached. List the people and roles: about 25 users (estimate), roles not assigned. | *"Their people sign in through their own identity provider, and nobody shares a login"*; *"Workspace roles match the people list, reviewed once by their admin"*; *"Someone who leaves loses access through their identity provider, without a ticket to us"* | **Gated by UNKNOWN:** `identity_provider`, `provisioning_required` | From: Single sign-on required · Identity / IT contact · Teams in scope at launch · product config |
+| Workspace and access | Long here, 4 to 8 weeks: 1 to 4 (estimate; SSO depends on an identity team outside the buying team), plus 3 to 4 for their IT approval | Confirm SSO provider: not started, Owen not yet reached. List the people and roles: about 25 users (estimate), roles not assigned. | *"Their people sign in through their own identity provider, and nobody shares a login"*; *"Workspace roles match the people list, reviewed once by their admin"*; *"Someone who leaves loses access through their identity provider, without a ticket to us"* | **Gated by UNKNOWN:** `identity_provider`, `provisioning_required` | From: Single sign-on required · Identity / IT contact · Teams in scope at launch · product config |
 
 **Requests, by volume** (`day30_required: yes`, SSO for the support
 engineering team; out of scope: access for teams outside support engineering):
@@ -248,7 +250,7 @@ tickets; out of scope: tracing their other internal agents):
 
 | Module | Lead time | Depends on, and where each stands | Evidence it is real | Status | From |
 |---|---|---|---|---|---|
-| Deployment. **Promised in sales:** "We'll help you choose between Hybrid and Self-hosted" | Long, 4 to 10 weeks (estimate). Gated by their security review and their infrastructure team. | Open the security review: not started, questionnaire not sent. Decide where traces live: not decided. Name the platform owner: nobody named; the platform team has not been on a call. Outbound connections need an IT-approved firewall change. | *"The agent handles real tickets from their infrastructure, deployed by their team through their own pipeline"*; *"They ship a new version of the agent without us"*; *"Security sign-off is recorded in writing by their security contact"* | **Blocked:** no platform owner. Unblocked by the exec sponsor, by default, because the handoff names nobody; the exec sponsor is `UNKNOWN` too. | From: Products and tiers purchased · Security review required before deployment · Who holds the credentials for each system above · Has anyone outside the buying team agreed to this · Restrictions on installing software or outbound connections · Commitments made during the sales cycle · product config |
+| Deployment. **Promised in sales:** "We'll help you choose between Hybrid and Self-hosted" | Long, 7 to 14 weeks: 4 to 10 (estimate), plus 3 to 4 for their security and IT approval. Gated by their security review and their infrastructure team. | Open the security review: not started, questionnaire not sent. Decide where traces live: not decided. Name the platform owner: nobody named; the platform team has not been on a call. Outbound connections need an IT-approved firewall change. | *"The agent handles real tickets from their infrastructure, deployed by their team through their own pipeline"*; *"They ship a new version of the agent without us"*; *"Security sign-off is recorded in writing by their security contact"* | **Blocked:** no platform owner. Unblocked by the exec sponsor, by default, because the handoff names nobody; the exec sponsor is `UNKNOWN` too. | From: Products and tiers purchased · Security review required before deployment · Who holds the credentials for each system above · Has anyone outside the buying team agreed to this · Restrictions on installing software or outbound connections · Commitments made during the sales cycle · product config |
 
 **Requests, by volume** (`day30_required: UNKNOWN`, conflict 3; out of scope:
 cloud deployment):
@@ -293,13 +295,14 @@ Checked as of **2026-09-14** (day 1). Every threshold comes from the config's
 **Drift rules**: a buffer of 0 weeks, freeze periods pause work, amber uses the
 long end of the lead time and red the short end. The freeze from 2026-10-26 to
 2026-10-30 is skipped in every count below. All lead times are estimates, so
-every flag here rests on an estimate. The app rechecks these against its own
-as-of date.
+every flag here rests on an estimate. Where the config says an item waits for
+their approval, the lead time includes their approval time, 3 to 4 weeks
+(approval_lead_time). The app rechecks these against its own as-of date.
 
 | Module | Lead time in weeks | Latest safe start | Earliest finish if started 2026-09-14 | Flag | From |
 |---|---|---|---|---|---|
-| Deployment | 4 to 10 (estimate) | 2026-09-02 | 2026-10-12 | **Drifting** (amber). Turns red from 2026-10-15 if still not started. | From: Target go-live date · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config |
-| Workspace and access (long here: identity team outside the buying team) | 1 to 4 (estimate) | 2026-10-14 | 2026-09-21 | None. Turns amber after 2026-10-14 and red from 2026-11-10 if still not started. | From: Target go-live date · Identity / IT contact · product config |
+| Deployment | 7 to 14: 4 to 10 (estimate) plus 3 to 4 for their approvals | 2026-08-05 | 2026-11-07 | **Drifting** (amber). Turns red from 2026-09-24 if still not started. | From: Target go-live date · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config |
+| Workspace and access (long here: identity team outside the buying team) | 4 to 8: 1 to 4 (estimate) plus 3 to 4 for their IT approval | 2026-09-16 | 2026-10-12 | None. Turns amber after 2026-09-16 and red from 2026-10-15 if still not started. | From: Target go-live date · Identity / IT contact · product config |
 
 Observability is short, and Evaluation and Monitoring and alerts are earned, so
 none of them is checked.

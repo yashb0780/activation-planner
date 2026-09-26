@@ -1,6 +1,7 @@
 import { isUnassigned, labelOf, nameOf, rolesFor, type RoleBook } from "./owners.ts";
+import { promiseRiskReason } from "./lead.ts";
 import { PREFIX, RULE } from "./titles.ts";
-import type { Item } from "./types";
+import type { Account, Item } from "./types";
 
 // Items the planner adds by rule, for any product. They are worked out live from the
 // plan and the People list, so naming someone on the People list makes the matching
@@ -80,7 +81,46 @@ function nameOwnerTasks(items: Item[], book: RoleBook): Item[] {
   });
 }
 
-/** The plan with every rule applied: the items as given, then the items rules add. */
-export function applyRules(items: Item[], book: RoleBook): Item[] {
-  return [...items, ...execSponsorTask(items, book), ...nameOwnerTasks(items, book)];
+/** "Ask about approval timelines", when the handoff does not say how long their approvals
+ *  take and at least one item waits for their approval. */
+function askApprovalsTask(items: Item[], account: Account): Item[] {
+  if (account.approvalWeeks) return [];
+  const waiting = items.filter((i) => i.approval?.length);
+  if (waiting.length === 0 || items.some((i) => i.title === RULE.askApprovals)) return [];
+  return [
+    {
+      id: "rule-ask-approvals",
+      title: RULE.askApprovals,
+      description: `Ask how many weeks their security or IT approvals usually take, and record it in the handoff as approval_lead_time. These wait for their approval: ${waiting
+        .map((i) => i.title)
+        .join(", ")}.`,
+      kind: "task",
+      module: waiting[0]!.module,
+      lane: "start",
+      week: 1,
+      status: "todo",
+      side: "us",
+      theirs: ["security_contact", "technical_owner"],
+      why: { facts: ["Approval timelines: not in the handoff", ...waiting.map((i) => `Waits for their approval: ${i.title}`)], source: "" },
+      from: ["approval_lead_time"],
+      doneWhen: ["Their usual approval time recorded, in weeks", "Lead times in the plan updated with it"],
+      notEvidence: [],
+      visibility: "shared",
+    },
+  ];
+}
+
+/** Promise at risk, worked out from the promised week and the lead time (with their
+ *  approval time when it applies). Items with no promised week keep what the data says. */
+function withPromiseRisk(item: Item, account: Account): Item {
+  if (item.promisedWeek === undefined) return item;
+  const reason = promiseRiskReason(item, account);
+  return { ...item, promiseRisk: reason ?? undefined };
+}
+
+/** The plan with every rule applied: the items as given (with Promise at risk worked out),
+ *  then the items rules add. */
+export function applyRules(items: Item[], book: RoleBook, account: Account): Item[] {
+  const plan = items.map((i) => withPromiseRisk(i, account));
+  return [...plan, ...execSponsorTask(plan, book), ...nameOwnerTasks(plan, book), ...askApprovalsTask(plan, account)];
 }

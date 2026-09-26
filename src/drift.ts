@@ -1,8 +1,10 @@
+import { effectiveLead } from "./lead.ts";
 import type { Account, DriftRules, Item } from "./types";
 
 // Drift flags: fixed rules, no judgement. Every threshold comes from the
 // config's Drift rules (see DriftRules). Only long-lead items with a lead time
-// in weeks are checked, and only while they have not started.
+// in weeks are checked, and only while they have not started. The lead time
+// includes the customer's approval time when the item waits for it (src/lead.ts).
 //
 //   Latest safe start = the target date, counted back by the lead time
 //   (skipping freeze days if freezes pause work), minus the buffer.
@@ -53,12 +55,13 @@ function finishFrom(from: string, weeks: number, account: Account, rules: DriftR
 }
 
 export function drift(item: Item, asOf: string, account: Account, rules: DriftRules): Drift | null {
-  if (!item.lead) return null;
-  const earliestFinish = finishFrom(asOf, item.lead[rules.redUses], account, rules);
+  const lead = effectiveLead(item, account);
+  if (!lead) return null;
+  const earliestFinish = finishFrom(asOf, lead[rules.redUses], account, rules);
   // No target date: nothing to count back from, so no latest safe start and no flag.
   if (!account.goLive) return { flag: null, latestSafeStart: null, redFrom: null, earliestFinish };
-  const amberStart = latestStart(item.lead[rules.amberUses], account.goLive, account, rules);
-  const redStart = latestStart(item.lead[rules.redUses], account.goLive, account, rules);
+  const amberStart = latestStart(lead[rules.amberUses], account.goLive, account, rules);
+  const redStart = latestStart(lead[rules.redUses], account.goLive, account, rules);
   const started = item.status === "progress" || item.status === "done";
   const flag = started ? null : asOf > redStart ? "risk" : asOf > amberStart ? "drifting" : null;
   return {

@@ -18,7 +18,7 @@ for (const file of readdirSync(dataDir).filter((f) => f.endsWith(".ts") && f !==
 }
 
 /** The plan as the app shows it on load: the demo's items plus the items rules add. */
-const full = (d: Dataset): Item[] => applyRules(d.items, new Map(d.roles.map((r) => [r.id, r])));
+const full = (d: Dataset): Item[] => applyRules(d.items, new Map(d.roles.map((r) => [r.id, r])), d.account);
 
 const RULES = new Set<string>(Object.values(RULE));
 const PREFIXES = new Set<string>(Object.values(PREFIX));

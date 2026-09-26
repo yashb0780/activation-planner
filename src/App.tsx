@@ -14,8 +14,9 @@ import { currentWeek, dueLabel, formatDate, todayIso } from "./dates";
 import { drift, type Drift } from "./drift";
 import { fieldLabel } from "./fields";
 import { buildGroups, LENS_LABEL, LENSES, type Lens } from "./grouping";
-import { RolesContext } from "./owners";
+import { RolesContext, type RoleBook } from "./owners";
 import { applyRules } from "./rules";
+import { describeLead } from "./lead";
 
 type Tab = "plan" | "success" | "people";
 
@@ -42,7 +43,8 @@ const ghost = "rounded-md border border-line px-2.5 py-1 text-muted transition-c
 
 export default function App({ data, switcher }: { data: Dataset; switcher?: ReactNode }) {
   const { account, configFieldLabels, driftRules, firstValue, gateGaps, gates, people, successPlan } = data;
-  const tracker = useTracker(`activation-tracker:${data.id}:v2`, data.items, data.roles, applyRules);
+  const derive = useCallback((items: Item[], book: RoleBook) => applyRules(items, book, data.account), [data.account]);
+  const tracker = useTracker(`activation-tracker:${data.id}:v2`, data.items, data.roles, derive);
   const { items, saved, roles, book } = tracker;
   const [asOf] = useState(() => readAsOf(data.asOf));
   const [tab, setTab] = useState<Tab>("plan");
@@ -509,6 +511,7 @@ export default function App({ data, switcher }: { data: Dataset; switcher?: Reac
               ...openItem.from.filter((f) => f === "config"),
             ].map((f) => fieldLabel(f, openItem.module, configFieldLabels))}
             due={dueLabel(openItem.week, account)}
+            lead={describeLead(openItem, account)}
             dependencies={(openItem.dependsOn ?? []).flatMap((id) => visible.filter((i) => i.id === id))}
             onOpenItem={open}
             drift={drifts.get(openItem.id) ?? null}

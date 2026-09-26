@@ -31,7 +31,8 @@ Technical owner (them). A task names other roles only where this plan does.
 
 **What this document is.** CoreWeave bought LangSmith to trace, evaluate and
 monitor a support triage agent, and to run it in their own environment.
-Deployment there runs 4 to 10 weeks (estimate) behind a security review that
+Deployment there runs 7 to 14 weeks (4 to 10 from the config, an estimate,
+plus 3 to 4 for their security and IT approval) behind a security review that
 has not started. A 30-day plan against that is not a list of things that will
 be finished. It answers three questions: what got started, what proof exists
 that it is moving, and what is on track to land after day 30. Nothing below is
@@ -107,8 +108,9 @@ traces flowing on test tickets.
     *Owners: CSM (us); Identity / IT contact (them) · From: Identity / IT contact · Identity provider · product config*
     *Done when:* Owen has been on a call · Identity provider named · SCIM required, yes or no
   - **Set up SSO. Promised in sales: SSO in week 1.** Promised week 1, lead
-    time 1 to 4 weeks: reset expectations at kickoff (board conflict 1). The
-    work starts this week with Owen.
+    time 4 to 8 weeks, including 3 to 4 for their IT approval: reset
+    expectations at kickoff (board conflict 1). The work starts this week with
+    Owen.
     *Owners: CSM (us); Identity / IT contact (them) · From: Commitments made during the sales cycle · Single sign-on required · Identity provider · Automated user provisioning (SCIM) required · product config*
     *Done when:* New SSO timing agreed with Tomás · Owen has what he needs to add the app
   - **Decide where traces live.** Ticket data must stay inside their
@@ -311,19 +313,21 @@ Not a pass/fail list. Three categories.
 
 - [ ] Reviewed
 
-Windows are the config's lead times (all estimates), anchored to the event that
-starts the clock. They are windows, not dates. The freeze from 2026-10-26 to
+Windows are the config's lead times (all estimates), plus their approval time
+(3 to 4 weeks) where the config says an item waits for it, anchored to the
+event that starts the clock. They are windows, not dates. The freeze from 2026-10-26 to
 2026-10-30 is counted: it adds five days to any window that crosses it.
 
 | Module | Window | What has to stay true | Drift flag (as of day 1) | From |
 |---|---|---|---|---|
-| SSO | 1 to 4 weeks from reaching Owen. **Promised in sales:** week 1. | Owen is reached in week 1. | Not flagged: finishes inside its window | From: Commitments made during the sales cycle · Identity / IT contact · product config |
-| Deployment | 4 to 10 weeks from the security review allowing work to start, plus five freeze days if the runway crosses 26 to 30 October. Started on day 1, the earliest finish would be 2026-10-12; at the long end it would be after the target date. | The questionnaire comes back in week 2, and a platform owner is named by week 2. | **Drifting** (amber); red from 2026-10-15 if not started | From: Products and tiers purchased · Target go-live date · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config |
+| SSO | 4 to 8 weeks from reaching Owen: 1 to 4, plus 3 to 4 for their IT approval. **Promised in sales:** week 1. | Owen is reached in week 1. | None on day 1; drifting after 2026-09-16 and red from 2026-10-15 if not started | From: Commitments made during the sales cycle · Identity / IT contact · product config |
+| Deployment | 7 to 14 weeks (4 to 10, plus 3 to 4 for their security and IT approval) from the security review allowing work to start, plus five freeze days if the runway crosses 26 to 30 October. Started on day 1, the earliest finish would be 2026-11-07; at the long end it would be after the target date. | The questionnaire comes back in week 2, and a platform owner is named in week 1. | **Drifting** (amber); red from 2026-09-24 if not started | From: Products and tiers purchased · Target go-live date · Known freeze periods, as YYYY-MM-DD to YYYY-MM-DD (quarter end, holiday change freeze) · product config |
 | Evaluation | 2 to 4 weeks after a week of production traffic | Real tickets may be traced; a reviewer is named. | Not checked: earned | From: product config |
 | Monitoring and alerts | 1 to 2 weeks after the first week of production traffic | An alert owner is named. | Not checked: earned | From: product config |
 
 **What this means for go-live, said plainly.** Go-live on 2026-11-16 holds only
-if Deployment lands near the short end of its lead time. That depends on two
+if Deployment starts by 2026-09-23 and lands at the short end of its lead time,
+including their approvals. That depends on two
 things this plan cannot do alone: Lena's review moving in weeks 1 and 2, and a
 platform owner appearing. Worth saying at kickoff, not at the day 30 review.
 

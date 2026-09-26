@@ -6,6 +6,8 @@ export type Week = 1 | 2 | 3 | 4 | "after";
 export type Status = "todo" | "progress" | "hold" | "done";
 export type Side = "us" | "customer";
 export type Visibility = "internal" | "shared";
+/** Kinds of customer sign-off a config item can wait for. */
+export type Approval = "security" | "IT" | "procurement";
 
 /** task: work on the plan. decision: a choice someone has to make and record.
  *  question: an UNKNOWN in the handoff, including "find out the volume". */
@@ -61,6 +63,12 @@ export interface Item {
   from: string[];
   /** Lead time in weeks, from the config, for long-lead items the drift check watches. */
   lead?: { min: number; max: number };
+  /** The customer sign-offs this item waits for, from the config's "Needs customer approval".
+   *  Their approval time (Account.approvalWeeks) is added to its lead time. */
+  approval?: Approval[];
+  /** The week a sales promise said this would be done by, when the commitments table gives
+   *  one as a number. Used to work out "Promise at risk". */
+  promisedWeek?: number;
   /** 2 to 3 short checks anyone could verify by looking. */
   doneWhen: string[];
   /** The config's "Evidence it is real" lines for this module, quoted unedited. */
@@ -73,8 +81,9 @@ export interface Item {
   /** A row of the handoff's commitments table this item carries: the promise and its
    *  stated timing, as recorded. Shown as "Promised in sales". */
   promised?: string;
-  /** Set when the promised timing is shorter than the config's lead time. The timing is
-   *  not moved; this says so. Shown as "Promise at risk". */
+  /** Set when the promised timing is shorter than the lead time. The timing is not moved;
+   *  this says so. Shown as "Promise at risk". Worked out by src/rules.ts when promisedWeek
+   *  is set; otherwise written in the demo data. */
   promiseRisk?: string;
   /** Set when the item rests on an answer sourced "agent's read": the agent's reason.
    *  Shown as "Verify". Never the only basis for a date, milestone or commitment. */
@@ -105,6 +114,9 @@ export interface Account {
   windowEnd: string;
   /** Target go-live date. Absent when the handoff's target date is UNKNOWN. */
   goLive?: string;
+  /** approval_lead_time from the handoff: how many weeks their security or IT approvals
+   *  usually take. Absent when the handoff leaves it blank. */
+  approvalWeeks?: { min: number; max: number };
 }
 
 export interface FirstValue {

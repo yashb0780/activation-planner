@@ -54,6 +54,8 @@ interface PanelProps {
   sources: string[];
   /** "20 Sept", or "After day 30". */
   due: string;
+  /** The lead time in words, with their approval time when it applies. Null: none set. */
+  lead: string | null;
   /** Items this one depends on, as the current view shows them. */
   dependencies: Item[];
   /** Open another item's panel, from the dependency list. */
@@ -360,11 +362,7 @@ export function Panel(props: PanelProps) {
             <dt className="text-xs leading-5 text-muted">Due</dt>
             <dd className="tabular">{props.due}</dd>
             <dt className="text-xs leading-5 text-muted">Lead time</dt>
-            <dd>
-              {item.lead
-                ? `${item.lead.min === item.lead.max ? item.lead.min : `${item.lead.min} to ${item.lead.max}`} weeks, from the product config`
-                : "None set in the product config"}
-            </dd>
+            <dd>{props.lead ?? "None set in the product config"}</dd>
             <dt className="text-xs leading-5 text-muted">Module</dt>
             <dd>{item.module}</dd>
           </dl>

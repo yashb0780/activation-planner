@@ -286,6 +286,17 @@ each one, find the handoff field that decides it.
   boundary is usually the largest single lever on the target date, and the
   config will normally say so — carry that reasoning through.
 
+**Their approval time.** If the handoff gives `approval_lead_time` (weeks,
+like `3 to 4`), add it to the lead time of every item the config marks **Needs
+customer approval**, and say so wherever the lead time appears: "4 to 8 weeks:
+1 to 4 from the config, plus 3 to 4 for their IT approval". Drift checks use
+the combined lead time. A sales promise with a stated week is **Promise at
+risk** when even the short end of the combined lead time is longer than the
+weeks promised; give the reason in one line. If `approval_lead_time` is blank,
+lead times are the config's alone, and week 1 gets a task
+`Ask about approval timelines` (only when the config marks at least one item).
+It is optional: a blank never becomes a guess.
+
 ## Step 3 — Status each module
 
 - **Ready** — dependencies are met or are themselves in scope and earlier in

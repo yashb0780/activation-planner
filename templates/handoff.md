@@ -150,12 +150,15 @@ The ID column is for the app. Don't edit it.
 
 *The most common single cause of a blown activation date. Ask even when they say there are none.*
 
+*`approval_lead_time` is optional. Write it as weeks, like `3 to 4` or `2`, or leave it blank. The planner adds it to the lead time of every item the product config says needs their approval.*
+
 | Field | ID | Answer | Source |
 |---|---|---|---|
 | Security review required before deployment | security_review | yes / no / UNKNOWN | |
 | Review status | security_review_status | not started / submitted / approved / UNKNOWN | |
 | Who owns security sign-off on their side | security_signoff | | |
 | Open items at signature (questionnaire, pen test report, DPA, insurance) | security_open_items | | |
+| About how many weeks do their security or IT approvals take? (min to max) | approval_lead_time | | |
 | Certifications they need from us | certifications | | |
 | Data residency or regional hosting requirements | data_residency | | |
 | Restrictions on installing software or outbound connections | install_restrictions | | |

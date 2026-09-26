@@ -18,6 +18,8 @@ const account: Account = {
   windowStart: "2026-09-14",
   windowEnd: "2026-10-13",
   goLive: "2026-11-16",
+  // approval_lead_time: "3 to 4" (weeks)
+  approvalWeeks: { min: 3, max: 4 },
   // freeze_periods: "2026-10-26 to 2026-10-30. Platform change freeze, no production changes."
   freezes: [{ start: "2026-10-26", end: "2026-10-30" }],
 };
@@ -43,7 +45,7 @@ const TECHNICAL = "Call recording, technical call, 2026-09-01";
 const DISCOVERY = "Call recording, discovery call, 2026-08-26";
 const Q_DONE = ["Every checklist line ticked, or given an owner and a date", "Their answer saved on the question"];
 const DEPLOY_WINDOW =
-  "4 to 10 weeks (estimate) from the security review allowing work to start, plus five freeze days if the runway crosses 26 to 30 October. At the long end it finishes after the target date.";
+  "7 to 14 weeks (4 to 10 from the config, an estimate, plus 3 to 4 for their approvals) from the security review allowing work to start, plus five freeze days if the runway crosses 26 to 30 October. At the long end it finishes after the target date.";
 const EARNED_WINDOW = "After one week of production traffic, which waits on Deployment.";
 
 const items: Item[] = [
@@ -166,7 +168,7 @@ const items: Item[] = [
     theirs: ["technical_owner"],
     why: {
       facts: [
-        "Deployment lead time: 4 to 10 weeks (estimate)",
+        "Deployment lead time: 7 to 14 weeks, with 3 to 4 for their approvals",
         "At the long end of its lead time it finishes after 2026-11-16",
         "The target date is preferred, not fixed",
         "Options: move the target date, or cut what must be live on 2026-11-16",
@@ -418,7 +420,7 @@ const items: Item[] = [
       facts: [
         "Tomás wants the agent running in their environment by day 30",
         "Lena: nothing touching real tickets runs before her review",
-        "Deployment lead time: 4 to 10 weeks (estimate)",
+        "Deployment lead time: 7 to 14 weeks, with 3 to 4 for their approvals",
       ],
       source: COMMERCIAL,
     },
@@ -486,12 +488,13 @@ const items: Item[] = [
     dependsOn: ["f-sso-provider"],
     from: ["sso_required", "identity_provider", "provisioning_required", "commitments", "config"],
     lead: LEAD.access,
+    approval: ["IT"],
+    promisedWeek: 1,
     doneWhen: ["SSO configured", "One support engineer signs in through SSO"],
     evidence: EVIDENCE.access,
     notEvidence: NOT_EVIDENCE.access,
     visibility: "shared",
     promised: "\"SSO will be live in week 1\" (M. Osei to Tomás Varga, commercial call, 2026-09-03)",
-    promiseRisk: "Promised week 1, lead time 1 to 4 weeks (estimate): reset expectations at kickoff.",
   },
   {
     id: "f-traces",
@@ -536,6 +539,7 @@ const items: Item[] = [
       source: COMMERCIAL,
     },
     from: ["security_review", "security_review_status", "security_signoff", "security_open_items", "config"],
+    approval: ["security"],
     doneWhen: ["Questionnaire received from Lena", "The security reports she needs are listed"],
     notEvidence: [],
     visibility: "shared",
@@ -673,13 +677,14 @@ const items: Item[] = [
       facts: [
         "The cluster, datastores and network access the chosen option needs",
         "Outbound connections need an IT-approved firewall change",
-        "Deployment lead time: 4 to 10 weeks (estimate)",
+        "Deployment lead time: 4 to 10 weeks (estimate), plus 3 to 4 for their approvals",
       ],
       source: TECHNICAL,
     },
     dependsOn: ["d-option", "rule-name-owner-platform_owner", "f-review"],
     from: ["install_restrictions", "credential_holders", "config"],
     lead: LEAD.deployment,
+    approval: ["security", "IT"],
     doneWhen: ["The cluster for the agent named", "Firewall change request raised with IT", "Datastores listed, if Self-hosted"],
     notEvidence: [],
     visibility: "shared",
