@@ -45,6 +45,14 @@ the demo is shown. Anything else real goes in `private-*` files in `config/`,
 `examples/` and `src/data/`, which git ignores. The public build must work
 without them.
 
+**One exception: the LangChain demo.** It shows a hypothetical engagement with a
+real customer, CoreWeave. LangChain and CoreWeave may appear only in
+`config/langchain.md`, `examples/langchain-coreweave-*`, `src/data/langchain-*.ts`,
+this line, and one README line describing the demo. Wherever the demo is shown,
+it carries the banner "Unofficial demo of a hypothetical engagement. Not
+affiliated with LangChain or CoreWeave. Scenario, people, and timelines are
+fictional estimates." Every person, number and date in it is fictional.
+
 **Scope.** Only work inside this folder. Never read or modify other folders in
 `~/projects`.
 
